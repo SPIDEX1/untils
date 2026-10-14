@@ -208,7 +208,6 @@ fsb.addEventListener("keydown",e=>{if(e.key=="Enter"||e.key==" "){e.preventDefau
 
 $("nv").onclick=e=>{const a=e.target.closest("a");if(a){e.preventDefault();navStack.length=0;show(a.dataset.v)}};
 let tt;function toast(t){const e=$("toast");e.textContent=t;e.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),2400)}
-$("devl").onclick=e=>{e.preventDefault();toast("Developer page is coming soon.")};
 $("sell").onclick=e=>{e.preventDefault();toast("Seller page is coming soon.")};
 
 /* ---- store ---- */
