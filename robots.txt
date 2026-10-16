@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /cart/
+Disallow: /developers/dashboard/
 
 Sitemap: https://untils.pages.dev/sitemap.xml
