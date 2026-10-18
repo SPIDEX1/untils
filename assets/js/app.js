@@ -74,7 +74,7 @@ $("bar").onclick=e=>{
  const s=e.target.closest("[data-s]");if(s){sort=s.dataset.s;render();return}
  const c=e.target.dataset.c;if(c){cat=c;render()}};
 document.addEventListener("click",e=>{if(!e.target.closest(".dd")&&$("ddm")){$("ddm").hidden=true;$("ddb").setAttribute("aria-expanded",false)}});
-$("sb").onclick=()=>{const o=$("sr").classList.toggle("open");if(o)$("q").focus();else{$("q").value="";q="";sq="";render();renderStore()}};
+$("sb").onclick=()=>{$("q").focus()};
 $("q").oninput=e=>{
  const t=e.target.value.trim().toLowerCase();q=t;sq=t;
  const gm=!t||games.some(g=>g[0].toLowerCase().includes(t)),pm=!t||prods.some(x=>(x[0]+" "+x[1]+" "+x[3]).toLowerCase().includes(t));
@@ -206,7 +206,7 @@ fsb.addEventListener("pointerup",()=>{const d=drag;drag=null;if(!d)return;if(d.m
 fsb.addEventListener("pointercancel",()=>{if(drag&&drag.moved)snap();drag=null});
 fsb.addEventListener("keydown",e=>{if(e.key=="Enter"||e.key==" "){e.preventDefault();exitFs()}});
 
-$("nv").onclick=e=>{const a=e.target.closest("a");if(a){e.preventDefault();navStack.length=0;show(a.dataset.v)}};
+$("nv").onclick=e=>{const a=e.target.closest("a");if(a&&a.dataset.v){e.preventDefault();navStack.length=0;show(a.dataset.v)}};
 let tt;function toast(t){const e=$("toast");e.textContent=t;e.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),2400)}
 $("sell").onclick=e=>{e.preventDefault();toast("Seller page is coming soon.")};
 
