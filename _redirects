@@ -1,0 +1,4 @@
+/store /games/ 301
+/store/* /games/ 301
+/cart /games/ 301
+/cart/* /games/ 301

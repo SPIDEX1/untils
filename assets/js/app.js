@@ -49,7 +49,8 @@ function route(p){
   else if(seg[0]=="games"){
    const g=seg[1]&&games.find(x=>slug(x[0])==seg[1]);
    if(g)openGame(g[0]);else show("home")}
-  else if(seg[0]=="store"){
+  else if(seg[0]=="store"||seg[0]=="cart"){try{history.replaceState(null,"","/games/")}catch(e){}show("home")}
+  else if(false){
    const i=seg[1]?prods.findIndex(x=>slug(x[0])==seg[1]):-1;
    if(i>=0)openProduct(i,true);else show("store")}
   else if(seg[0]=="about")show("about");
@@ -79,7 +80,7 @@ $("q").oninput=e=>{
  const t=e.target.value.trim().toLowerCase();q=t;sq=t;
  const gm=!t||games.some(g=>g[0].toLowerCase().includes(t)),pm=!t||prods.some(x=>(x[0]+" "+x[1]+" "+x[3]).toLowerCase().includes(t));
  const toStore=curView=="store"?(pm||!gm):(!gm&&pm);
- show(toStore?"store":"home");render();renderStore()};
+ show("home");render();renderStore()};
 $("grid").onclick=e=>{const c=e.target.closest(".card");if(c)openGame(c.dataset.g)};
 
 /* ---- Untils SDK (demo) ---- */
