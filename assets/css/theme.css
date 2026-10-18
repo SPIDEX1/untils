@@ -292,3 +292,67 @@ nav a svg{width:24px;height:24px}
 .pic{font-size:24px}
 .dd{display:none}
 }
+
+/* ===== v4 ===== */
+/* header scrolls away with the page (not stuck on top) */
+header{position:relative!important;top:auto!important}
+
+/* category icons (SVG, like Accounts / About) */
+.pic{display:inline-flex;align-items:center;justify-content:center;line-height:0}
+.pic svg{width:22px;height:22px;display:block}
+
+/* click animation: icon inside any button / link pops */
+.ic-pop{animation:icpop .55s cubic-bezier(.34,1.56,.64,1)}
+@keyframes icpop{0%{transform:scale(1) rotate(0)}25%{transform:scale(.55) rotate(-18deg)}60%{transform:scale(1.5) rotate(12deg)}80%{transform:scale(.92) rotate(-5deg)}100%{transform:scale(1) rotate(0)}}
+#sb.ic-pop,#sb svg.ic-pop{animation-name:icspin}
+@keyframes icspin{0%{transform:scale(1) rotate(0)}40%{transform:scale(1.4) rotate(200deg)}100%{transform:scale(1) rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.ic-pop{animation:none}}
+
+/* ===== About = game-world panels ===== */
+#about{padding:6px 3vw 10px}
+.ab-hero,.ab-sec,.ab-fut{margin:18px 0;padding:34px clamp(18px,4vw,44px);border:0;border-radius:30px;background:rgba(255,255,255,.72);box-shadow:var(--sh)}
+.ab-hero{background:linear-gradient(135deg,#fff 0,#e9f6ff 55%,#c9e9ff 100%)}
+.ab-brand{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:26px}
+.ab-logo{height:58px;width:auto}
+.ab-chip{display:inline-block;background:linear-gradient(135deg,#ff9a1a,#ff4d6d);color:#fff;font:800 clamp(15px,2vw,21px) var(--fh);padding:9px 24px;border-radius:12px 40px 12px 40px;transform:rotate(-3deg);box-shadow:0 6px 14px rgba(255,90,60,.35)}
+.ut,.us{display:none}
+.eyb{display:inline-block;background:#dbeeff;color:var(--ac);padding:5px 14px;border-radius:20px;font-weight:800;letter-spacing:.08em;font-size:12px}
+.ab-sec h2,.ab-fut h2{font-size:clamp(28px,3.6vw,42px)}
+.ab-sec p,.ab-fut p{font-size:16px}
+.ab-sec:nth-of-type(4) .eyb{background:#ffe6c7;color:#d96a00}
+.ab-sec:nth-of-type(3) .eyb{background:#e6dcff;color:#6a2fd6}
+.ab-fut .eyb{background:#d9f6df;color:#1d9a45}
+
+.vg{gap:16px}
+.vc{position:relative;overflow:hidden;color:#fff;border-radius:24px;padding:22px;aspect-ratio:1/1;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 6px 16px rgba(20,90,170,.2);
+transition:transform .28s cubic-bezier(.34,1.56,.64,1),box-shadow .28s}
+.vc::before{content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.16)}
+.vc:hover{transform:translateY(-6px) scale(1.06);box-shadow:0 18px 32px rgba(10,108,255,.35),0 0 0 3px #fff;z-index:2}
+.vg .vc:nth-child(4n+1){background:linear-gradient(135deg,#2fa8ff,#0a6cff)}
+.vg .vc:nth-child(4n+2){background:linear-gradient(135deg,#2fbf5a,#7ad36b)}
+.vg .vc:nth-child(4n+3){background:linear-gradient(135deg,#ffb347,#ff6b8a)}
+.vg .vc:nth-child(4n+4){background:linear-gradient(135deg,#8a3ffc,#ff5fa2)}
+.ab-sec:nth-of-type(4) .vc{background:linear-gradient(135deg,#ffb347,#ff4d4d)!important}
+.vc .vi{background:rgba(255,255,255,.26);color:#fff;margin:0 0 auto;position:relative}
+.vc .av{background:rgba(255,255,255,.26);border:3px solid #fff;width:66px;height:66px;font-size:28px;margin:0 0 auto;position:relative;color:#fff}
+.vc h3{color:#fff;font-size:20px;position:relative;margin:14px 0 6px}
+.vc p{color:rgba(255,255,255,.95);font-size:14px;position:relative;margin:0}
+.vc small{display:inline-block;align-self:flex-start;background:rgba(255,255,255,.3);color:#fff;border-radius:20px;padding:4px 14px;margin:0;font-size:12px;letter-spacing:.06em;font-weight:800;position:relative}
+.vc:hover .vi svg,.vc:hover .av{animation:wig .6s ease-in-out 2}
+.vg.two{grid-template-columns:repeat(auto-fit,minmax(200px,260px))}
+
+.dev{background:linear-gradient(135deg,#2fbf5a,#7ad36b);border:0;color:#fff;box-shadow:0 8px 20px rgba(40,160,80,.3);transition:transform .28s cubic-bezier(.34,1.56,.64,1)}
+.dev:hover{transform:translateY(-5px) scale(1.03)}
+.dev h3{color:#fff;font-size:22px}
+.dev p{color:rgba(255,255,255,.96)}
+.dev .btn,.dev a.btn{background:#fff;color:var(--navy);box-shadow:0 6px 14px rgba(0,0,0,.18)}
+
+@media(max-width:900px){
+.ab-hero,.ab-sec,.ab-fut{margin:14px 0;padding:24px 16px;border-radius:24px}
+.ab-brand{gap:12px;margin-bottom:18px}.ab-logo{height:46px}
+.vg,.vg.two{grid-template-columns:1fr 1fr;gap:12px}
+.vg.two .vc:last-child:nth-child(odd){grid-column:auto}
+.vc{padding:16px;border-radius:20px}.vc h3{font-size:16px}.vc p{font-size:12.5px}
+.vc .av{width:54px;height:54px;font-size:22px}
+}
+@media(max-width:900px){.ab-brand{flex-wrap:nowrap;gap:8px}.ab-logo{height:36px;flex:none}.ab-chip{font-size:13px;padding:7px 14px;white-space:nowrap}}
