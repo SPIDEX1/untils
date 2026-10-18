@@ -250,3 +250,45 @@ header{padding:9px 22px}
 .sf-in{grid-template-columns:1fr 1fr}.sf-c:first-child{grid-column:1/-1}
 .mg .mt{width:100%;height:auto;aspect-ratio:1/1}
 }
+
+/* ===== v3 ===== */
+/* one font everywhere: Baloo 2 */
+:root{--fb:var(--fh)}
+body,body *{font-family:var(--fh)!important}
+
+/* home = straight to games: hide landing banner/cards + games hero */
+#landing,.hero{display:none!important}
+#home .bar{padding:20px 3vw 6px}
+
+/* category pills: icon + text on PC, icon only on mobile */
+.pills{display:flex;flex-wrap:wrap;gap:10px}
+.pill{display:inline-flex;align-items:center;gap:8px;transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.pill:hover{transform:translateY(-2px) scale(1.05)}
+.pic{font-size:20px;line-height:1}
+.ptx{font-size:15px}
+
+@media(max-width:900px){
+/* header: logo centered on top, icons row below */
+header{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px 14px;padding:10px 14px 12px;margin:8px 10px 0}
+header .lg{order:1;flex:1 1 100%;justify-content:center}
+.logo{height:46px}
+.hr{display:contents}
+.sr{display:contents}
+#sb{order:2;width:46px;height:46px;margin:0}
+#sb svg{width:22px;height:22px}
+nav{display:contents}
+nav a,nav a.sep{order:2;width:46px;height:46px;padding:0;margin:0;justify-content:center;border-radius:50%;background:#e4f0fb;border:0}
+nav a.on{background:#dbeeff}
+nav a span:last-child{display:none}
+nav a svg{width:24px;height:24px}
+.sr input,.sr.open input{display:none}
+.sr.open input{display:block;order:3;flex:1 1 100%;width:100%;background:#e4f0fb;border-radius:30px;padding:12px 18px;font-size:16px}
+.dv-signin,.dv-who{margin-left:0;order:2}
+/* categories = icons only */
+#home .bar{padding:14px 12px 4px}
+.pills{flex-wrap:nowrap;overflow:visible;justify-content:space-between;gap:6px;width:100%;margin:0;padding:0}
+.pill{flex:1 1 0;min-width:0;height:48px;padding:0;justify-content:center;border-radius:16px}
+.ptx{display:none}
+.pic{font-size:24px}
+.dd{display:none}
+}

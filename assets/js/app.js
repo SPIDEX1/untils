@@ -4,6 +4,7 @@ const games=[
 ["Star Raider","Space","Arcade",4.5,"🚀","#05051a,#3a1c71"],["Night Cabin","Adventure","Minimal",4.2,"🏚️","#0b1d1a,#27455c"],
 ["Cube Drift","Minimal","Puzzle",4.3,"🧊","#1a1d26,#5b6478"],["Neon Snake","Arcade","Action",4.6,"🐍","#0d0221,#00f5d4"]];
 const cats=["All","Popular","IO","Arcade","Puzzle","Action","Minimal"];
+const catIcon={All:"🎮",Popular:"🔥",IO:"🌐",Arcade:"🕹️",Puzzle:"🧩",Action:"💥",Minimal:"🧊"};
 let cat="All",sort="Popular",q="",sq="";
 const $=id=>document.getElementById(id);
 var curView="home";function _show(v){curView=v;["landing","home","game","about","store","product","cart"].forEach(x=>$(x).style.display=x==v?"block":"none");if(v!="game")stopGame();document.querySelectorAll("#nv a").forEach(a=>a.classList.toggle("on",a.dataset.v==(v=="product"||v=="cart"?"store":v=="about"||v=="store"||v=="landing"?v:"home")));window.scrollTo(0,0)}
@@ -11,7 +12,7 @@ var curView="home";function _show(v){curView=v;["landing","home","game","about",
 const slug=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
 let routing=false;
 function urlFor(v){
- if(v=="home")return"/games/";if(v=="about")return"/about/";if(v=="store")return"/store/";if(v=="cart")return"/cart/";
+ if(v=="home")return"/";if(v=="about")return"/about/";if(v=="store")return"/store/";if(v=="cart")return"/cart/";
  if(v=="game")return"/games/"+slug(cur)+"/";
  if(v=="product")return"/store/"+slug(prods[curProd][0])+"/";
  return"/"}
@@ -20,7 +21,7 @@ function pageMeta(v){
  if(v=="product"){const x=prods[curProd];return[x[0]+" - Handmade "+x[1]+" | UNTILS Store",x[3]]}
  return({
   landing:["UNTILS - Unique Things. Endless Possibilities.","UNTILS is your space to play free HTML5 games and shop unique handmade things."],
-  home:["Play Free Online Games | UNTILS","Play fun, free HTML5 games on UNTILS. IO, arcade, puzzle and action games that run right in your browser."],
+  home:["UNTILS - Play Free Online Games","Play fun, free HTML5 games on UNTILS. IO, arcade, puzzle and action games that run right in your browser."],
   store:["Store - Unique Handmade Products | UNTILS","Handmade glowing lamps, decor, gadgets and art. Unique products, made with passion."],
   about:["About UNTILS - Our Story","UNTILS was born from a simple belief: even the smallest things can create the biggest impact. Meet the team and our vision."],
   cart:["Your Cart | UNTILS","Review the items in your UNTILS cart."]})[v]}
@@ -45,7 +46,7 @@ function route(p){
  try{
   navStack.length=0;
   const seg=p.replace(/index\.html$/,"").split("/").filter(Boolean);
-  if(!seg.length)show("landing");
+  if(!seg.length)show("home");
   else if(seg[0]=="games"){
    const g=seg[1]&&games.find(x=>slug(x[0])==seg[1]);
    if(g)openGame(g[0]);else show("home")}
@@ -55,7 +56,7 @@ function route(p){
    if(i>=0)openProduct(i,true);else show("store")}
   else if(seg[0]=="about")show("about");
   else if(seg[0]=="cart"){renderCart();show("cart")}
-  else show("landing");
+  else show("home");
  }finally{routing=false}}
 function go(p){try{history.pushState(null,"",p)}catch(e){}route(p)}
 addEventListener("popstate",()=>route(location.pathname));
@@ -64,7 +65,7 @@ document.addEventListener("click",e=>{
  if(!a||e.metaKey||e.ctrlKey||e.shiftKey||e.button)return;
  e.preventDefault();go(a.getAttribute("href"))});
 function render(){
- $("bar").innerHTML='<div class="pills">'+cats.map(c=>`<button class="pill ${c==cat?"on":""}" data-c="${c}">${c.toUpperCase()}</button>`).join("")+'</div>'+`<div class="dd">SORT BY<button class="ddb" id="ddb" aria-expanded="false" aria-haspopup="listbox">${sort}<svg viewBox="0 0 10 6" width="10" height="6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button><ul class="ddm" id="ddm" role="listbox" hidden>${["Popular","Rating","Name"].map(s=>`<li role="option" data-s="${s}" class="${s==sort?"on":""}">${s}</li>`).join("")}</ul></div>`;
+ $("bar").innerHTML='<div class="pills">'+cats.map(c=>`<button class="pill ${c==cat?"on":""}" data-c="${c}" aria-label="${c}" title="${c}"><span class="pic">${catIcon[c]}</span><span class="ptx">${c.toUpperCase()}</span></button>`).join("")+'</div>'+`<div class="dd">SORT BY<button class="ddb" id="ddb" aria-expanded="false" aria-haspopup="listbox">${sort}<svg viewBox="0 0 10 6" width="10" height="6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button><ul class="ddm" id="ddm" role="listbox" hidden>${["Popular","Rating","Name"].map(s=>`<li role="option" data-s="${s}" class="${s==sort?"on":""}">${s}</li>`).join("")}</ul></div>`;
  let l=games.filter(g=>cat=="All"||cat=="Popular"?g[3]>=(cat=="Popular"?4.5:0):[g[1],g[2]].includes(cat));
  if(q)l=l.filter(g=>g[0].toLowerCase().includes(q));
  if(sort=="Name")l.sort((a,b)=>a[0].localeCompare(b[0]));else l.sort((a,b)=>b[3]-a[3]);
@@ -73,9 +74,9 @@ function render(){
 $("bar").onclick=e=>{
  if(e.target.closest("#ddb")){const o=$("ddm").hidden;$("ddm").hidden=!o;$("ddb").setAttribute("aria-expanded",o);return}
  const s=e.target.closest("[data-s]");if(s){sort=s.dataset.s;render();return}
- const c=e.target.dataset.c;if(c){cat=c;render()}};
+ const cb=e.target.closest("[data-c]");const c=cb&&cb.dataset.c;if(c){cat=c;render()}};
 document.addEventListener("click",e=>{if(!e.target.closest(".dd")&&$("ddm")){$("ddm").hidden=true;$("ddb").setAttribute("aria-expanded",false)}});
-$("sb").onclick=()=>{$("q").focus()};
+$("sb").onclick=()=>{if(matchMedia("(max-width:900px)").matches){const o=$("sr").classList.toggle("open");if(o)$("q").focus();else{$("q").value="";q="";sq="";render()}}else $("q").focus()};
 $("q").oninput=e=>{
  const t=e.target.value.trim().toLowerCase();q=t;sq=t;
  const gm=!t||games.some(g=>g[0].toLowerCase().includes(t)),pm=!t||prods.some(x=>(x[0]+" "+x[1]+" "+x[3]).toLowerCase().includes(t));
