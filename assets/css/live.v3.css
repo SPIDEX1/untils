@@ -1,0 +1,19 @@
+img.gi{display:block;object-fit:cover}.th img.gi{width:100%;height:100%;border-radius:inherit}.tile .te img.gi{width:52px;height:52px;border-radius:12px}.gemo img.gi{width:96px;height:96px;border-radius:22px;margin:0 auto}.pb-e img.gi{width:clamp(80px,12vw,140px);height:clamp(80px,12vw,140px);border-radius:26px}.gfr{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;z-index:1}#fsb{z-index:5}
+#dnote{display:none;max-width:320px;text-align:center;font-weight:800;line-height:1.4;color:#ffd0d0;background:rgba(0,0,0,.6);padding:12px 16px;border-radius:14px;margin:0 16px;position:relative}
+#start.dsk #dnote{display:block}#start.dsk .playbtn{display:none}#gemo.gimg{opacity:1}
+#start.paused #dnote{display:block}
+#start.hasimg{overflow:hidden}
+#start.hasimg::before{content:"";position:absolute;inset:0;background:var(--gimg) center/cover;filter:blur(22px) brightness(.55);transform:scale(1.2);z-index:0}
+#gemo.gimg{position:absolute!important;inset:0;display:grid;place-items:center;font-size:0!important;opacity:1!important;animation:none!important;filter:none!important;pointer-events:none;z-index:0}
+#gemo.gimg img.gi{height:92%!important;width:auto!important;aspect-ratio:1;max-width:92%;border-radius:24px;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+#start h2{text-shadow:0 2px 6px rgba(0,0,0,.7)}
+.tile .te.teimg{left:0;top:0;width:100%;height:100%;transform:none;filter:none}
+.tile .te.teimg img.gi{width:100%;height:100%;border-radius:0}
+.tile:hover .te.teimg{transform:scale(1.06);animation:none}
+@media(max-width:900px){
+.pills{flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden;justify-content:flex-start!important;gap:8px!important;padding:4px 2px 6px!important;scrollbar-width:none;-webkit-overflow-scrolling:touch;max-width:100%}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none!important;width:62px;min-width:62px!important;height:62px!important;padding:4px!important;border-radius:16px!important;flex-direction:column;gap:3px!important;justify-content:center}
+.ptx{display:block!important;font-size:8.5px!important;letter-spacing:0;line-height:1}
+.pic{font-size:22px!important}.pic svg{width:22px;height:22px}
+}
