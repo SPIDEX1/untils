@@ -66,7 +66,7 @@
       g.forEach(function (x) {
         var li = document.createElement("li"), d = document.createElement("div");
         var b = document.createElement("b"), sm = document.createElement("small"), st = document.createElement("span");
-        b.textContent = x.title; sm.textContent = x.category;
+        b.textContent = x.title; sm.textContent = x.category + (x.note ? " · " + x.note : "");
         st.className = "dv-st " + x.status; st.textContent = x.status.toUpperCase();
         d.appendChild(b); d.appendChild(sm); li.appendChild(d); li.appendChild(st); ul.appendChild(li);
       });
