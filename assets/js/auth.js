@@ -122,6 +122,7 @@
   }
 
   window.UntilsAuth = {
+    cfg: CFG,
     sendCode: sendCode,
     verifyCode: verifyCode,
     getSession: getSession,

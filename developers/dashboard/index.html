@@ -20,6 +20,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="/assets/css/style.css?v=5122f816"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap"><link rel="stylesheet" href="/assets/css/theme.v8.css">
 <link rel="stylesheet" href="/assets/css/developers.v8.css">
+<style>.dv-gf{display:grid;gap:12px;margin:0 0 18px}.dv-gf label{display:grid;gap:6px;font-weight:800;font-size:14px}.dv-gf input,.dv-gf select,.dv-gf textarea{font:inherit;padding:10px 12px;border:2px solid #d5e3f5;border-radius:12px}.dv-gl{list-style:none;margin:0;padding:0;display:grid;gap:10px}.dv-gl li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 14px;border-radius:14px;background:#f2f8ff}.dv-gl small{display:block;color:#6b7c93}.dv-st{font-weight:800;font-size:12px;padding:4px 10px;border-radius:99px;background:#ffe9b8}.dv-st.approved{background:#c9f5d3}.dv-st.rejected{background:#ffd0d6}</style>
 </head>
 <body>
 <header><a class="lg" href="/" aria-label="UNTILS home"><img class="logo" src="/assets/img/untils-logo.png?v=2" alt="UNTILS" width="206" height="50"></a><div class="hr"><span class="dv-who" id="dvWho"></span><button type="button" class="dv-signin" id="dvOut"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg><span>LOG OUT</span></button></div></header>
@@ -35,9 +36,18 @@
   <article class="dv-panel">
     <div class="dv-ph">
       <h2>Your games</h2>
-      <button type="button" class="dv-add" disabled title="Opening soon">+ ADD NEW GAME <small>SOON</small></button>
+      <button type="button" class="dv-add" id="dvAddBtn">+ ADD NEW GAME</button>
     </div>
-    <div class="dv-empty">
+    <form id="dvGameForm" class="dv-gf" hidden>
+      <label>Game title<input id="gTitle" maxlength="60" required></label>
+      <label>Category<select id="gCat"><option value="">Choose...</option><option>Arcade</option><option>Action</option><option>Adventure</option><option>Puzzle</option><option>Racing</option><option>Space</option><option>Casual</option><option>Other</option></select></label>
+      <label>Description<textarea id="gDesc" rows="3" maxlength="500" required></textarea></label>
+      <label>Game zip (index.html at the top, max 50 MB)<input id="gZip" type="file" accept=".zip,application/zip"></label>
+      <p class="dv-err" id="gErr" role="alert"></p>
+      <button type="submit" class="dv-sbtn" id="gGo">UPLOAD GAME</button>
+    </form>
+    <ul id="dvList" class="dv-gl"></ul>
+    <div class="dv-empty" id="dvEmpty">
       <div class="dv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="11" rx="4"/><path d="M8 12h4M10 10v4M16 11.5h.01M18 13.5h.01"/></svg></div>
       <h3>No games yet</h3>
       <p>Game uploads are opening very soon. Your account is ready, so you'll be able to add your first game right here.</p>
@@ -75,8 +85,8 @@
 </div>
 <div class="sf-b"><span>Small details. Big emotions.</span><span>&copy; 2026 UNTILS</span></div>
 </footer>
-<script src="/assets/js/auth.js?v=7695e380"></script>
-<script src="/assets/js/dashboard.js?v=e083b323"></script>
+<script src="/assets/js/auth.js?v=8"></script>
+<script src="/assets/js/dashboard.v2.js"></script>
 <script src="/assets/js/fx.v7.js"></script>
 </body>
 </html>
