@@ -65,3 +65,25 @@ export async function onRequestPost({ request, env }) {
   await env.GAMES.put(prefix + id, JSON.stringify(game));
   return json({ ok: true, game });
 }
+
+export async function onRequestPut({ request, env }) {
+  if (!env.GAMES) return json({ error: "KV binding GAMES missing" }, 500);
+  const u = await who(request);
+  if (!u) return json({ error: "Please sign in again." }, 401);
+  let b; try { b = await request.json(); } catch (e) { return json({ error: "Bad request." }, 400); }
+  const id = String(b.id || "");
+  if (!/^[a-z0-9-]{8,40}$/.test(id)) return json({ error: "Bad game id." }, 400);
+  const key = "game:" + u.id + ":" + id, g = await env.GAMES.get(key, "json");
+  if (!g) return json({ error: "Game not found." }, 404);
+  if (b.description !== undefined) { const d = String(b.description).trim(); if (d.length < 10 || d.length > 500) return json({ error: "Description must be 10 to 500 characters." }, 400); g.description = d; }
+  if (b.category !== undefined) { if (CATS.indexOf(b.category) < 0) return json({ error: "Please choose a category." }, 400); g.category = b.category; }
+  if (b.device !== undefined) g.device = b.device === "desktop" ? "desktop" : "all";
+  const ok = (p, re) => typeof p === "string" && p.startsWith(u.id + "/" + id + "-") && re.test(p);
+  if (b.icon) { if (!ok(b.icon, /-i\d+\.(png|jpg|webp)$/)) return json({ error: "Bad icon." }, 400); g.icon = b.icon; }
+  if (b.banner) { if (!ok(b.banner, /-b\d+\.(png|jpg|webp)$/)) return json({ error: "Bad banner." }, 400); g.banner = b.banner; }
+  if (b.removeBanner && !b.banner) g.banner = "";
+  if (b.path) { if (!ok(b.path, /-v\d+\.zip$/)) return json({ error: "Bad file path." }, 400); g.path = b.path; g.version = (g.version || 1) + 1; }
+  g.updatedAt = Date.now();
+  await env.GAMES.put(key, JSON.stringify(g));
+  return json({ ok: true, game: g });
+}

@@ -19,12 +19,12 @@ function read(b, e) {
   const v = new DataView(b.buffer, b.byteOffset, b.byteLength), s = e.o + 30 + v.getUint16(e.o + 26, true) + v.getUint16(e.o + 28, true);
   const d = b.subarray(s, s + e.c); return e.m === 0 ? d : inflate(d);
 }
-export async function serve(env, o, i, rest) {
-  const ck = new Request("https://zipcache.invalid/" + o + "/" + i), cache = caches.default;
+export async function serve(env, o, i, rest, path) {
+  const ck = new Request("https://zipcache.invalid/" + path), cache = caches.default;
   let buf, hit = await cache.match(ck);
   if (hit) buf = await hit.arrayBuffer();
   else {
-    const r = await fetch(SUPA + "/storage/v1/object/game-zips/" + o + "/" + i + ".zip", { headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: "Bearer " + env.SUPABASE_SERVICE_KEY } });
+    const r = await fetch(SUPA + "/storage/v1/object/game-zips/" + path, { headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: "Bearer " + env.SUPABASE_SERVICE_KEY } });
     if (!r.ok) return new Response("Game file not found", { status: 404 });
     buf = await r.arrayBuffer();
     await cache.put(ck, new Response(buf, { headers: { "Cache-Control": "max-age=3600" } }));
@@ -35,7 +35,7 @@ export async function serve(env, o, i, rest) {
   let pre = ""; if (!en["index.html"]) { const k = Object.keys(en).find(n => /^[^/]+\/index\.html$/.test(n)); if (k) pre = k.split("/")[0] + "/"; }
   const e = en[pre + f]; if (!e) return new Response("File not found in zip", { status: 404 });
   const d = await read(b, e), ext = f.split(".").pop().toLowerCase();
-  const h = { "Content-Type": MT[ext] || "application/octet-stream", "Content-Security-Policy": "sandbox allow-scripts allow-popups allow-pointer-lock", "Access-Control-Allow-Origin": "*", "Cache-Control": "private, max-age=300", "X-Content-Type-Options": "nosniff" };
+  const h = { "Content-Type": MT[ext] || "application/octet-stream", "Content-Security-Policy": "sandbox allow-scripts allow-popups allow-pointer-lock", "Access-Control-Allow-Origin": "*", "Cache-Control": "private, max-age=60", "X-Content-Type-Options": "nosniff" };
   if (ext === "html") { let t = new TextDecoder().decode(d); t = /<head[^>]*>/i.test(t) ? t.replace(/<head[^>]*>/i, m => m + SHIM) : SHIM + t; return new Response(t, { headers: h }); }
   return new Response(d, { headers: h });
 }

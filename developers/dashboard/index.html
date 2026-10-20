@@ -49,6 +49,19 @@
       <p class="dv-err" id="gErr" role="alert"></p>
       <button type="submit" class="dv-sbtn" id="gGo">UPLOAD GAME</button>
     </form>
+    <form id="dvEdit" class="dv-gf" hidden>
+      <h3 id="eTitle" style="margin:0"></h3>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><img id="eIc" alt="" width="64" height="64" style="border-radius:14px"><img id="eBn" alt="" style="max-width:240px;border-radius:10px"></div>
+      <label>Description<textarea id="eDesc" rows="3" maxlength="500"></textarea></label>
+      <label>Category (tag)<select id="eCat"></select></label>
+      <label>This game is for<select id="eDev"><option value="all">Mobile game (plays on phone and PC)</option><option value="desktop">Desktop game (PC only)</option></select></label>
+      <label>Change icon (optional): square, at least 512 x 512 px<input id="eIcon" type="file" accept="image/png,image/jpeg,image/webp"></label>
+      <label>Change / add popular banner (optional): 1920 x 400 px<input id="eBan" type="file" accept="image/png,image/jpeg,image/webp"></label>
+      <label style="display:flex;gap:8px;align-items:center;font-weight:600"><input id="eRm" type="checkbox" style="width:auto"> Remove current banner</label>
+      <label>Upload new version (optional): .zip, max 50 MB<input id="eZip" type="file" accept=".zip,application/zip"></label>
+      <p class="dv-err" id="eErr" role="alert"></p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="submit" class="dv-sbtn" id="eGo">SAVE CHANGES</button><button type="button" class="dv-sbtn" id="eCancel" style="background:#e4f0fb;color:#12233d">CANCEL</button></div>
+    </form>
     <ul id="dvList" class="dv-gl"></ul>
     <div class="dv-empty" id="dvEmpty">
       <div class="dv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="11" rx="4"/><path d="M8 12h4M10 10v4M16 11.5h.01M18 13.5h.01"/></svg></div>
@@ -81,7 +94,7 @@
 <div class="sf-b"><span>Small details. Big emotions.</span><span>&copy; 2026 UNTILS</span></div>
 </footer>
 <script src="/assets/js/auth.js?v=8"></script>
-<script src="/assets/js/dashboard.v4.js"></script>
+<script src="/assets/js/dashboard.v5.js"></script>
 <script src="/assets/js/fx.v7.js"></script>
 </body>
 </html>

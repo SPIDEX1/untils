@@ -8,3 +8,8 @@
 
 /admin/*
   X-Robots-Tag: noindex, nofollow
+
+/admin/
+  Cache-Control: no-store
+/admin/index.html
+  Cache-Control: no-store
