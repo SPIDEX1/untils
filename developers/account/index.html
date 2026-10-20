@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Account | UNTILS</title>
+<meta name="description" content="Your UNTILS developer dashboard.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="canonical" href="https://untils.pages.dev/developers/account/">
+<meta name="theme-color" content="#4fc3ff">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="UNTILS">
+<meta property="og:title" content="Account | UNTILS">
+<meta property="og:description" content="Your UNTILS developer dashboard.">
+<meta property="og:url" content="https://untils.pages.dev/developers/account/">
+<meta property="og:image" content="https://untils.pages.dev/assets/img/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="/assets/css/style.css?v=5122f816"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap"><link rel="stylesheet" href="/assets/css/theme.v8.css">
+<link rel="stylesheet" href="/assets/css/developers.v8.css">
+<style>.dv-dgrid{grid-template-columns:1fr!important}.dv-acc{display:inline-flex;align-items:center;gap:8px;background:#e4f0fb;color:var(--navy);padding:9px 16px;border-radius:30px;font-weight:800;font-size:14px;text-decoration:none;margin:0 10px 0 auto}.dv-acc svg{width:18px;height:18px}.dv-acc+.dv-signin{margin-left:0}a.dv-back{display:inline-block;padding:10px 18px;border-radius:30px;background:#e4f0fb;font-weight:800;text-decoration:none;color:var(--navy);margin-bottom:14px}.dv-gf{display:grid;gap:12px;margin:0 0 18px}.dv-gf label{display:grid;gap:6px;font-weight:800;font-size:14px}.dv-gf input,.dv-gf select,.dv-gf textarea{font:inherit;padding:10px 12px;border:2px solid #d5e3f5;border-radius:12px}.dv-gl{list-style:none;margin:0;padding:0;display:grid;gap:10px}.dv-gl li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 14px;border-radius:14px;background:#f2f8ff}.dv-gl small{display:block;color:#6b7c93}.dv-st{font-weight:800;font-size:12px;padding:4px 10px;border-radius:99px;background:#ffe9b8}.dv-st.approved{background:#c9f5d3}.dv-st.rejected{background:#ffd0d6}</style>
+</head>
+<body>
+<header><a class="lg" href="/" aria-label="UNTILS home"><img class="logo" src="/assets/img/untils-logo.png?v=2" alt="UNTILS" width="206" height="50"></a><div class="hr"><a class="dv-acc" href="/developers/account/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>ACCOUNT</span></a><button type="button" class="dv-signin" id="dvOut"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg><span>LOG OUT</span></button></div></header>
+<main class="dv dv-dash" id="acc" hidden>
+<section class="dv-dh"><a class="dv-back" href="/developers/account/">&larr; Back to dashboard</a><br><span class="dv-eyebrow">YOUR ACCOUNT</span><h1>Account details</h1></section>
+<section class="dv-sec"><article class="dv-panel">
+<dl class="dv-dl"><div><dt>STUDIO</dt><dd id="aStudio">-</dd></div><div><dt>EMAIL</dt><dd id="aMail">-</dd></div><div><dt>MEMBER SINCE</dt><dd id="aSince">-</dd></div></dl>
+<form id="aForm" class="dv-gf" style="margin-top:18px"><label>About developer (optional)<textarea id="aAbout" rows="4" maxlength="500"></textarea></label>
+<label>Address (optional)<textarea id="aAddr" rows="2" maxlength="300"></textarea></label>
+<p class="dv-err" id="aErr" role="alert"></p><button type="submit" class="dv-sbtn" id="aGo">SAVE</button></form>
+</article></section>
+</main>
+<noscript><div class="legal"><h1>Dashboard</h1><p>Please enable JavaScript to use your dashboard.</p></div></noscript>
+<footer class="sf">
+<div class="sf-brand ab-brand"><img class="ab-logo" src="/assets/img/untils-logo.png?v=2" alt="UNTILS" width="230" height="56"><span class="ab-chip">More Than Just Games</span></div>
+<div class="sf-in">
+<div class="sf-c"><h4>GAMES</h4><a href="/games/">All Games</a><a href="/games/expand-io/">Expand.io</a><a href="/games/volt-io/">Volt.io</a><a href="/games/switch-dash/">Switch Dash</a><a href="/games/candy-shift/">Candy Shift</a><a href="/games/star-raider/">Star Raider</a><a href="/games/night-cabin/">Night Cabin</a><a href="/games/cube-drift/">Cube Drift</a><a href="/games/neon-snake/">Neon Snake</a></div>
+<div class="sf-c"><h4>COMPANY</h4><a href="/about/">About</a><a href="/developers/">For Developers</a><a href="/contact/">Contact</a><a href="/privacy/">Privacy Policy</a><a href="/terms/">Terms of Use</a></div>
+<div class="sf-c sf-soc"><h4>FOLLOW US ON</h4><a href="https://www.youtube.com/@untilsofficial" target="_blank" rel="noopener noreferrer" aria-label="UNTILS on YouTube"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg><span>YouTube</span></a><a href="https://www.instagram.com/untilsofficial/" target="_blank" rel="noopener noreferrer" aria-label="UNTILS on Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg><span>Instagram</span></a><a href="https://x.com/untilsofficial/" target="_blank" rel="noopener noreferrer" aria-label="UNTILS on X (Twitter)"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg><span>X (Twitter)</span></a></div>
+</div>
+<div class="sf-b"><span>Small details. Big emotions.</span><span>&copy; 2026 UNTILS</span></div>
+</footer>
+<script src="/assets/js/auth.js?v=8"></script>
+<script src="/assets/js/account.js"></script>
+<script src="/assets/js/fx.v7.js"></script>
+</body>
+</html>

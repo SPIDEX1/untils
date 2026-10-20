@@ -1,5 +1,6 @@
 (function () {
   "use strict";
+  var MOB = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && Math.min(screen.width, screen.height) < 820);
   var A = window.UntilsAuth, $ = function (i) { return document.getElementById(i); }, role = null, tab = "pending", email = "";
   function h(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
   function api(a, body) {
@@ -47,13 +48,14 @@
   }
   function open(x) {
     var D = $("det"); D.hidden = false; D.innerHTML = ""; D.scrollIntoView({ behavior: "smooth" });
-    D.appendChild(h("h2", "", x.title)); D.appendChild(h("p", "m", (x.studio || "?") + " · " + x.category + " · " + x.status.toUpperCase()));
+    D.appendChild(h("h2", "", x.title)); D.appendChild(h("p", "m", (x.studio || "?") + " · " + x.category + " · " + x.status.toUpperCase() + " · " + (x.device === "desktop" ? "🖥 DESKTOP ONLY" : "📱 MOBILE + PC")));
     D.appendChild(h("p", "", x.description));
     var pr = h("div", "row"), pb = h("button", "", "▶ PLAY"), pc = h("button", "g", "📱 Phone view"), fs = h("button", "g", "⛶ Fullscreen"), pe = h("div", "err"), box = h("div");
-    pr.appendChild(pb); pr.appendChild(pc); pr.appendChild(fs); D.appendChild(pr); D.appendChild(pe); D.appendChild(box);
+    pr.appendChild(pb); pr.appendChild(pc); pr.appendChild(fs); if (x.device === "desktop") pc.hidden = true; D.appendChild(pr); D.appendChild(pe); D.appendChild(box);
     var fr = null;
     pb.onclick = function () {
-      pe.textContent = ""; api("play?owner=" + x.owner + "&id=" + x.id).then(function (r) {
+      pe.textContent = "";
+      if (x.device === "desktop" && MOB) { box.innerHTML = ""; pe.textContent = "🚫 This game is not for mobile. It can only be played on a desktop (PC). Please review it on a PC."; return; } api("play?owner=" + x.owner + "&id=" + x.id).then(function (r) {
         if (!r.ok) { pe.textContent = r.data.error || "Could not open."; return; }
         box.innerHTML = ""; fr = h("iframe", "fr"); fr.setAttribute("sandbox", "allow-scripts allow-popups allow-pointer-lock");
         fr.setAttribute("allow", "fullscreen; autoplay; gamepad"); fr.setAttribute("allowfullscreen", ""); fr.src = r.data.url; box.appendChild(fr);

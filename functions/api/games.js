@@ -54,7 +54,7 @@ export async function onRequestPost({ request, env }) {
   const game = {
     id, title, description: desc, category: cat,
     studio: (u.user_metadata && u.user_metadata.studio) || "",
-    owner: u.id, path: b.path, status: "pending", createdAt: Date.now()
+    owner: u.id, path: b.path, device: b.device === "desktop" ? "desktop" : "all", status: "pending", createdAt: Date.now()
   };
   await env.GAMES.put(prefix + id, JSON.stringify(game));
   return json({ ok: true, game });

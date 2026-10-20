@@ -9,14 +9,7 @@
     var meta = u.user_metadata || {};
     var email = u.email || "";
     var studio = meta.studio || email.split("@")[0] || "Developer";
-    $("dvWho").textContent = email;
     $("dvHello").textContent = "Welcome, " + studio;
-    $("dvStudio").textContent = studio;
-    $("dvMail").textContent = email;
-    var d = u.created_at ? new Date(u.created_at) : null;
-    $("dvSince").textContent = d && !isNaN(d)
-      ? d.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
-      : "-";
     $("dvDash").hidden = false;
   }
 
@@ -66,7 +59,7 @@
       g.forEach(function (x) {
         var li = document.createElement("li"), d = document.createElement("div");
         var b = document.createElement("b"), sm = document.createElement("small"), st = document.createElement("span");
-        b.textContent = x.title; sm.textContent = x.category + (x.note ? " · " + x.note : "");
+        b.textContent = x.title; sm.textContent = x.category + " · " + (x.device === "desktop" ? "PC only" : "Mobile + PC") + (x.note ? " · " + x.note : "");
         st.className = "dv-st " + x.status; st.textContent = x.status.toUpperCase();
         d.appendChild(b); d.appendChild(sm); li.appendChild(d); li.appendChild(st); ul.appendChild(li);
       });
@@ -100,7 +93,7 @@
         body: file
       }).then(function (up) {
         if (!up.ok) throw new Error("Zip upload failed (" + up.status + ").");
-        return api("POST", { id: id, path: path, title: $("gTitle").value, category: $("gCat").value, description: $("gDesc").value });
+        return api("POST", { id: id, path: path, title: $("gTitle").value, category: $("gCat").value, device: $("gDev").value, description: $("gDesc").value });
       }).then(function (r) {
         if (!r.ok) throw new Error(r.data.error || "Could not save the game.");
         $("dvGameForm").reset(); $("dvGameForm").hidden = true; list();

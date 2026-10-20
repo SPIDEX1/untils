@@ -2,6 +2,7 @@ User-agent: *
 Allow: /
 Disallow: /developers/dashboard/
 Disallow: /admin/
+Disallow: /developers/account/
 Disallow: /play/
 
 Sitemap: https://untils.pages.dev/sitemap.xml
