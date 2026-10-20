@@ -47,6 +47,12 @@ export async function onRequestPost({ request, env }) {
   if (CATS.indexOf(cat) < 0) return json({ error: "Please choose a category." }, 400);
   if (b.path !== u.id + "/" + id + ".zip") return json({ error: "Bad file path." }, 400);
 
+  const ext = (String(b.icon || "").match(/\.(png|jpg|webp)$/) || [])[1];
+  if (!ext || b.icon !== u.id + "/" + id + "." + ext) return json({ error: "Game icon is required." }, 400);
+
+  const bext = (String(b.banner || "").match(/-banner\.(png|jpg|webp)$/) || [])[1];
+  if (b.banner && (!bext || b.banner !== u.id + "/" + id + "-banner." + bext)) return json({ error: "Bad banner." }, 400);
+
   const prefix = "game:" + u.id + ":";
   const existing = await env.GAMES.list({ prefix, limit: MAX_GAMES + 1 });
   if (existing.keys.length >= MAX_GAMES) return json({ error: "Game limit reached." }, 400);
@@ -54,7 +60,7 @@ export async function onRequestPost({ request, env }) {
   const game = {
     id, title, description: desc, category: cat,
     studio: (u.user_metadata && u.user_metadata.studio) || "",
-    owner: u.id, path: b.path, device: b.device === "desktop" ? "desktop" : "all", status: "pending", createdAt: Date.now()
+    owner: u.id, path: b.path, icon: b.icon, banner: b.banner || "", device: b.device === "desktop" ? "desktop" : "all", status: "pending", createdAt: Date.now()
   };
   await env.GAMES.put(prefix + id, JSON.stringify(game));
   return json({ ok: true, game });

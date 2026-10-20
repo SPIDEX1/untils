@@ -44,10 +44,18 @@ export async function onRequest({ request, env, params }) {
   if (a === "decide" && request.method === "POST") {
     if (!lead) return J({ error: "Only the leader can do this." }, 403);
     const d = String(b.decision || "");
-    if (["approved", "rejected", "pending"].indexOf(d) < 0 || !idok) return J({ error: "Bad request." }, 400);
+    if (["approved", "rejected", "pending", "live"].indexOf(d) < 0 || !idok) return J({ error: "Bad request." }, 400);
     const g = await env.GAMES.get(gk, "json"); if (!g) return J({ error: "Not found." }, 404);
+    if (d === "live" && g.status !== "approved" && g.status !== "live") return J({ error: "Approve the game first." }, 400);
     g.status = d; g.note = String(b.note || "").slice(0, 500); g.decidedAt = Date.now();
     await env.GAMES.put(gk, JSON.stringify(g));
+    return J({ ok: true });
+  }
+  if (a === "popular" && request.method === "POST") {
+    if (!lead) return J({ error: "Only the leader can do this." }, 403);
+    if (!idok) return J({ error: "Bad request." }, 400);
+    const g = await env.GAMES.get(gk, "json"); if (!g) return J({ error: "Not found." }, 404);
+    g.popular = !!b.popular; await env.GAMES.put(gk, JSON.stringify(g));
     return J({ ok: true });
   }
   if (a === "staff") {
