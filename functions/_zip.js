@@ -34,8 +34,14 @@ export async function serve(env, o, i, rest, path) {
   let f = rest.join("/") || "index.html"; if (f.endsWith("/")) f += "index.html";
   let pre = ""; if (!en["index.html"]) { const k = Object.keys(en).find(n => /^[^/]+\/index\.html$/.test(n)); if (k) pre = k.split("/")[0] + "/"; }
   const e = en[pre + f]; if (!e) return new Response("File not found in zip", { status: 404 });
-  const d = await read(b, e), ext = f.split(".").pop().toLowerCase();
+  const d = await read(b, e);
+  let ext = f.split(".").pop().toLowerCase(), enc = null, bn = f;
+  if (ext === "br") { enc = "br"; bn = f.slice(0, -3); }
+  else if (ext === "gz") { enc = "gzip"; bn = f.slice(0, -3); }
+  else if (ext === "unityweb") { enc = d[0] === 0x1f && d[1] === 0x8b ? "gzip" : "br"; bn = f.slice(0, -9); }
+  if (enc) ext = bn.split(".").pop().toLowerCase();
   const h = { "Content-Type": MT[ext] || "application/octet-stream", "Content-Security-Policy": "sandbox allow-scripts allow-popups allow-pointer-lock", "Access-Control-Allow-Origin": "*", "Cache-Control": "private, max-age=60", "X-Content-Type-Options": "nosniff" };
-  if (ext === "html") { let t = new TextDecoder().decode(d); t = /<head[^>]*>/i.test(t) ? t.replace(/<head[^>]*>/i, m => m + SHIM) : SHIM + t; return new Response(t, { headers: h }); }
+  if (enc) h["Content-Encoding"] = enc;
+  if (ext === "html" && !enc) { let t = new TextDecoder().decode(d); t = /<head[^>]*>/i.test(t) ? t.replace(/<head[^>]*>/i, m => m + SHIM) : SHIM + t; return new Response(t, { headers: h }); }
   return new Response(d, { headers: h });
 }

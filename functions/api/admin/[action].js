@@ -28,9 +28,11 @@ export async function onRequest({ request, env, params }) {
     return J({ game: g, reviews });
   }
   if (a === "play") {
-    if (!idok || !(await env.GAMES.get(gk))) return J({ error: "Not found." }, 404);
+    const pg = idok ? await env.GAMES.get(gk, "json") : null;
+    if (!pg) return J({ error: "Not found." }, 404);
+    const nv = q.get("v") === "new" && pg.pending;
     if (!env.PLAY_SECRET || !env.SUPABASE_SERVICE_KEY) return J({ error: "PLAY_SECRET / SUPABASE_SERVICE_KEY not set." }, 500);
-    const exp = Math.floor(Date.now() / 1000) + 7200, s = [o, i, exp].join("~");
+    const exp = Math.floor(Date.now() / 1000) + 7200, s = [o, i, exp].concat(nv ? ["n"] : []).join("~");
     return J({ url: "/play/" + s + "~" + await sign(env, s) + "/index.html" });
   }
   if (a === "review" && request.method === "POST") {
@@ -48,6 +50,17 @@ export async function onRequest({ request, env, params }) {
     const g = await env.GAMES.get(gk, "json"); if (!g) return J({ error: "Not found." }, 404);
     if (d === "live" && g.status !== "approved" && g.status !== "live") return J({ error: "Approve the game first." }, 400);
     g.status = d; g.note = String(b.note || "").slice(0, 500); g.decidedAt = Date.now();
+    await env.GAMES.put(gk, JSON.stringify(g));
+    return J({ ok: true });
+  }
+  if (a === "update" && request.method === "POST") {
+    if (!lead) return J({ error: "Only the leader can do this." }, 403);
+    if (!idok) return J({ error: "Bad request." }, 400);
+    const g = await env.GAMES.get(gk, "json"); if (!g || !g.pending) return J({ error: "No update waiting." }, 404);
+    if (b.decision === "approve") { g.path = g.pending.path; g.version = (g.version || 1) + 1; g.updateNote = ""; }
+    else if (b.decision === "reject") g.updateNote = String(b.note || "Update rejected").slice(0, 300);
+    else return J({ error: "Bad request." }, 400);
+    delete g.pending; g.updatedAt = Date.now();
     await env.GAMES.put(gk, JSON.stringify(g));
     return J({ ok: true });
   }

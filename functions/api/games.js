@@ -92,7 +92,8 @@ export async function onRequestPut({ request, env }) {
   if (b.banner) { if (!ok(b.banner, /-b\d+\.(png|jpg|webp)$/)) return json({ error: "Bad banner." }, 400); g.banner = b.banner; }
   if (b.shots !== undefined) { const sh = shotsOk(b.shots, u.id, id); if (!sh) return json({ error: "Bad screenshots." }, 400); g.shots = sh; }
   if (b.removeBanner && !b.banner) g.banner = "";
-  if (b.path) { if (!ok(b.path, /-v\d+\.zip$/)) return json({ error: "Bad file path." }, 400); g.path = b.path; g.version = (g.version || 1) + 1; }
+  if (b.path) { if (!ok(b.path, /-v\d+\.zip$/)) return json({ error: "Bad file path." }, 400); if (g.status === "live") { g.pending = { path: b.path, at: Date.now() }; g.updateNote = ""; }
+    else { g.path = b.path; g.version = (g.version || 1) + 1; if (g.status !== "pending") { g.status = "pending"; g.note = ""; } } }
   g.updatedAt = Date.now();
   await env.GAMES.put(key, JSON.stringify(g));
   return json({ ok: true, game: g });

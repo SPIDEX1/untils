@@ -44,7 +44,7 @@ html{scroll-behavior:smooth}
 <a class="dd-back" href="/developers/dashboard/">&larr; Dashboard</a>
 <h1>Developer docs</h1>
 <p>Everything you need to publish an HTML5 game on UNTILS: what to prepare, what sizes to use, how review works, and how to use the SDK.</p>
-<div class="toc" id="toc"><a href="#quick">Quick start</a><a href="#package">Game package</a><a href="#size">Game size</a><a href="#icon">Icon</a><a href="#banner">Banner</a><a href="#shots">Screenshots</a><a href="#review">Review</a><a href="#sdk">SDK</a><a href="#api">SDK commands</a><a href="#rules">Rules</a></div>
+<div class="toc" id="toc"><a href="#quick">Quick start</a><a href="#package">Game package</a><a href="#size">Game size</a><a href="#icon">Icon</a><a href="#banner">Banner</a><a href="#shots">Screenshots</a><a href="#review">Review</a><a href="#sdk">SDK</a><a href="#api">SDK commands</a><a href="#engines">Engines</a><a href="#rules">Rules</a></div>
 
 <section class="sec" id="quick">
 <h2>Quick start</h2>
@@ -133,7 +133,7 @@ html{scroll-behavior:smooth}
 <li><b>APPROVED</b> or <b>REJECTED</b> - the leader decides. If rejected, a note explains why on your dashboard, and you can fix it and upload again.</li>
 <li><b>LIVE</b> - the game is public on UNTILS. A green <b>PLAY</b> button appears next to it in your dashboard.</li>
 </ol>
-<div class="tip"><b>Updating a live game:</b> click it in your dashboard to change the description, category, icon, banner, screenshots, or upload a new version. When you press <b>SAVE CHANGES</b> the update goes live right away. We can take a game offline if an update breaks the rules.</div>
+<div class="tip"><b>Updating a live game:</b> click it in your dashboard to change the description, category, icon, banner, screenshots, or upload a new version. Changes to the description, category, icon, banner and screenshots go live right away when you press <b>SAVE CHANGES</b>. A <b>new version (new zip)</b> of a live game is reviewed first: it shows as "New version in review" and the current version keeps running until we approve it (up to 2 days).</div>
 </section>
 <section class="sec" id="sdk">
 <h2>SDK for HTML5 games</h2>
@@ -194,6 +194,20 @@ main();</code></pre>
 <tr><td><code>Untils.isMobile</code>, <code>Untils.env</code>, <code>Untils.isReady</code></td><td>Handy flags.</td><td>Live</td></tr>
 </table>
 <div class="tip"><b>Saving tips:</b> save small things (level, coins, settings) often, not huge data. Today saves stay in the player's browser on that device. When player accounts arrive, the same <code>save</code> and <code>load</code> commands will work on every device, so your game will not need changes.</div>
+</section>
+<section class="sec" id="engines">
+<h2>Unity and other engines</h2>
+<p>Web (HTML5) exports from game engines work if the zip follows the same rules as above: <code>index.html</code> at the top, relative paths, under 50 MB.</p>
+<h3>Unity (WebGL)</h3>
+<ol>
+<li>File &rarr; Build Settings &rarr; <b>WebGL</b> &rarr; Build.</li>
+<li>In Player Settings &rarr; Publishing Settings: <b>Compression Format</b> can be Brotli, Gzip or Disabled (UNTILS serves all three). Turn <b>Data Caching OFF</b>.</li>
+<li>Zip the <b>contents</b> of the build folder (<code>index.html</code>, <code>Build/</code>, <code>TemplateData/</code>) so <code>index.html</code> is at the top of the zip.</li>
+<li>Make the canvas fill the window so it works on phones and PC.</li>
+</ol>
+<div class="tip"><b>Saving in Unity:</b> Unity keeps <code>PlayerPrefs</code> in the browser's IndexedDB, which is blocked in UNTILS' protected sandbox. So Unity progress is <b>not saved yet</b>. A Unity plugin for the UNTILS SDK is coming. Until then, design Unity games so they are fine without saved progress.</div>
+<h3>Godot and Cocos</h3>
+<p>Export for Web and zip the export as above. For Godot 4, make sure <b>Thread Support</b> is off (threads need special server headers). Plugins for the UNTILS SDK are planned. We have not tested these engines in depth yet, so please test your game after upload and tell us if something fails.</p>
 </section>
 <section class="sec" id="rules">
 <h2>Rules</h2>
