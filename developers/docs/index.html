@@ -30,14 +30,24 @@
 .doc table{width:100%;border-collapse:collapse;margin:10px 0;font-size:15px;display:block;overflow-x:auto}.doc th,.doc td{text-align:left;padding:9px 12px;border-bottom:1px solid #d5e3f5;vertical-align:top}.doc th{background:#e4f0fb}
 .doc .tip{background:#fff6dc;border-left:5px solid #ffb020;padding:10px 14px;border-radius:10px;margin:14px 0}
 .doc .btns{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.doc .btns a{background:#0a6cff;color:#fff;font-weight:800;text-decoration:none;padding:11px 18px;border-radius:30px}.doc .btns a.g{background:#e4f0fb;color:#12233d}
-.doc nav.toc{background:#fff;border-radius:16px;padding:12px 18px;margin:16px 0;box-shadow:0 4px 14px rgba(20,90,170,.1)}.doc nav.toc a{display:inline-block;margin:3px 12px 3px 0;color:#0a6cff;font-weight:700;text-decoration:none}
-</style><header><a class="lg" href="/" aria-label="UNTILS home"><img class="logo" src="/assets/img/untils-logo.png?v=2" alt="UNTILS" width="206" height="50"></a><div class="hr"><a class="dd-back" href="/developers/dashboard/">Dashboard</a></div></header>
+html{scroll-behavior:smooth}
+.dd-back{margin-bottom:6px}
+.doc .toc{display:flex;flex-wrap:wrap;gap:8px;background:#fff;border-radius:18px;padding:12px;margin:16px 0;box-shadow:0 4px 14px rgba(20,90,170,.1)}
+.doc .toc a{padding:8px 14px;border-radius:30px;background:#eef5ff;color:#0a6cff;font-weight:800;font-size:14px;text-decoration:none;white-space:nowrap;transition:background .15s,color .15s}
+.doc .toc a:hover{background:#dbeaff}.doc .toc a.on{background:#0a6cff;color:#fff}
+.doc .sec{background:#fff;border-radius:20px;padding:18px 20px 8px;margin:18px 0;box-shadow:0 4px 14px rgba(20,90,170,.1);scroll-margin-top:100px}
+.doc .sec h2{margin-top:0}.doc p a,.doc li a{color:#0a6cff;font-weight:700}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media(max-width:700px){.doc{padding:12px 12px 50px}.doc .toc{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;border-radius:16px;padding:10px}.doc .toc::-webkit-scrollbar{display:none}.doc .sec{padding:16px 14px 6px;border-radius:18px}.doc h2{font-size:22px}.doc ol,.doc ul{padding-left:22px}.doc .btns a{flex:1 1 100%;text-align:center}}
+</style><header><a class="lg" href="/" aria-label="UNTILS home"><img class="logo" src="/assets/img/untils-logo.png?v=2" alt="UNTILS" width="206" height="50"></a></header>
 <main class="doc">
+<a class="dd-back" href="/developers/dashboard/">&larr; Dashboard</a>
 <h1>Developer docs</h1>
 <p>Everything you need to publish an HTML5 game on UNTILS: what to prepare, what sizes to use, how review works, and how to use the SDK.</p>
-<nav class="toc"><a href="#quick">Quick start</a><a href="#package">Game package</a><a href="#size">Game size</a><a href="#icon">Icon</a><a href="#banner">Banner</a><a href="#shots">Screenshots</a><a href="#review">Review</a><a href="#sdk">SDK</a><a href="#api">SDK commands</a><a href="#rules">Rules</a></nav>
+<div class="toc" id="toc"><a href="#quick">Quick start</a><a href="#package">Game package</a><a href="#size">Game size</a><a href="#icon">Icon</a><a href="#banner">Banner</a><a href="#shots">Screenshots</a><a href="#review">Review</a><a href="#sdk">SDK</a><a href="#api">SDK commands</a><a href="#rules">Rules</a></div>
 
-<h2 id="quick">Quick start</h2>
+<section class="sec" id="quick">
+<h2>Quick start</h2>
 <ol>
 <li>Make your game as a normal HTML5 game with an <code>index.html</code>.</li>
 <li>(Recommended) Download the SDK below and add it to your game.</li>
@@ -47,8 +57,9 @@
 </ol>
 <div class="btns"><a href="/sdk/untils.js" download>Download SDK (untils.js)</a><a class="g" href="/sdk/untils-starter.zip" download>Starter game (zip)</a><a class="g" href="/sdk/starter-icon-512.png" download>Sample icon</a></div>
 <p>The starter game already uses every SDK command. Upload it as a test game to see how publishing works.</p>
-
-<h2 id="package">Game package (the zip)</h2>
+</section>
+<section class="sec" id="package">
+<h2>Game package (the zip)</h2>
 <table>
 <tr><th>Item</th><th>Rule</th></tr>
 <tr><td>Format</td><td>One <code>.zip</code> file. <code>index.html</code> at the top (not inside a sub-folder).</td></tr>
@@ -61,8 +72,9 @@
 
 <h3>Device: mobile or desktop</h3>
 <p>When you upload, choose <b>Mobile game</b> if it plays well on phones <i>and</i> PC. Choose <b>Desktop game</b> if it needs a keyboard or mouse. Desktop games show "This game is for desktop (PC) only" on phones instead of a Play button.</p>
-
-<h2 id="size">Recommended game size (what the player sees)</h2>
+</section>
+<section class="sec" id="size">
+<h2>Recommended game size (what the player sees)</h2>
 <table>
 <tr><th>Where</th><th>What to do</th></tr>
 <tr><td>PC</td><td>Design for <b>1280 x 720</b> (16:9 landscape). The game area is shown in a 16:9 frame and can go fullscreen.</td></tr>
@@ -71,8 +83,9 @@
 <p><b>Most important:</b> make the game <i>responsive</i>. It must fill the window (<code>window.innerWidth</code> x <code>window.innerHeight</code>), keep its aspect ratio, and never need scrolling. Add this to your page:</p>
 <pre><code>&lt;meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"&gt;
 &lt;style&gt;html,body{margin:0;height:100%;overflow:hidden;touch-action:manipulation}&lt;/style&gt;</code></pre>
-
-<h2 id="icon">Game icon (logo) - required</h2>
+</section>
+<section class="sec" id="icon">
+<h2>Game icon (logo) - required</h2>
 <table>
 <tr><th>Item</th><th>Rule</th></tr>
 <tr><td>Shape</td><td><b>Square</b> (width = height).</td></tr>
@@ -89,8 +102,9 @@
 <li>Only artwork you made or are allowed to use. No copied characters or logos.</li>
 </ul>
 <p>The icon is shown on the game card, the Play screen, "More games" and the popular banner.</p>
-
-<h2 id="banner">Popular banner - optional</h2>
+</section>
+<section class="sec" id="banner">
+<h2>Popular banner - optional</h2>
 <p>If the UNTILS team marks your game as <b>Popular</b>, it appears in the big banner at the top of the home page. A banner is optional, but without one your game shows only its icon on a gradient.</p>
 <table>
 <tr><th>Item</th><th>Rule</th></tr>
@@ -100,8 +114,9 @@
 <tr><td>Text</td><td>Do <b>not</b> write the game name or a Play button on it. UNTILS adds the title and a Play Now button on the left, with a dark fade for readability. Keep the left side calm.</td></tr>
 </table>
 <p><b>How to upload:</b> choose it in the <b>Popular banner</b> field when you add the game. You can also add or change it later: open your dashboard, click the game, pick a new banner, and press <b>SAVE CHANGES</b>.</p>
-
-<h2 id="shots">Screenshots - optional</h2>
+</section>
+<section class="sec" id="shots">
+<h2>Screenshots - optional</h2>
 <table>
 <tr><th>Item</th><th>Rule</th></tr>
 <tr><td>Count</td><td>Up to <b>5</b>.</td></tr>
@@ -110,16 +125,18 @@
 </table>
 <p><b>What to show:</b> real in-game screens (menu, gameplay, a level, a win or upgrade screen). No fake or edited-in screens, no device frames, no big promo text, no screens from other games.</p>
 <p>Screenshots appear at the very bottom of your game page. Click one to see it large. You can remove or add screenshots later from the dashboard.</p>
-
-<h2 id="review">Review and going live</h2>
+</section>
+<section class="sec" id="review">
+<h2>Review and going live</h2>
 <ol>
 <li><b>PENDING</b> - your game is waiting. Our team plays it on PC and phone and writes reviews. <b>Review takes up to 2 days.</b></li>
 <li><b>APPROVED</b> or <b>REJECTED</b> - the leader decides. If rejected, a note explains why on your dashboard, and you can fix it and upload again.</li>
 <li><b>LIVE</b> - the game is public on UNTILS. A green <b>PLAY</b> button appears next to it in your dashboard.</li>
 </ol>
 <div class="tip"><b>Updating a live game:</b> click it in your dashboard to change the description, category, icon, banner, screenshots, or upload a new version. When you press <b>SAVE CHANGES</b> the update goes live right away. We can take a game offline if an update breaks the rules.</div>
-
-<h2 id="sdk">SDK for HTML5 games</h2>
+</section>
+<section class="sec" id="sdk">
+<h2>SDK for HTML5 games</h2>
 <p>The SDK is one small file, <code>untils.js</code>. It gives your game progress saving, pause/resume, and (soon) ads and leaderboards. <b>It is optional, but recommended.</b> Games that use it will keep working as we add features.</p>
 <h3>Import</h3>
 <ol>
@@ -159,8 +176,9 @@
   Untils.onResume(() =&gt; resumeGame());
 }
 main();</code></pre>
-
-<h2 id="api">SDK commands</h2>
+</section>
+<section class="sec" id="api">
+<h2>SDK commands</h2>
 <table>
 <tr><th>Command</th><th>What it does</th><th>Status</th></tr>
 <tr><td><code>await Untils.init()</code></td><td>Starts the SDK. Resolves with <code>{ env, isMobile, player, version }</code>. <code>env</code> is <code>"untils"</code> on the site or <code>"offline"</code> on your PC. Never fails.</td><td>Live</td></tr>
@@ -176,8 +194,9 @@ main();</code></pre>
 <tr><td><code>Untils.isMobile</code>, <code>Untils.env</code>, <code>Untils.isReady</code></td><td>Handy flags.</td><td>Live</td></tr>
 </table>
 <div class="tip"><b>Saving tips:</b> save small things (level, coins, settings) often, not huge data. Today saves stay in the player's browser on that device. When player accounts arrive, the same <code>save</code> and <code>load</code> commands will work on every device, so your game will not need changes.</div>
-
-<h2 id="rules">Rules</h2>
+</section>
+<section class="sec" id="rules">
+<h2>Rules</h2>
 <ul>
 <li>Your game must be yours, or you must have the right to publish it.</li>
 <li>No adult content, hate, or violence aimed at real people.</li>
@@ -186,4 +205,9 @@ main();</code></pre>
 <li>The game must work, load in a reasonable time, and not crash.</li>
 </ul>
 <p>Questions? Use the <a href="/contact/">contact page</a>.</p>
-</main></body></html>
+</section>
+</main>
+<script>(function(){var t=document.getElementById("toc"),L=[].slice.call(t.querySelectorAll("a")),S=L.map(function(a){return document.getElementById(a.getAttribute("href").slice(1))});
+L.forEach(function(a,i){a.addEventListener("click",function(e){e.preventDefault();if(S[i]){S[i].scrollIntoView({behavior:"smooth",block:"start"});history.replaceState(null,"",a.getAttribute("href"))}})});
+function act(){var y=window.scrollY+130,k=0;S.forEach(function(el,i){if(el&&el.getBoundingClientRect().top+window.scrollY<=y)k=i});L.forEach(function(a,i){a.classList.toggle("on",i===k)});if(t.scrollWidth>t.clientWidth)t.scrollTo({left:Math.max(L[k].offsetLeft-24,0),behavior:"smooth"})}
+window.addEventListener("scroll",act,{passive:true});act()})();</script></body></html>
