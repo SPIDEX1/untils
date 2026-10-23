@@ -18,5 +18,6 @@ export async function onRequest({ request, env }) {
     if (v === 0) await env.GAMES.delete(vk); else await env.GAMES.put(vk, String(v));
     mine = v;
   }
-  return J({ l: c.l, d: c.d, mine });
+  const st = (await env.GAMES.get("stats:" + g, "json")) || {};
+  return J({ l: c.l, d: c.d, mine, plays: st.p || 0 });
 }

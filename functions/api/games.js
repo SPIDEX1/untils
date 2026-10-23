@@ -1,3 +1,4 @@
+import { sign } from "../_lib.js";
 /* UNTILS games API (Cloudflare Pages Function)
    Binding chahiye: GAMES (KV namespace). Zip file browser se seedha Supabase Storage me jaati hai. */
 const SUPA = "https://fjfkwfklglovuxeecxsg.supabase.co";
@@ -29,8 +30,22 @@ export async function onRequestGet({ request, env }) {
   if (!env.GAMES) return json({ error: "KV binding GAMES missing" }, 500);
   const u = await who(request);
   if (!u) return json({ error: "Please sign in again." }, 401);
+  const pv = new URL(request.url).searchParams.get("preview");
+  if (pv) {
+    if (!/^[a-z0-9-]{8,40}$/.test(pv) || !(await env.GAMES.get("game:" + u.id + ":" + pv))) return json({ error: "Game not found." }, 404);
+    if (!env.PLAY_SECRET || !env.SUPABASE_SERVICE_KEY) return json({ error: "PLAY_SECRET / SUPABASE_SERVICE_KEY not set." }, 500);
+    const s = [u.id, pv, Math.floor(Date.now() / 1000) + 86400].join("~");
+    return json({ token: s + "~" + await sign(env, s) });
+  }
   const l = await env.GAMES.list({ prefix: "game:" + u.id + ":", limit: 50 });
   const games = (await Promise.all(l.keys.map(k => env.GAMES.get(k.name, "json")))).filter(Boolean);
+  const day7 = new Date(Date.now() - 6 * 86400000).toISOString().slice(0, 10);
+  await Promise.all(games.map(async g => {
+    const k = g.owner + "~" + g.id;
+    const [st, vt] = await Promise.all([env.GAMES.get("stats:" + k, "json"), env.GAMES.get("votes:" + k, "json")]);
+    let week = 0; for (const d in ((st && st.d) || {})) if (d >= day7) week += st.d[d];
+    g.stats = { plays: (st && st.p) || 0, players: (st && st.u) || 0, week, likes: (vt && vt.l) || 0, dislikes: (vt && vt.d) || 0 };
+  }));
   games.sort((a, b) => b.createdAt - a.createdAt);
   return json({ games });
 }
@@ -84,6 +99,7 @@ export async function onRequestPut({ request, env }) {
   if (!/^[a-z0-9-]{8,40}$/.test(id)) return json({ error: "Bad game id." }, 400);
   const key = "game:" + u.id + ":" + id, g = await env.GAMES.get(key, "json");
   if (!g) return json({ error: "Game not found." }, 404);
+  if (b.seen) { g.msgSeen = Date.now(); await env.GAMES.put(key, JSON.stringify(g)); return json({ ok: true }); }
   if (b.description !== undefined) { const d = String(b.description).trim(); if (d.length < 10 || d.length > 500) return json({ error: "Description must be 10 to 500 characters." }, 400); g.description = d; }
   if (b.category !== undefined) { if (CATS.indexOf(b.category) < 0) return json({ error: "Please choose a category." }, 400); g.category = b.category; }
   if (b.device !== undefined) g.device = b.device === "desktop" ? "desktop" : "all";

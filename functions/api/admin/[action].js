@@ -64,6 +64,15 @@ export async function onRequest({ request, env, params }) {
     await env.GAMES.put(gk, JSON.stringify(g));
     return J({ ok: true });
   }
+  if (a === "message" && request.method === "POST") {
+    if (!lead) return J({ error: "Only the leader can do this." }, 403);
+    const text = String(b.text || "").trim();
+    if (!idok || text.length < 2 || text.length > 500) return J({ error: "Message must be 2 to 500 characters." }, 400);
+    const g = await env.GAMES.get(gk, "json"); if (!g) return J({ error: "Not found." }, 404);
+    g.msgs = (g.msgs || []).concat([{ text, at: Date.now() }]).slice(-20);
+    await env.GAMES.put(gk, JSON.stringify(g));
+    return J({ ok: true });
+  }
   if (a === "popular" && request.method === "POST") {
     if (!lead) return J({ error: "Only the leader can do this." }, 403);
     if (!idok) return J({ error: "Bad request." }, 400);
