@@ -55,7 +55,7 @@ html{scroll-behavior:smooth}
 <li>Open your <a href="/developers/dashboard/">dashboard</a>, press <b>+ ADD NEW GAME</b>, fill in the details, add your icon and zip, and press <b>UPLOAD GAME</b>.</li>
 <li>Our team reviews it (up to 2 days). After approval we make it live on UNTILS.</li>
 </ol>
-<div class="btns"><a href="/sdk/untils.js" download>Download SDK (untils.js)</a><a class="g" href="/sdk/untils-starter.zip" download>Starter game (zip)</a><a class="g" href="/sdk/starter-icon-512.png" download>Sample icon</a></div>
+<div class="btns"><a href="/sdk/untils.js" download>Download Untils SDK HTML (untils.js)</a><a class="g" href="/sdk/untils-starter.zip" download>Starter game (zip)</a><a class="g" href="/sdk/starter-icon-512.png" download>Sample icon</a></div>
 <p>The starter game already uses every SDK command. Upload it as a test game to see how publishing works.</p>
 </section>
 <section class="sec" id="package">
@@ -136,8 +136,8 @@ html{scroll-behavior:smooth}
 <div class="tip"><b>Updating a live game:</b> click it in your dashboard to change the description, category, icon, banner, screenshots, or upload a new version. Changes to the description, category, icon, banner and screenshots go live right away when you press <b>SAVE CHANGES</b>. A <b>new version (new zip)</b> of a live game is reviewed first: it shows as "New version in review" and the current version keeps running until we approve it (up to 2 days).</div>
 </section>
 <section class="sec" id="sdk">
-<h2>SDK for HTML5 games</h2>
-<p>The SDK is one small file, <code>untils.js</code>. It gives your game progress saving, pause/resume, and (soon) ads and leaderboards. <b>It is optional, but recommended.</b> Games that use it will keep working as we add features.</p>
+<h2>Untils SDK HTML</h2>
+<p><b>Untils SDK HTML</b> (version 1.1.0) is one small file, <code>untils.js</code>, for HTML5 games. It gives your game progress saving, pause/resume, share links, language, fullscreen and event tracking. Ads and leaderboards are reserved and will work later without changing your code. <b>It is optional, but recommended.</b></p>
 <h3>Import</h3>
 <ol>
 <li><a href="/sdk/untils.js" download>Download untils.js</a>.</li>
@@ -181,19 +181,25 @@ main();</code></pre>
 <h2>SDK commands</h2>
 <table>
 <tr><th>Command</th><th>What it does</th><th>Status</th></tr>
-<tr><td><code>await Untils.init()</code></td><td>Starts the SDK. Resolves with <code>{ env, isMobile, player, version }</code>. <code>env</code> is <code>"untils"</code> on the site or <code>"offline"</code> on your PC. Never fails.</td><td>Live</td></tr>
-<tr><td><code>loadingStart()</code> / <code>loadingFinished()</code></td><td>Tell UNTILS when your game is loading and when it is ready.</td><td>Live</td></tr>
-<tr><td><code>gameplayStart()</code> / <code>gameplayStop()</code></td><td>Call when real play starts and when it stops (death, menu, pause). Used for stats and, later, ad timing.</td><td>Live</td></tr>
-<tr><td><code>Untils.save(key, value)</code></td><td>Saves any JSON value (number, text, object, array). Example: <code>Untils.save("coins", 120)</code>.</td><td>Live (this browser)</td></tr>
+<tr><td><code>await Untils.init({ debug })</code></td><td>Starts the SDK. Call it first. Resolves with <code>{ name, version, env, isMobile, player, language }</code>. <code>env</code> is <code>"untils"</code> on the site or <code>"offline"</code> on your own PC. Never fails. Waits up to 3 seconds for UNTILS.</td><td>Live</td></tr>
+<tr><td><code>loadingStart()</code> / <code>loadingFinished()</code></td><td>Tell UNTILS when your game is loading and when the menu is ready.</td><td>Live</td></tr>
+<tr><td><code>gameplayStart()</code> / <code>gameplayStop()</code></td><td>Call when real play starts and stops (death, menu, pause). Repeated calls are ignored. When the tab is hidden, the SDK stops gameplay for you, so call <code>gameplayStart()</code> again when the player returns.</td><td>Live</td></tr>
+<tr><td><code>Untils.save(key, value)</code></td><td>Saves any JSON value (number, text, object, array). Returns <code>true</code> or <code>false</code>.</td><td>Live (this browser)</td></tr>
 <tr><td><code>await Untils.load(key, fallback)</code></td><td>Reads it back. Returns <code>fallback</code> if nothing is saved.</td><td>Live (this browser)</td></tr>
-<tr><td><code>Untils.remove(key)</code> / <code>Untils.clearSave()</code></td><td>Delete one value / all values.</td><td>Live</td></tr>
-<tr><td><code>Untils.onPause(fn)</code> / <code>onResume(fn)</code></td><td>Run your function when the player leaves or returns to the tab. Pause your game here.</td><td>Live</td></tr>
-<tr><td><code>await Untils.showAd("interstitial" | "rewarded")</code></td><td>Interstitial resolves <code>true</code> to continue. Rewarded resolves <code>true</code> only if the player earned the reward. Until ads go live: interstitial returns <code>true</code> at once, rewarded returns <code>false</code>.</td><td>Coming soon</td></tr>
-<tr><td><code>await Untils.getPlayer()</code></td><td>Returns <code>{ guest, name }</code>. Everyone is "Guest" for now.</td><td>Basic</td></tr>
-<tr><td><code>await Untils.submitScore(board, score)</code></td><td>Sends a score. Returns <code>false</code> until leaderboards go live. Safe to call now.</td><td>Coming soon</td></tr>
-<tr><td><code>Untils.isMobile</code>, <code>Untils.env</code>, <code>Untils.isReady</code></td><td>Handy flags.</td><td>Live</td></tr>
+<tr><td><code>remove(key)</code>, <code>clearSave()</code>, <code>keys()</code></td><td>Delete one value, delete everything, or list saved keys.</td><td>Live</td></tr>
+<tr><td><code>onPause(fn)</code> / <code>onResume(fn)</code></td><td>Runs when the player leaves or returns to the tab. Pause your game and sound here.</td><td>Live</td></tr>
+<tr><td><code>await getPlayer()</code></td><td>Returns <code>{ guest, name }</code>. Everyone is "Guest" for now.</td><td>Basic</td></tr>
+<tr><td><code>Untils.getLanguage()</code></td><td>Player's language as a 2-letter code, like <code>"en"</code> or <code>"hi"</code>.</td><td>Live</td></tr>
+<tr><td><code>Untils.shareableURL({ level: 5 })</code></td><td>Returns a link to your game with your own values in it. Show it in a "Share" button.</td><td>Live</td></tr>
+<tr><td><code>Untils.getURLParam("level")</code></td><td>Reads a value from the link the player opened. Returns <code>undefined</code> if missing.</td><td>Live</td></tr>
+<tr><td><code>requestFullscreen()</code> / <code>exitFullscreen()</code></td><td>Asks UNTILS to enter or leave fullscreen. Call it from a button click.</td><td>Live</td></tr>
+<tr><td><code>Untils.track(name, data)</code></td><td>Sends your own event, like <code>track("level_complete", { level: 3 })</code>. Name up to 40 characters. Stats for developers are coming later.</td><td>Reserved</td></tr>
+<tr><td><code>Untils.setDebug(true)</code></td><td>Prints SDK activity to the browser console while you build.</td><td>Live</td></tr>
+<tr><td><code>Untils.isMobile</code>, <code>env</code>, <code>isReady</code>, <code>version</code></td><td>Handy flags.</td><td>Live</td></tr>
+<tr><td><code>await showAd("interstitial" | "rewarded")</code>, <code>commercialBreak()</code>, <code>rewardedBreak()</code></td><td>Ads are not live yet. Until then interstitial returns <code>true</code> at once and rewarded returns <code>false</code>, so you can write your ad code now. <code>commercialBreak()</code> and <code>rewardedBreak()</code> are shortcuts.</td><td>Coming soon</td></tr>
+<tr><td><code>await submitScore(board, score)</code></td><td>Sends a score. Returns <code>false</code> until leaderboards go live. Safe to call now.</td><td>Coming soon</td></tr>
 </table>
-<div class="tip"><b>Saving tips:</b> save small things (level, coins, settings) often, not huge data. Today saves stay in the player's browser on that device. When player accounts arrive, the same <code>save</code> and <code>load</code> commands will work on every device, so your game will not need changes.</div>
+<div class="tip"><b>Limits and tips:</b> all saved values together can be about <b>900 KB</b> per game. If you go over, <code>save()</code> returns <code>false</code> and prints a warning. Save small things (level, coins, settings), not big data. Today saves stay in the player's browser on that device. When player accounts arrive, the same <code>save</code> and <code>load</code> will work on every device, so your game needs no change.</div>
 </section>
 <section class="sec" id="engines">
 <h2>Unity and other engines</h2>
