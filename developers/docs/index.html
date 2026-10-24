@@ -44,7 +44,7 @@ html{scroll-behavior:smooth}
 <a class="dd-back" href="/developers/dashboard/">&larr; Dashboard</a>
 <h1>Developer docs</h1>
 <p>Everything you need to publish an HTML5 game on UNTILS: what to prepare, what sizes to use, how review works, and how to use the SDK.</p>
-<div class="toc" id="toc"><a href="#quick">Quick start</a><a href="#package">Game package</a><a href="#size">Game size</a><a href="#icon">Icon</a><a href="#banner">Banner</a><a href="#shots">Screenshots</a><a href="#review">Review</a><a href="#sdk">SDK</a><a href="#api">SDK commands</a><a href="#engines">Engines</a><a href="#rules">Rules</a></div>
+<div class="toc" id="toc"><a href="#quick">Quick start</a><a href="#package">Game package</a><a href="#size">Game size</a><a href="#icon">Icon</a><a href="#banner">Banner</a><a href="#shots">Screenshots</a><a href="#review">Review</a><a href="#sdk">SDK</a><a href="#api">SDK commands</a><a href="#unity">Unity SDK</a><a href="#engines">Engines</a><a href="#rules">Rules</a></div>
 
 <section class="sec" id="quick">
 <h2>Quick start</h2>
@@ -201,17 +201,96 @@ main();</code></pre>
 </table>
 <div class="tip"><b>Limits and tips:</b> all saved values together can be about <b>900 KB</b> per game. If you go over, <code>save()</code> returns <code>false</code> and prints a warning. Save small things (level, coins, settings), not big data. Today saves stay in the player's browser on that device. When player accounts arrive, the same <code>save</code> and <code>load</code> will work on every device, so your game needs no change.</div>
 </section>
+<section class="sec" id="unity">
+<h2>Untils SDK Unity <small style="font-size:14px;color:#6b7c93">(beta, Unity 2022.3 LTS, WebGL)</small></h2>
+<p>One package with everything you need: the C# SDK, the <b>Untils WebGL template</b> (it appears in Player Settings, like other platform SDK templates), <code>UntilsPrefs</code> (a save-safe replacement for <code>PlayerPrefs</code>), an editor menu and a sample script.</p>
+<div class="btns"><a href="/sdk/unity/UntilsSDK-Unity2022.zip" download>Download Untils SDK Unity (Unity 2022)</a></div>
+<h3>Install and build</h3>
+<ol>
+<li>Unzip the file <b>into your Unity project folder</b> (the one that contains <code>Assets</code>). Merge the <code>Assets</code> folder.</li>
+<li>In Unity open the menu <b>Untils &rarr; Apply recommended WebGL settings</b>. This sets everything in the table below for you.</li>
+<li>In your first script call <code>Untils.Init(...)</code> and use <code>UntilsPrefs</code> instead of <code>PlayerPrefs</code> (see the code below).</li>
+<li><b>File &rarr; Build Settings &rarr; WebGL &rarr; Build.</b></li>
+<li>Zip the <b>contents</b> of the build folder, so <code>index.html</code> is at the top of the zip, and upload it in your dashboard.</li>
+</ol>
+<table>
+<tr><th>Player Settings (WebGL)</th><th>Value</th></tr>
+<tr><td>Resolution and Presentation &rarr; <b>WebGL Template</b></td><td><b>Untils</b></td></tr>
+<tr><td>Publishing Settings &rarr; Compression Format</td><td>Gzip (Brotli or Disabled also work)</td></tr>
+<tr><td>Publishing Settings &rarr; Decompression Fallback</td><td>On</td></tr>
+<tr><td>Publishing Settings &rarr; Data Caching</td><td>Off</td></tr>
+</table>
+<p>The template makes your game fill the whole window (phones and PC), shows a loading bar, loads <code>untils.js</code>, starts the SDK, and tells UNTILS when loading starts and finishes. You do not need to call <code>LoadingStart</code> yourself.</p>
+<h3>Code</h3>
+<pre><code>using UnityEngine;
+
+public class GameManager : MonoBehaviour
+{
+    int level;
+
+    void Start()
+    {
+        Untils.Init(ok =&gt;
+        {
+            level = UntilsPrefs.GetInt("level", 1);    // saved progress
+            StartGame();
+        });
+        Untils.OnPause  += () =&gt; Debug.Log("paused");   // optional
+        Untils.OnResume += () =&gt; Debug.Log("resumed");
+    }
+
+    public void OnPlayPressed() { Untils.GameplayStart(); }
+
+    public void OnGameOver()
+    {
+        Untils.GameplayStop();
+        UntilsPrefs.SetInt("level", level);             // saved automatically
+        Untils.CommercialBreak(() =&gt; ShowGameOverScreen());   // ads not live yet: continues at once
+    }
+
+    public void OnRewardButton()
+    {
+        Untils.RewardedBreak(rewarded =&gt; { if (rewarded) GiveCoins(); });
+    }
+}</code></pre>
+<h3>Commands</h3>
+<table>
+<tr><th>Command</th><th>What it does</th><th>Status</th></tr>
+<tr><td><code>Untils.Init(Action&lt;bool&gt; onReady)</code></td><td>Starts the SDK and loads saved data. Call it first. <code>onReady</code> runs when ready.</td><td>Live</td></tr>
+<tr><td><code>UntilsPrefs.SetInt / GetInt / SetFloat / GetFloat / SetString / GetString / HasKey / DeleteKey / DeleteAll / Save</code></td><td>Same as <code>PlayerPrefs</code>. Saves itself shortly after each change. About 900 KB per game.</td><td>Live (this browser)</td></tr>
+<tr><td><code>Untils.GameplayStart()</code> / <code>GameplayStop()</code></td><td>Real play starts / stops (death, menu, pause).</td><td>Live</td></tr>
+<tr><td><code>Untils.LoadingStart()</code> / <code>LoadingFinished()</code></td><td>Done for you by the template. Only call them if you load more content later.</td><td>Live</td></tr>
+<tr><td><code>Untils.OnPause</code> / <code>OnResume</code></td><td>Events when the tab is hidden or shown. With <code>Untils.AutoPause = true</code> (default) the SDK also pauses <code>Time.timeScale</code> and audio for you.</td><td>Live</td></tr>
+<tr><td><code>Untils.IsMobile</code>, <code>Language</code>, <code>Env</code>, <code>IsReady</code>, <code>Player</code></td><td>Handy values. <code>Env</code> is <code>"untils"</code> on the site and <code>"editor"</code> in the Unity Editor.</td><td>Live</td></tr>
+<tr><td><code>Untils.GetPlayer(callback)</code></td><td>Returns the player (<code>guest</code>, <code>name</code>). Everyone is "Guest" for now.</td><td>Basic</td></tr>
+<tr><td><code>Untils.ShareableURL(dictionary)</code> / <code>GetURLParam(name)</code></td><td>Make a share link with your values, and read them back when the game is opened from that link.</td><td>Live</td></tr>
+<tr><td><code>Untils.RequestFullscreen()</code> / <code>ExitFullscreen()</code></td><td>Ask UNTILS to enter or leave fullscreen. Call from a button press.</td><td>Live</td></tr>
+<tr><td><code>Untils.Track(name, json)</code></td><td>Send your own event, like <code>Track("level_complete", "{\"level\":3}")</code>. Stats come later.</td><td>Reserved</td></tr>
+<tr><td><code>Untils.CommercialBreak(callback)</code>, <code>RewardedBreak(callback)</code>, <code>ShowAd(type, callback)</code></td><td>Ads are not live yet. The interstitial continues at once; the rewarded callback gets <code>false</code>.</td><td>Coming soon</td></tr>
+<tr><td><code>Untils.SubmitScore(board, score, callback)</code></td><td>Leaderboards. Returns <code>false</code> until they go live.</td><td>Coming soon</td></tr>
+<tr><td><code>Untils.SetDebug(true)</code></td><td>Prints SDK activity in the browser console.</td><td>Live</td></tr>
+</table>
+<div class="tip"><b>In the Unity Editor</b> nothing is sent anywhere: <code>UntilsPrefs</code> uses <code>PlayerPrefs</code>, and rewarded ads return <code>Untils.EditorRewardedResult</code> (default <code>true</code>) so you can test your reward code.</div>
+<h3>If something goes wrong</h3>
+<ul>
+<li><b>"untils.js is not loaded"</b> in the browser console: the WebGL template is not set to <b>Untils</b>. Run the menu <b>Untils &rarr; Apply recommended WebGL settings</b> and build again.</li>
+<li><b>Progress is not saved:</b> you used <code>PlayerPrefs</code>. Change it to <code>UntilsPrefs</code>. Unity's own save uses IndexedDB, which is blocked in the UNTILS sandbox.</li>
+<li><b>The game stays on the loading bar:</b> open the browser console (F12). Check that the zip has <code>index.html</code> at the top and the <code>Build</code> folder next to it.</li>
+<li><b>Very large builds:</b> keep the zip under 50 MB. Compress textures and audio.</li>
+</ul>
+<p>This SDK is in <b>beta</b>. If you find a problem, please tell us through the <a href="/contact/">contact page</a> and include your Unity version.</p>
+</section>
 <section class="sec" id="engines">
 <h2>Unity and other engines</h2>
 <p>Web (HTML5) exports from game engines work if the zip follows the same rules as above: <code>index.html</code> at the top, relative paths, under 50 MB.</p>
 <h3>Unity (WebGL)</h3>
 <ol>
 <li>File &rarr; Build Settings &rarr; <b>WebGL</b> &rarr; Build.</li>
-<li>In Player Settings &rarr; Publishing Settings: <b>Compression Format</b> can be Brotli, Gzip or Disabled (UNTILS serves all three). Turn <b>Data Caching OFF</b>.</li>
+<li>In Player Settings &rarr; Publishing Settings: <b>Compression Format</b> can be Brotli, Gzip or Disabled (UNTILS serves all three). We recommend <b>Gzip</b> with <b>Decompression Fallback ON</b>. Turn <b>Data Caching OFF</b>.</li>
 <li>Zip the <b>contents</b> of the build folder (<code>index.html</code>, <code>Build/</code>, <code>TemplateData/</code>) so <code>index.html</code> is at the top of the zip.</li>
 <li>Make the canvas fill the window so it works on phones and PC.</li>
 </ol>
-<div class="tip"><b>Saving in Unity:</b> Unity keeps <code>PlayerPrefs</code> in the browser's IndexedDB, which is blocked in UNTILS' protected sandbox. So Unity progress is <b>not saved yet</b>. A Unity plugin for the UNTILS SDK is coming. Until then, design Unity games so they are fine without saved progress.</div>
+<div class="tip"><b>Using Unity?</b> Use the <a href="#unity">Untils SDK Unity</a>. It adds the WebGL template and <code>UntilsPrefs</code> so progress is saved.</div>
 <h3>Godot and Cocos</h3>
 <p>Export for Web and zip the export as above. For Godot 4, make sure <b>Thread Support</b> is off (threads need special server headers). Plugins for the UNTILS SDK are planned. We have not tested these engines in depth yet, so please test your game after upload and tell us if something fails.</p>
 </section>
