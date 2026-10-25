@@ -5,6 +5,21 @@ const SUPA = "https://fjfkwfklglovuxeecxsg.supabase.co";
 const KEY = "sb_publishable_HUSSW4Xiau3suUYMfcTjtQ_h083WJbS";
 const CATS = ["Arcade", "Action", "Adventure", "Puzzle", "Racing", "Space", "Casual", "Other"];
 const MAX_GAMES = 20;
+const cleanTitle = t => String(t || "").replace(/[<>&"'`\\$]/g, "").replace(/\s+/g, " ").trim();
+const slugOf = t => String(t).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+async function titleTaken(env, title, selfKey) {
+  const want = slugOf(title); let c;
+  do {
+    const l = await env.GAMES.list({ prefix: "game:", cursor: c });
+    for (const k of l.keys) {
+      if (k.name === selfKey) continue;
+      const g = await env.GAMES.get(k.name, "json");
+      if (g && slugOf(g.title || "") === want) return true;
+    }
+    c = l.list_complete ? null : l.cursor;
+  } while (c);
+  return false;
+}
 function shotsOk(a, uid, id) {
   if (a === undefined || a === null || a === "") return [];
   if (!Array.isArray(a) || a.length > 5) return null;
@@ -32,9 +47,12 @@ export async function onRequestGet({ request, env }) {
   if (!u) return json({ error: "Please sign in again." }, 401);
   const pv = new URL(request.url).searchParams.get("preview");
   if (pv) {
-    if (!/^[a-z0-9-]{8,40}$/.test(pv) || !(await env.GAMES.get("game:" + u.id + ":" + pv))) return json({ error: "Game not found." }, 404);
+    const pg = /^[a-z0-9-]{8,40}$/.test(pv) ? await env.GAMES.get("game:" + u.id + ":" + pv, "json") : null;
+    if (!pg) return json({ error: "Game not found." }, 404);
+    const nv = new URL(request.url).searchParams.get("v") === "new";
+    if (nv && !pg.pending) return json({ error: "No new version waiting." }, 404);
     if (!env.PLAY_SECRET || !env.SUPABASE_SERVICE_KEY) return json({ error: "PLAY_SECRET / SUPABASE_SERVICE_KEY not set." }, 500);
-    const s = [u.id, pv, Math.floor(Date.now() / 1000) + 86400].join("~");
+    const s = [u.id, pv, Math.floor(Date.now() / 1000) + 86400].concat(nv ? ["n"] : []).join("~");
     return json({ token: s + "~" + await sign(env, s) });
   }
   const l = await env.GAMES.list({ prefix: "game:" + u.id + ":", limit: 50 });
@@ -58,12 +76,13 @@ export async function onRequestPost({ request, env }) {
   let b;
   try { b = await request.json(); } catch (e) { return json({ error: "Bad request." }, 400); }
   const id = String(b.id || "");
-  const title = String(b.title || "").trim();
+  const title = cleanTitle(b.title);
   const desc = String(b.description || "").trim();
   const cat = String(b.category || "");
 
   if (!/^[a-z0-9-]{8,40}$/.test(id)) return json({ error: "Bad game id." }, 400);
   if (title.length < 2 || title.length > 60) return json({ error: "Title must be 2 to 60 characters." }, 400);
+  if (await titleTaken(env, title, null)) return json({ error: "Another game already uses this name. Please choose a different name." }, 400);
   if (desc.length < 10 || desc.length > 500) return json({ error: "Description must be 10 to 500 characters." }, 400);
   if (CATS.indexOf(cat) < 0) return json({ error: "Please choose a category." }, 400);
   if (b.path !== u.id + "/" + id + ".zip") return json({ error: "Bad file path." }, 400);
@@ -100,6 +119,21 @@ export async function onRequestPut({ request, env }) {
   const key = "game:" + u.id + ":" + id, g = await env.GAMES.get(key, "json");
   if (!g) return json({ error: "Game not found." }, 404);
   if (b.seen) { g.msgSeen = Date.now(); await env.GAMES.put(key, JSON.stringify(g)); return json({ ok: true }); }
+  if (b.sdk && typeof b.sdk === "object") {
+    const path = b.sdk.which === "new" ? (g.pending && g.pending.path) : g.path;
+    if (!path) return json({ error: "No such version." }, 400);
+    g.sdk = { path, ok: !!b.sdk.ok, name: String(b.sdk.name || "").slice(0, 40), version: String(b.sdk.version || "").slice(0, 20), at: Date.now() };
+    await env.GAMES.put(key, JSON.stringify(g));
+    return json({ ok: true });
+  }
+  if (b.title !== undefined) {
+    const t = cleanTitle(b.title);
+    if (t.length < 2 || t.length > 60) return json({ error: "Name must be 2 to 60 characters." }, 400);
+    if (t !== g.title) {
+      if (await titleTaken(env, t, key)) return json({ error: "Another game already uses this name. Please choose a different name." }, 400);
+      g.title = t;
+    }
+  }
   if (b.description !== undefined) { const d = String(b.description).trim(); if (d.length < 10 || d.length > 500) return json({ error: "Description must be 10 to 500 characters." }, 400); g.description = d; }
   if (b.category !== undefined) { if (CATS.indexOf(b.category) < 0) return json({ error: "Please choose a category." }, 400); g.category = b.category; }
   if (b.device !== undefined) g.device = b.device === "desktop" ? "desktop" : "all";

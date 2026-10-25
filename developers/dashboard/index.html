@@ -51,6 +51,13 @@
       <button type="submit" class="dv-sbtn" id="gGo">UPLOAD GAME</button>
     </form>
     <p id="dvNote" class="dv-ok" hidden></p>
+    <section id="dvInsp" class="dv-info" hidden>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">🔎 Inspector view</h3><button type="button" class="dv-lk" id="inClose">Close</button></div>
+      <p id="inState" style="font-weight:800;margin:10px 0 4px">Checking your game for the Untils SDK...</p>
+      <p class="dv-meta">The Inspector opens your game on its own page with a console on the side. You can see whether the SDK starts and which events fire.</p>
+      <div class="dv-links"><a id="inLink" class="dv-play" href="#">Open Inspector view</a><a id="inDocs" class="dv-lk" href="/developers/docs/#sdk" style="display:none;text-decoration:none">How to add the SDK</a></div>
+      <div id="inHold" aria-hidden="true" style="position:fixed;left:-9999px;top:0;width:360px;height:640px;overflow:hidden"></div>
+    </section>
     <section id="dvInfo" class="dv-info" hidden>
       <div class="dv-ih"><img id="iIc" alt="" width="56" height="56" style="border-radius:14px"><div><h3 id="iTitle"></h3><p id="iStatus"></p></div></div>
       <div id="iStats" class="dv-stats"></div>
@@ -61,6 +68,7 @@
     <form id="dvEdit" class="dv-gf" hidden>
       <h3 id="eTitle" style="margin:0"></h3>
       <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><img id="eIc" alt="" width="64" height="64" style="border-radius:14px"><img id="eBn" alt="" style="max-width:240px;border-radius:10px"></div>
+      <label>Game name<input id="eName" maxlength="60"></label>
       <label>Description<textarea id="eDesc" rows="3" maxlength="500"></textarea></label>
       <label>Category (tag)<select id="eCat"></select></label>
       <label>This game is for<select id="eDev"><option value="all">Mobile game (plays on phone and PC)</option><option value="desktop">Desktop game (PC only)</option></select></label>
@@ -105,7 +113,8 @@
 <div class="sf-b"><span>Small details. Big emotions.</span><span>&copy; 2026 UNTILS</span></div>
 </footer>
 <script src="/assets/js/auth.js?v=8"></script>
-<script src="/assets/js/dashboard.v9.js"></script>
+<script src="/assets/js/inspector-core.js"></script>
+<script src="/assets/js/dashboard.v11.js"></script>
 <script src="/assets/js/fx.v7.js"></script>
 </body>
 </html>

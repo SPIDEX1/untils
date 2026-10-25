@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Inspector view | UNTILS</title>
+<meta name="description" content="Your UNTILS developer dashboard.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="canonical" href="https://untils.pages.dev/developers/inspector/">
+<meta name="theme-color" content="#4fc3ff">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="UNTILS">
+<meta property="og:title" content="Inspector view | UNTILS">
+<meta property="og:description" content="Your UNTILS developer dashboard.">
+<meta property="og:url" content="https://untils.pages.dev/developers/inspector/">
+<meta property="og:image" content="https://untils.pages.dev/assets/img/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="/assets/css/style.css?v=5122f816"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap"><link rel="stylesheet" href="/assets/css/theme.v8.css">
+<link rel="stylesheet" href="/assets/css/developers.v8.css">
+<style>.dv-dgrid{grid-template-columns:1fr!important}.dv-acc{display:inline-flex;align-items:center;gap:8px;background:#e4f0fb;color:var(--navy);padding:9px 16px;border-radius:30px;font-weight:800;font-size:14px;text-decoration:none;margin:0 10px 0 auto}.dv-acc svg{width:18px;height:18px}.dv-acc+.dv-signin{margin-left:0}a.dv-back{display:inline-block;padding:10px 18px;border-radius:30px;background:#e4f0fb;font-weight:800;text-decoration:none;color:var(--navy);margin-bottom:14px}.dv-gf{display:grid;gap:12px;margin:0 0 18px}.dv-gf label{display:grid;gap:6px;font-weight:800;font-size:14px}.dv-gf input,.dv-gf select,.dv-gf textarea{font:inherit;padding:10px 12px;border:2px solid #d5e3f5;border-radius:12px}.dv-gl{list-style:none;margin:0;padding:0;display:grid;gap:10px}.dv-gl li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 14px;border-radius:14px;background:#f2f8ff}.dv-gl small{display:block;color:#6b7c93}.dv-st{font-weight:800;font-size:12px;padding:4px 10px;border-radius:99px;background:#ffe9b8}.dv-st.approved{background:#c9f5d3}.dv-st.rejected{background:#ffd0d6}</style>
+<style>.ins-chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}.ins-chip{font-size:12px;font-weight:800;padding:5px 10px;border-radius:99px;background:#e4f0fb;color:#6b7c93}.ins-chip.on{background:#c9f5d3;color:#0b5a25}.ins-chip.bad{background:#ffd0d6;color:#8a1226}
+.ins-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;align-items:start}@media(max-width:900px){.ins-grid{grid-template-columns:1fr}}
+.ins-tools,.ins-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:0 0 8px}.ins-tools{justify-content:flex-start}
+.ins-box{width:100%;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;margin:0 auto}.ins-box.ph{width:375px;max-width:100%;aspect-ratio:9/16;max-height:75vh}
+.ins-log{background:#0b1f3a;color:#e8f2ff;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;height:min(70vh,560px);overflow:auto;border-radius:12px;padding:10px}.ins-log div{padding:2px 0;word-break:break-word}.ins-log .t{opacity:.5;margin-right:6px}.ins-log .k-ok{color:#7dffa6}.ins-log .k-warn{color:#ffd36b}.ins-log .k-err{color:#ff8a8a}.ins-log .k-info{color:#cfe3ff}.dv-lk.on{background:#0a6cff;color:#fff}</style>
+</head>
+<body>
+<header><a class="lg" href="/" aria-label="UNTILS home"><img class="logo" src="/assets/img/untils-logo.png?v=2" alt="UNTILS" width="206" height="50"></a><div class="hr"><a class="dv-acc" href="/developers/inspector/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>ACCOUNT</span></a><button type="button" class="dv-signin" id="dvOut"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg><span>LOG OUT</span></button></div></header>
+<main class="dv dv-dash" id="ins" hidden>
+<section class="dv-dh"><a class="dv-back" href="/developers/dashboard/">&larr; Back to dashboard</a><br><span class="dv-eyebrow">INSPECTOR VIEW</span><h1 id="insTitle">Inspector</h1>
+<p class="dv-meta" style="font-size:15px">Your game runs here like on UNTILS. The console on the side shows every Untils SDK event.</p></section>
+<section class="dv-sec">
+<div id="insChips" class="ins-chips"></div>
+<div class="ins-grid">
+<div><div class="ins-tools"><button type="button" class="dv-lk on" id="insDesk">🖥 Desktop</button><button type="button" class="dv-lk" id="insPhone">📱 Phone</button><button type="button" class="dv-lk" id="insFs">⛶ Fullscreen</button><button type="button" class="dv-lk" id="insRe">↻ Restart</button></div><div id="insBox" class="ins-box"></div></div>
+<div><div class="ins-bar"><b>Console</b><span><button type="button" class="dv-lk" id="insClear">Clear</button> <button type="button" class="dv-lk" id="insCopy">Copy</button></span></div><div id="insLog" class="ins-log"></div></div>
+</div></section>
+</main>
+<noscript><div class="legal"><h1>Dashboard</h1><p>Please enable JavaScript to use your dashboard.</p></div></noscript>
+<footer class="sf">
+<div class="sf-brand ab-brand"><img class="ab-logo" src="/assets/img/untils-logo.png?v=2" alt="UNTILS" width="230" height="56"><span class="ab-chip">More Than Just Games</span></div>
+<div class="sf-in">
+<div class="sf-c"><h4>GAMES</h4><a href="/games/">All Games</a></div>
+<div class="sf-c"><h4>COMPANY</h4><a href="/about/">About</a><a href="/developers/">For Developers</a><a href="/developers/docs/">Documentation</a><a href="/contact/">Contact</a><a href="/privacy/">Privacy Policy</a><a href="/terms/">Terms of Use</a></div>
+<div class="sf-c sf-soc"><h4>FOLLOW US ON</h4><a href="https://www.youtube.com/@untilsofficial" target="_blank" rel="noopener noreferrer" aria-label="UNTILS on YouTube"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg><span>YouTube</span></a><a href="https://www.instagram.com/untilsofficial/" target="_blank" rel="noopener noreferrer" aria-label="UNTILS on Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg><span>Instagram</span></a><a href="https://x.com/untilsofficial/" target="_blank" rel="noopener noreferrer" aria-label="UNTILS on X (Twitter)"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg><span>X (Twitter)</span></a></div>
+</div>
+<div class="sf-b"><span>Small details. Big emotions.</span><span>&copy; 2026 UNTILS</span></div>
+</footer>
+<script src="/assets/js/auth.js?v=8"></script>
+<script src="/assets/js/inspector-core.js"></script><script src="/assets/js/inspector.js"></script>
+<script src="/assets/js/fx.v7.js"></script>
+</body>
+</html>

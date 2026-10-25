@@ -44,7 +44,7 @@ html{scroll-behavior:smooth}
 <a class="dd-back" href="/developers/dashboard/">&larr; Dashboard</a>
 <h1>Developer docs</h1>
 <p>Everything you need to publish an HTML5 game on UNTILS: what to prepare, what sizes to use, how review works, and how to use the SDK.</p>
-<div class="toc" id="toc"><a href="#quick">Quick start</a><a href="#package">Game package</a><a href="#size">Game size</a><a href="#icon">Icon</a><a href="#banner">Banner</a><a href="#shots">Screenshots</a><a href="#review">Review</a><a href="#sdk">SDK</a><a href="#api">SDK commands</a><a href="#unity">Unity SDK</a><a href="#engines">Engines</a><a href="#rules">Rules</a></div>
+<div class="toc" id="toc"><a href="#quick">Quick start</a><a href="#package">Game package</a><a href="#size">Game size</a><a href="#icon">Icon</a><a href="#banner">Banner</a><a href="#shots">Screenshots</a><a href="#review">Review</a><a href="#sdk">SDK</a><a href="#api">SDK commands</a><a href="#inspector">Inspector</a><a href="#unity">Unity SDK</a><a href="#engines">Engines</a><a href="#rules">Rules</a></div>
 
 <section class="sec" id="quick">
 <h2>Quick start</h2>
@@ -133,11 +133,11 @@ html{scroll-behavior:smooth}
 <li><b>APPROVED</b> or <b>REJECTED</b> - the leader decides. If rejected, a note explains why on your dashboard, and you can fix it and upload again.</li>
 <li><b>LIVE</b> - the game is public on UNTILS. A green <b>PLAY</b> button appears next to it in your dashboard, together with plays, players and likes. Messages from our team also show there, next to the game.</li>
 </ol>
-<div class="tip"><b>Updating a live game:</b> click it in your dashboard to change the description, category, icon, banner, screenshots, or upload a new version. Changes to the description, category, icon, banner and screenshots go live right away when you press <b>SAVE CHANGES</b>. A <b>new version (new zip)</b> of a live game is reviewed first: it shows as "New version in review" and the current version keeps running until we approve it (up to 2 days).</div>
+<div class="tip"><b>Updating a live game:</b> click it in your dashboard to change the name, description, category, icon, banner, screenshots, or upload a new version. If you rename a game, its link changes too. Changes to the name, description, category, icon, banner and screenshots go live right away when you press <b>SAVE CHANGES</b>. A <b>new version (new zip)</b> of a live game is reviewed first: it shows as "New version in review" and the current version keeps running until we approve it (up to 2 days).</div>
 </section>
 <section class="sec" id="sdk">
 <h2>Untils SDK HTML</h2>
-<p><b>Untils SDK HTML</b> (version 1.1.0) is one small file, <code>untils.js</code>, for HTML5 games. It gives your game progress saving, pause/resume, share links, language, fullscreen and event tracking. Ads and leaderboards are reserved and will work later without changing your code. <b>It is optional, but recommended.</b></p>
+<p><b>Untils SDK HTML</b> (version 1.2.0) is one small file, <code>untils.js</code>, for HTML5 games. It gives your game progress saving, pause/resume, share links, language, fullscreen and event tracking. Ads and leaderboards are reserved and will work later without changing your code. <b>It is optional, but recommended.</b></p>
 <h3>Import</h3>
 <ol>
 <li><a href="/sdk/untils.js" download>Download untils.js</a>.</li>
@@ -201,17 +201,31 @@ main();</code></pre>
 </table>
 <div class="tip"><b>Limits and tips:</b> all saved values together can be about <b>900 KB</b> per game. If you go over, <code>save()</code> returns <code>false</code> and prints a warning. Save small things (level, coins, settings), not big data. Today saves stay in the player's browser on that device. When player accounts arrive, the same <code>save</code> and <code>load</code> will work on every device, so your game needs no change.</div>
 </section>
+<section class="sec" id="inspector">
+<h2>Inspector view and SDK check</h2>
+<p>Every time you <b>upload a game</b> or a <b>new version (new zip)</b>, UNTILS opens an <b>Inspector view</b> panel in your dashboard. It starts your game in the background and checks whether the Untils SDK is running. If the SDK is found, the panel just confirms it. If not, it tells you the SDK was not detected (the SDK is optional, so your game can still be reviewed).</p>
+<p>The panel always has a link to the <b>Inspector page</b>. There your game opens like on UNTILS, with a <b>console on the side</b> that shows each event as it happens:</p>
+<ul>
+<li><b>init</b>: the SDK started (and which SDK and version).</li>
+<li><b>loading</b> start and finished, <b>gameplay</b> start and stop.</li>
+<li><b>save</b>: how many keys and how big, and <b>track</b> events with their data.</li>
+<li><b>ad</b> and <b>score</b> requests (ads and leaderboards are not live yet).</li>
+<li><b>error</b>: errors from your game, when the SDK is running.</li>
+</ul>
+<p>Chips at the top turn green when an event has fired. You can switch between Desktop and Phone size, restart the game, and copy the log.</p>
+<div class="tip"><b>When does the panel appear?</b> Only when you upload a zip (first upload or a new version). It does not appear when you only change the text, category, icon, banner or screenshots. You can open the Inspector at any time from your game's details in the dashboard. For a live game with a new version waiting for review, you can inspect the new version too.</div>
+</section>
 <section class="sec" id="unity">
-<h2>Untils SDK Unity <small style="font-size:14px;color:#6b7c93">(beta, Unity 2022.3 LTS, WebGL)</small></h2>
-<p>One package with everything you need: the C# SDK, the <b>Untils WebGL template</b> (it appears in Player Settings, like other platform SDK templates), <code>UntilsPrefs</code> (a save-safe replacement for <code>PlayerPrefs</code>), an editor menu and a sample script.</p>
-<div class="btns"><a href="/sdk/unity/UntilsSDK-Unity2022.zip" download>Download Untils SDK Unity (Unity 2022)</a></div>
+<h2>Untils SDK Unity <small style="font-size:14px;color:#6b7c93">(beta, Unity 2020.1 to Unity 6, WebGL)</small></h2>
+<p>One package for <b>Unity 2020.1 up to Unity 6</b> (Unity 2019 and older are not supported, they use an older WebGL loader). It has everything you need: the C# SDK, the <b>Untils WebGL template</b> (it appears in Player Settings, like other platform SDK templates), <code>UntilsPrefs</code> (a save-safe replacement for <code>PlayerPrefs</code>), an editor menu and a sample script.</p>
+<div class="btns"><a href="/sdk/unity/UntilsSDK-Unity.zip" download>Download Untils SDK Unity (Unity 2020 to Unity 6)</a></div>
 <h3>Install and build</h3>
 <ol>
 <li>Unzip the file <b>into your Unity project folder</b> (the one that contains <code>Assets</code>). Merge the <code>Assets</code> folder.</li>
 <li>In Unity open the menu <b>Untils &rarr; Apply recommended WebGL settings</b>. This sets everything in the table below for you.</li>
 <li>In your first script call <code>Untils.Init(...)</code> and use <code>UntilsPrefs</code> instead of <code>PlayerPrefs</code> (see the code below).</li>
 <li><b>File &rarr; Build Settings &rarr; WebGL &rarr; Build.</b></li>
-<li>Zip the <b>contents</b> of the build folder, so <code>index.html</code> is at the top of the zip, and upload it in your dashboard.</li>
+<li>Zip the <b>contents</b> of the build folder, so <code>index.html</code> is at the top of the zip, and upload it in your dashboard. UNTILS then opens the <a href="#inspector">Inspector view</a> to check your SDK.</li>
 </ol>
 <table>
 <tr><th>Player Settings (WebGL)</th><th>Value</th></tr>

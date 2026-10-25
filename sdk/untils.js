@@ -1,7 +1,7 @@
-/*! Untils SDK HTML v1.1.0 | Docs: /developers/docs/ */
+/*! Untils SDK HTML v1.2.0 | Docs: /developers/docs/ */
 (function (w) {
   "use strict";
-  var NAME = "Untils SDK HTML", VERSION = "1.1.0", TIMEOUT = 3000, OFF = "untils_sdk_offline", MAXSAVE = 900000;
+  var NAME = "Untils SDK HTML", VERSION = "1.2.0", TIMEOUT = 3000, OFF = "untils_sdk_offline", MAXSAVE = 900000;
   var env = "none", ready = false, data = {}, player = { guest: true, name: "Guest" }, debug = false, ctx = { url: "", params: "" };
   var mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && Math.min(screen.width, screen.height) < 820);
   var pend = {}, seq = 0, pauseCb = [], resumeCb = [], paused = false, saveT = 0, loading = false, playing = false;
@@ -48,6 +48,14 @@
   });
   document.addEventListener("visibilitychange", function () { if (document.hidden) doPause(); else doResume(); });
   w.addEventListener("pagehide", function () { if (ready) flush(); });
+  var errN = 0;
+  w.addEventListener("error", function (e) {
+    if (ready && env === "untils" && errN++ < 20) evt("error", { message: String((e && e.message) || "error").slice(0, 200), source: String((e && e.filename) || "").slice(-80), line: (e && e.lineno) || 0 });
+  });
+  w.addEventListener("unhandledrejection", function (e) {
+    var r = e && e.reason;
+    if (ready && env === "untils" && errN++ < 20) evt("error", { message: ("Unhandled promise: " + String((r && r.message) || r)).slice(0, 200) });
+  });
 
   w.Untils = {
     sdkName: NAME,
@@ -61,7 +69,7 @@
     init: function (opts) {
       if (opts && opts.debug) debug = true;
       if (ready) return Promise.resolve(info());
-      var p = inFrame() ? send("init", {}).then(function (r) {
+      var p = inFrame() ? send("init", { sdk: NAME, sdkVersion: VERSION, via: (opts && opts.via) || "" }).then(function (r) {
         if (!r || !r.ok || !r.data) throw new Error("bad reply");
         env = "untils"; data = r.data.data || {}; player = r.data.player || player;
         ctx = { url: r.data.url || "", params: r.data.params || "" };
@@ -73,6 +81,9 @@
       }).then(function () { ready = true; log("ready", info()); return info(); });
     },
     setDebug: function (on) { debug = !!on; },
+
+    /* Used by engine plugins (for example Untils SDK Unity) to tell UNTILS which plugin is running. */
+    announce: function (name, version) { if (ready && env === "untils") send("announce", { name: String(name), version: String(version) }).catch(noop); },
 
     /* Loading and gameplay state */
     loadingStart: function () { if (!need("loadingStart") || loading) return; loading = true; evt("loading", { state: "start" }); },
