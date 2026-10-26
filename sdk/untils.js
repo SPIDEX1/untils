@@ -1,7 +1,7 @@
-/*! Untils SDK HTML v1.2.0 | Docs: /developers/docs/ */
+/*! HTML SDK (untils.js) v1.2.0 | Docs: /developers/docs/ */
 (function (w) {
   "use strict";
-  var NAME = "Untils SDK HTML", VERSION = "1.2.0", TIMEOUT = 3000, OFF = "untils_sdk_offline", MAXSAVE = 900000;
+  var NAME = "HTML SDK", VERSION = "1.2.0", TIMEOUT = 3000, OFF = "untils_sdk_offline", MAXSAVE = 900000;
   var env = "none", ready = false, data = {}, player = { guest: true, name: "Guest" }, debug = false, ctx = { url: "", params: "" };
   var mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && Math.min(screen.width, screen.height) < 820);
   var pend = {}, seq = 0, pauseCb = [], resumeCb = [], paused = false, saveT = 0, loading = false, playing = false;
