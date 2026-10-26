@@ -27,6 +27,8 @@ function shotsOk(a, uid, id) {
   return a;
 }
 
+const ORI = o => (o === "landscape" || o === "portrait") ? o : "both";
+const vlist = g => (Array.isArray(g.versions) && g.versions.length) ? g.versions : (g.path ? [{ n: g.version || 1, path: g.path, at: g.createdAt || 0 }] : []);
 const json = (o, s) => new Response(JSON.stringify(o), {
   status: s || 200,
   headers: { "Content-Type": "application/json", "Cache-Control": "no-store" }
@@ -55,10 +57,23 @@ export async function onRequestGet({ request, env }) {
     const s = [u.id, pv, Math.floor(Date.now() / 1000) + 86400].concat(nv ? ["n"] : []).join("~");
     return json({ token: s + "~" + await sign(env, s) });
   }
+  const dl = new URL(request.url).searchParams.get("download");
+  if (dl) {
+    if (!/^[a-z0-9-]{8,40}$/.test(dl)) return json({ error: "Bad game id." }, 400);
+    const dg = await env.GAMES.get("game:" + u.id + ":" + dl, "json");
+    if (!dg) return json({ error: "Game not found." }, 404);
+    const n = +new URL(request.url).searchParams.get("n"), ver = vlist(dg).find(v => v.n === n);
+    if (!ver) return json({ error: "Version not found." }, 404);
+    if (!env.SUPABASE_SERVICE_KEY) return json({ error: "SUPABASE_SERVICE_KEY not set." }, 500);
+    const r = await fetch(SUPA + "/storage/v1/object/game-zips/" + ver.path, { headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: "Bearer " + env.SUPABASE_SERVICE_KEY } });
+    if (!r.ok) return json({ error: "This version file is no longer available." }, 404);
+    return new Response(r.body, { headers: { "Content-Type": "application/zip", "Content-Disposition": 'attachment; filename="' + (slugOf(dg.title) || "game") + "-v" + n + '.zip"', "Cache-Control": "no-store" } });
+  }
   const l = await env.GAMES.list({ prefix: "game:" + u.id + ":", limit: 50 });
   const games = (await Promise.all(l.keys.map(k => env.GAMES.get(k.name, "json")))).filter(Boolean);
   const day7 = new Date(Date.now() - 6 * 86400000).toISOString().slice(0, 10);
   await Promise.all(games.map(async g => {
+    g.versions = vlist(g); g.orient = ORI(g.orient);
     const k = g.owner + "~" + g.id;
     const [st, vt] = await Promise.all([env.GAMES.get("stats:" + k, "json"), env.GAMES.get("votes:" + k, "json")]);
     let week = 0; for (const d in ((st && st.d) || {})) if (d >= day7) week += st.d[d];
@@ -103,7 +118,7 @@ export async function onRequestPost({ request, env }) {
   const game = {
     id, title, description: desc, category: cat,
     studio: (u.user_metadata && u.user_metadata.studio) || "",
-    owner: u.id, path: b.path, icon: b.icon, banner: b.banner || "", shots: sh, device: b.device === "desktop" ? "desktop" : "all", status: "pending", createdAt: Date.now()
+    owner: u.id, path: b.path, icon: b.icon, banner: b.banner || "", shots: sh, device: b.device === "desktop" ? "desktop" : "all", orient: b.device === "desktop" ? "both" : ORI(b.orient), versions: [{ n: 1, path: b.path, at: Date.now() }], status: "pending", createdAt: Date.now()
   };
   await env.GAMES.put(prefix + id, JSON.stringify(game));
   return json({ ok: true, game });
@@ -137,12 +152,13 @@ export async function onRequestPut({ request, env }) {
   if (b.description !== undefined) { const d = String(b.description).trim(); if (d.length < 10 || d.length > 500) return json({ error: "Description must be 10 to 500 characters." }, 400); g.description = d; }
   if (b.category !== undefined) { if (CATS.indexOf(b.category) < 0) return json({ error: "Please choose a category." }, 400); g.category = b.category; }
   if (b.device !== undefined) g.device = b.device === "desktop" ? "desktop" : "all";
+  if (b.orient !== undefined || b.device !== undefined) g.orient = g.device === "desktop" ? "both" : ORI(b.orient !== undefined ? b.orient : g.orient);
   const ok = (p, re) => typeof p === "string" && p.startsWith(u.id + "/" + id + "-") && re.test(p);
   if (b.icon) { if (!ok(b.icon, /-i\d+\.(png|jpg|webp)$/)) return json({ error: "Bad icon." }, 400); g.icon = b.icon; }
   if (b.banner) { if (!ok(b.banner, /-b\d+\.(png|jpg|webp)$/)) return json({ error: "Bad banner." }, 400); g.banner = b.banner; }
   if (b.shots !== undefined) { const sh = shotsOk(b.shots, u.id, id); if (!sh) return json({ error: "Bad screenshots." }, 400); g.shots = sh; }
   if (b.removeBanner && !b.banner) g.banner = "";
-  if (b.path) { if (!ok(b.path, /-v\d+\.zip$/)) return json({ error: "Bad file path." }, 400); if (g.status === "live") { g.pending = { path: b.path, at: Date.now() }; g.updateNote = ""; }
+  if (b.path) { if (!ok(b.path, /-v\d+\.zip$/)) return json({ error: "Bad file path." }, 400); { const vs = vlist(g).slice(); vs.push({ n: Math.max.apply(null, vs.map(v => v.n).concat([0])) + 1, path: b.path, at: Date.now() }); g.versions = vs.slice(-50); } if (g.status === "live") { g.pending = { path: b.path, at: Date.now() }; g.updateNote = ""; }
     else { g.path = b.path; g.version = (g.version || 1) + 1; if (g.status !== "pending") { g.status = "pending"; g.note = ""; } } }
   g.updatedAt = Date.now();
   await env.GAMES.put(key, JSON.stringify(g));
