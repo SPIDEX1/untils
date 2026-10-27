@@ -15,7 +15,7 @@
     d.appendChild(t); d.appendChild(document.createTextNode(e.text));
     L.appendChild(d); L.scrollTop = L.scrollHeight;
   }
-  function chip(txt, on, bad) { var c = document.createElement("span"); c.className = "ins-chip" + (on ? " on" : "") + (bad ? " bad" : ""); c.textContent = (on ? "✔ " : bad ? "✖ " : "") + txt; return c; }
+  function chip(txt, on, bad) { var c = document.createElement("span"); c.className = "ins-chip" + (on ? " on" : "") + (bad ? " bad" : ""); if (window.UI) UI.set(c, on ? "check-circle" : bad ? "x-circle" : "", txt); else c.textContent = txt; return c; }
   function chips(st) {
     var C = $("insChips"); C.innerHTML = "";
     C.appendChild(chip("SDK init", st.init)); C.appendChild(chip("Loading start", st.loadingStart)); C.appendChild(chip("Loading finished", st.loadingFinished));
@@ -47,7 +47,7 @@
   $("insClear").onclick = function () { $("insLog").innerHTML = ""; };
   $("insCopy").onclick = function () {
     var txt = [].map.call($("insLog").children, function (d) { return d.textContent; }).join("\n");
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { $("insCopy").textContent = "Copied ✓"; setTimeout(function () { $("insCopy").textContent = "Copy"; }, 1500); });
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { UI.set($("insCopy"), "check", "Copied"); setTimeout(function () { $("insCopy").textContent = "Copy"; }, 1500); });
     else prompt("Copy the log:", txt);
   };
 

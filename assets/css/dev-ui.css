@@ -1,0 +1,25 @@
+/* developer portal: icons, hover effects, disabled save, delete */
+.ic{display:inline-flex;align-items:center;justify-content:center;flex:none;vertical-align:-.22em;margin-right:6px}
+.ic .ic-s{width:1.2em;height:1.2em}
+.dv-lk,.dv-play,.dv-back,.dv-acc,.dv-bell{display:inline-flex;align-items:center;justify-content:center;transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,background .2s,color .2s}
+.dv-lk:hover,.dv-play:hover,.dv-back:hover,.dv-acc:hover{transform:translateY(-3px) scale(1.07);box-shadow:0 10px 20px rgba(10,108,255,.28)}
+.dv-lk:hover{background:#cfe6ff}
+.dv-lk.on:hover{background:#0a6cff}
+.dv-play:hover{box-shadow:0 10px 20px rgba(31,162,74,.4)}
+.dv-lk:active,.dv-play:active,.dv-back:active,.dv-acc:active{transform:scale(.94)}
+.dv-lk:hover .ic,.dv-play:hover .ic,.dv-back:hover .ic,.dv-acc:hover .ic,.dv-sbtn:hover:not(:disabled) .ic{animation:wig .6s ease-in-out}
+.dv-lk:disabled,.dv-play:disabled{opacity:.6;cursor:default;transform:none;box-shadow:none}
+.dv-sbtn{display:flex;align-items:center;justify-content:center}
+.dv-sbtn:disabled{background:#cfd8e6!important;color:#8795aa!important;box-shadow:none!important;cursor:not-allowed;transform:none!important;opacity:1}
+.dv-sbtn.dv-danger{background:linear-gradient(135deg,#ff6b6b,#e11d48);box-shadow:0 8px 18px rgba(225,29,72,.35)}
+.dv-sbtn.dv-danger:hover{background:linear-gradient(135deg,#ff6b6b,#e11d48);box-shadow:0 14px 28px rgba(225,29,72,.45)}
+.dv-lk.dv-danger{background:#ffe3e8;color:#c0143c}
+.dv-lk.dv-danger:hover{background:#ffd0d8;box-shadow:0 10px 20px rgba(225,29,72,.3)}
+#dvList li{transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,background .2s}
+#dvList li:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(10,108,255,.2)}
+.dv-delbox{background:#fff0f3;border:2px solid #ffc2cf;border-radius:16px;padding:14px;display:grid;gap:10px}
+.dv-delbox[hidden]{display:none!important}
+.dv-delbox p{margin:0;font-weight:700;color:#7a1230}
+.dv-delbox .row{display:flex;gap:10px;flex-wrap:wrap}
+.dv-delbox .row .dv-sbtn{width:auto;flex:1 1 150px;padding:12px}
+.dv-st .ic,.ins-chip .ic{margin-right:4px}

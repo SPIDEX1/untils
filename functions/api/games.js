@@ -164,3 +164,41 @@ export async function onRequestPut({ request, env }) {
   await env.GAMES.put(key, JSON.stringify(g));
   return json({ ok: true, game: g });
 }
+
+/* Delete a game: removes it from the platform (KV) and its files from storage. Owner only. */
+export async function onRequestDelete({ request, env }) {
+  if (!env.GAMES) return json({ error: "KV binding GAMES missing" }, 500);
+  const u = await who(request);
+  if (!u) return json({ error: "Please sign in again." }, 401);
+  let b; try { b = await request.json(); } catch (e) { return json({ error: "Bad request." }, 400); }
+  const id = String(b.id || "");
+  if (!/^[a-z0-9-]{8,40}$/.test(id)) return json({ error: "Bad game id." }, 400);
+  const key = "game:" + u.id + ":" + id, g = await env.GAMES.get(key, "json");
+  if (!g) return json({ error: "Game not found." }, 404);
+  /* 1) platform: the game record goes first, so it disappears from UNTILS immediately */
+  await env.GAMES.delete(key);
+  const gk = u.id + "~" + id;
+  await Promise.all([env.GAMES.delete("stats:" + gk), env.GAMES.delete("votes:" + gk)].map(p => p.catch(() => {})));
+  try {
+    const rv = await env.GAMES.list({ prefix: "review:" + u.id + ":" + id + ":", limit: 30 });
+    await Promise.all(rv.keys.map(k => env.GAMES.delete(k.name).catch(() => {})));
+  } catch (e) {}
+  /* 2) storage: every file of this game (all versions, icon, banner, screenshots) */
+  let files = 0, warn = "";
+  if (!env.SUPABASE_SERVICE_KEY) warn = "Files were not removed from storage (SUPABASE_SERVICE_KEY not set).";
+  else {
+    const h = { apikey: env.SUPABASE_SERVICE_KEY, Authorization: "Bearer " + env.SUPABASE_SERVICE_KEY, "Content-Type": "application/json" };
+    for (const bucket of ["game-zips", "game-icons"]) {
+      try {
+        const lr = await fetch(SUPA + "/storage/v1/object/list/" + bucket, { method: "POST", headers: h, body: JSON.stringify({ prefix: u.id, search: id, limit: 1000 }) });
+        const items = lr.ok ? await lr.json() : [];
+        const names = items.map(o => o.name).filter(n => typeof n === "string" && n.startsWith(id)).map(n => u.id + "/" + n);
+        if (names.length) {
+          const dr = await fetch(SUPA + "/storage/v1/object/" + bucket, { method: "DELETE", headers: h, body: JSON.stringify({ prefixes: names }) });
+          if (dr.ok) files += names.length; else warn = "Some files could not be removed from storage.";
+        }
+      } catch (e) { warn = "Some files could not be removed from storage."; }
+    }
+  }
+  return json({ ok: true, files, warn });
+}

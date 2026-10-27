@@ -22,7 +22,7 @@
       var data = { about: $("aAbout").value.trim(), address: $("aAddr").value.trim() };
       if (meta.studio) data.studio = meta.studio;
       return fetch(C.URL + "/auth/v1/user", { method: "PUT", headers: { "apikey": C.KEY, "Authorization": "Bearer " + s.access_token, "Content-Type": "application/json" }, body: JSON.stringify({ data: data }) })
-        .then(function (r) { err.textContent = r.ok ? "Saved ✓" : "Could not save. Please try again."; });
+        .then(function (r) { err.textContent = r.ok ? "Saved" : "Could not save. Please try again."; });
     }).catch(function () { err.textContent = "No internet connection."; })
       .then(function () { btn.disabled = false; btn.textContent = "SAVE"; });
   });
