@@ -23,3 +23,56 @@
 .dv-delbox .row{display:flex;gap:10px;flex-wrap:wrap}
 .dv-delbox .row .dv-sbtn{width:auto;flex:1 1 150px;padding:12px}
 .dv-st .ic,.ins-chip .ic{margin-right:4px}
+
+/* ---------- every screen size: nothing may push the page wider than the phone ---------- */
+body.dvp{overflow-x:hidden}
+body.dvp img,body.dvp video,body.dvp svg{max-width:100%}
+.dv-dgrid>*,.dv-panel,.dv-info,.dv-gf,.dv-gf>*,.dv-ph>*,.dv-links>*,#dvList li>*,.dv-stats>*{min-width:0}
+.dv-gf input,.dv-gf select,.dv-gf textarea{width:100%;max-width:100%;box-sizing:border-box}
+.dv-gf input[type=checkbox]{width:auto}
+.dv-panel,.dv-info h3,#dvList li b,#dvList li small,.dv-msg,#iMeta,#iStatus{overflow-wrap:anywhere}
+.dv-links{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.dd-back{display:inline-flex;align-items:center;gap:8px}
+.dd-back .ic-s,.dv-back .ic-s{width:20px;height:20px;flex:none}
+.dv-back{display:inline-flex;align-items:center;gap:6px}
+.doc{overflow-x:hidden}
+.doc pre{max-width:100%}
+.doc .btns a{max-width:100%;overflow-wrap:anywhere;text-align:center}
+
+@media(max-width:820px){
+ /* header: one tidy row, logo left, icon buttons right */
+ body.dvp header{display:flex!important;flex-wrap:nowrap!important;justify-content:space-between!important;align-items:center!important;gap:8px!important;padding:8px 10px!important;margin:8px 8px 0!important}
+ body.dvp header .lg{order:0!important;flex:0 1 auto!important;justify-content:flex-start!important;min-width:0}
+ body.dvp header .logo{height:34px;width:auto;max-width:100%}
+ body.dvp .hr{display:flex!important;flex:none;align-items:center;gap:8px!important;margin-left:auto}
+ body.dvp .dv-acc,body.dvp .dv-signin,body.dvp .dv-docs{width:42px;height:42px;padding:0!important;margin:0!important;border-radius:50%;justify-content:center;gap:0}
+ body.dvp .dv-acc .tx,body.dvp .dv-signin .tx,body.dvp .dv-docs .tx,body.dvp .dv-back .tx,body.dvp .dd-back .tx,body.dvp .ins-tools .tx{display:none!important}
+ body.dvp .dv-acc svg,body.dvp .dv-signin svg,body.dvp .dv-docs svg{width:22px;height:22px}
+ /* other nav buttons: icon only */
+ body.dvp .dv-back,body.dvp .dd-back,body.dvp .ins-tools .dv-lk{width:42px;height:42px;padding:0!important;border-radius:50%;justify-content:center;gap:0}
+ body.dvp .ins-tools .ic,body.dvp .dv-back .ic,body.dvp .dd-back .ic-s{margin:0}
+ body.dvp .ins-tools .ic .ic-s{width:22px;height:22px}
+ /* layout */
+ body.dvp main.dv,body.dvp .dv{padding-left:12px;padding-right:12px}
+ .dv-panel{padding:18px 14px;border-radius:22px}
+ .dv-panel h2{font-size:21px}
+ .dv-ph{margin-bottom:14px}
+ .dv-ph .dv-add{width:100%;justify-content:center}
+ .dv-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:8px}
+ #dvList li{flex-wrap:wrap;gap:8px}
+ .dv-gf .dv-or .row{gap:12px}
+ .dv-gf>div[style*="flex"] .dv-sbtn{flex:1 1 140px;width:auto}
+ .dv-vr{align-items:flex-start}
+ .doc .btns a{flex:1 1 100%}
+ .ins-bar b{flex:1}
+}
+@media(max-width:380px){
+ body.dvp header .logo{height:30px}
+ .dv-panel{padding:16px 12px}
+ .dv-lk,.dv-play{font-size:12px;padding:6px 10px}
+ .dv-sbtn{font-size:16px;padding:13px}
+}
+@media(max-width:340px){
+ body.dvp header .logo{height:26px}
+ body.dvp .dv-acc,body.dvp .dv-signin,body.dvp .dv-docs{width:38px;height:38px}
+}

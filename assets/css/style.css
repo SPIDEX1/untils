@@ -4,6 +4,8 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 "Montserrat","Segoe UI",system-ui,sans-serif}
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+img,video,canvas,iframe{max-width:100%}
 header{display:flex;align-items:center;justify-content:space-between;padding:18px 5vw;border-bottom:1px solid var(--line)}
 .logo{height:54px;width:auto;cursor:pointer}
 nav{display:flex;gap:28px;font-size:12px;letter-spacing:.2em}
