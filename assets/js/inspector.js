@@ -2,7 +2,7 @@
 (function () {
   "use strict";
   var A = window.UntilsAuth, $ = function (id) { return document.getElementById(id); };
-  var q = new URLSearchParams(location.search), id = q.get("id") || "", which = q.get("v") === "new" ? "new" : "cur";
+  var q = new URLSearchParams(location.search), id = q.get("id") || "", ver = parseInt(q.get("ver"), 10) || 0, which = ver ? "ver" : q.get("v") === "new" ? "new" : "cur", suffix = ver ? " (version " + ver + ")" : which === "new" ? " (new version)" : "";
   var ctl = null, tok = "", reported = false, warnT = 0, session = null;
 
   function toLogin() { location.replace("/developers/#signin"); }
@@ -24,7 +24,7 @@
     if (st.unityName) C.appendChild(chip(st.unityName + " " + st.unityVersion, true));
     if (st.errors) C.appendChild(chip(st.errors + " error(s)", false, true));
     var det = st.init && (st.via !== "unity-template" || st.unityName);
-    if (det && !reported) {
+    if (det && !reported && !ver) {
       reported = true;
       fetch("/api/games", { method: "PUT", headers: { "Authorization": "Bearer " + session.access_token, "Content-Type": "application/json" },
         body: JSON.stringify({ id: id, sdk: { ok: true, name: st.unityName || st.sdk, version: st.unityName ? st.unityVersion : st.version, which: which } }) }).catch(function () {});
@@ -55,15 +55,15 @@
     if (!s) return toLogin();
     session = s;
     var H = { "Authorization": "Bearer " + s.access_token };
-    fetch("/api/games?preview=" + encodeURIComponent(id) + (which === "new" ? "&v=new" : ""), { headers: H })
+    fetch("/api/games?preview=" + encodeURIComponent(id) + (ver ? "&ver=" + ver : which === "new" ? "&v=new" : ""), { headers: H })
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (r) {
         $("ins").hidden = false;
         if (!r.ok || !r.d.token) { $("insTitle").textContent = "Could not open the Inspector"; add({ t: 0, kind: "err", text: r.d.error || "Game not found." }); return; }
         tok = r.d.token;
-        $("insTitle").textContent = "Inspector view" + (which === "new" ? " (new version)" : "");
+        $("insTitle").textContent = "Inspector view" + suffix;
         fetch("/api/games", { headers: H }).then(function (x) { return x.json(); }).then(function (d) {
-          (d.games || []).forEach(function (g) { if (g.id === id) $("insTitle").textContent = g.title + (which === "new" ? " (new version)" : ""); });
+          (d.games || []).forEach(function (g) { if (g.id === id) $("insTitle").textContent = g.title + suffix; });
         }).catch(function () {});
         run();
       }).catch(function () { $("ins").hidden = false; add({ t: 0, kind: "err", text: "No internet connection." }); });

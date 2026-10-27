@@ -51,10 +51,11 @@ export async function onRequestGet({ request, env }) {
   if (pv) {
     const pg = /^[a-z0-9-]{8,40}$/.test(pv) ? await env.GAMES.get("game:" + u.id + ":" + pv, "json") : null;
     if (!pg) return json({ error: "Game not found." }, 404);
-    const nv = new URL(request.url).searchParams.get("v") === "new";
+    const nv = new URL(request.url).searchParams.get("v") === "new", vn = +new URL(request.url).searchParams.get("ver") || 0;
     if (nv && !pg.pending) return json({ error: "No new version waiting." }, 404);
+    if (vn && !vlist(pg).some(v => v.n === vn)) return json({ error: "Version not found." }, 404);
     if (!env.PLAY_SECRET || !env.SUPABASE_SERVICE_KEY) return json({ error: "PLAY_SECRET / SUPABASE_SERVICE_KEY not set." }, 500);
-    const s = [u.id, pv, Math.floor(Date.now() / 1000) + 86400].concat(nv ? ["n"] : []).join("~");
+    const s = [u.id, pv, Math.floor(Date.now() / 1000) + 86400].concat(vn ? ["v" + vn] : nv ? ["n"] : []).join("~");
     return json({ token: s + "~" + await sign(env, s) });
   }
   const dl = new URL(request.url).searchParams.get("download");
