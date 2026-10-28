@@ -127,3 +127,9 @@ body.dvp img,body.dvp video,body.dvp svg{max-width:100%}
 @media(max-width:820px){#iVers .dv-vt{display:flex;width:max-content;margin:4px 0}}
 .doc .btns a{white-space:nowrap}
 .doc table td:last-child{min-width:118px}
+
+/* back / docs buttons: icon and text perfectly aligned on every screen */
+a.dv-back,a.dd-back,.dv-back,.dd-back{display:inline-flex!important;align-items:center;justify-content:center;gap:8px;line-height:1}
+.dv-back .ic,.dd-back .ic{display:inline-flex;margin:0}
+.dv-back .ic-s,.dd-back .ic-s{width:20px;height:20px;display:block;flex:none}
+.dv-back .tx,.dd-back .tx{display:inline-block;line-height:1}
