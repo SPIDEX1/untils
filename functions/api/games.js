@@ -41,7 +41,7 @@ async function who(req) {
   if (!r.ok) return null;
   const u = await r.json();
   if (!u || !u.id) return null;
-  if (["google", "apple", "phone"].indexOf((u.app_metadata || {}).provider) > -1) return null; /* player accounts are separate from developer accounts */
+  if (["google", "apple", "phone"].indexOf((u.app_metadata || {}).provider) > -1 || (u.user_metadata || {}).kind === "player") return null; /* player accounts are separate from developer accounts */
   return u;
 }
 

@@ -1,5 +1,5 @@
 /* UNTILS player account (main site). Separate from the developer account:
-   own session key, own sign-in panel. Google / Apple / phone number via Supabase Auth.
+   own session key, own sign-in panel. Google or email code via Supabase Auth.
    URL and publishable key are public. Never put a secret key here. */
 (function () {
   "use strict";
@@ -26,7 +26,7 @@
   }
   function clear() { try { localStorage.removeItem(SK); } catch (e) {} }
 
-  /* ---------- session: finish Google / Apple redirect, refresh when needed ---------- */
+  /* ---------- session: finish Google redirect, refresh when needed ---------- */
   var session = load(), authMsg = "";
   (function fromHash() {
     var h = location.hash || "";
@@ -67,13 +67,11 @@
   /* ---------- panel ---------- */
   var IC = {
     g: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.7v3h3.9c2.3-2.1 3.5-5.2 3.5-8.9z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.5 1.2-4 1.2-3.1 0-5.7-2.1-6.7-4.9H1.3v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.3a12 12 0 0 0 0 10.8z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1C6.3 6.9 8.9 4.8 12 4.8z"/></svg>',
-    a: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>',
-    p: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>',
+    m: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3.5 7.5l8.5 6 8.5-6"/></svg>',
     x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
     b: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>'
   };
-  var CODES = [["+91", "India"], ["+1", "US / Canada"], ["+44", "UK"], ["+971", "UAE"], ["+92", "Pakistan"], ["+880", "Bangladesh"], ["+977", "Nepal"], ["+94", "Sri Lanka"], ["+966", "Saudi Arabia"], ["+65", "Singapore"], ["+61", "Australia"], ["+49", "Germany"], ["+33", "France"], ["+62", "Indonesia"], ["+55", "Brazil"], ["+63", "Philippines"]];
-  var panel = null, shade = null, phone = "", providers = null;
+  var panel = null, shade = null, mail = "", providers = null;
 
   function settings() {
     if (providers) return Promise.resolve(providers);
@@ -111,23 +109,21 @@
       h = head("Join UNTILS", "Sign up or log in to continue") +
         '<div class="pl-b">' +
         '<button type="button" class="pl-o" data-p="google"><span class="pl-oi">' + IC.g + '</span>Continue with Google</button>' +
-        '<button type="button" class="pl-o" data-p="apple"><span class="pl-oi">' + IC.a + '</span>Continue with Apple</button>' +
-        '<button type="button" class="pl-o" data-go="phone"><span class="pl-oi">' + IC.p + '</span>Continue with phone number</button>' +
-        '<div class="pl-msg' + (authMsg ? '' : '') + '" role="status">' + esc(authMsg) + '</div>' +
+        '<button type="button" class="pl-o" data-go="email"><span class="pl-oi">' + IC.m + '</span>Continue with email</button>' +
+        '<div class="pl-msg" role="status">' + esc(authMsg) + '</div>' +
         '<p class="pl-f">By continuing you agree to our <a href="/terms/">Terms</a> and <a href="/privacy/">Privacy Policy</a>.</p></div>';
       authMsg = "";
-    } else if (view === "phone") {
-      h = head("Phone number", "We will text you a 6-digit code", "home") +
-        '<div class="pl-b"><div class="pl-ph"><select id="plCc" aria-label="Country code">' + CODES.map(function (c) { return '<option value="' + c[0] + '">' + c[0] + ' ' + c[1] + '</option>'; }).join("") + '</select>' +
-        '<input id="plNum" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="Phone number" maxlength="15"></div>' +
+    } else if (view === "email") {
+      h = head("Your email", "We will email you a 6-digit code", "home") +
+        '<div class="pl-b"><input id="plMail" type="email" inputmode="email" autocomplete="email" placeholder="you@gmail.com" maxlength="120">' +
         '<button type="button" class="pl-go" id="plSend">SEND CODE</button><div class="pl-msg" role="status"></div></div>';
     } else if (view === "code") {
-      h = head("Enter the code", "Sent to " + esc(phone), "phone") +
+      h = head("Enter the code", "Sent to " + esc(mail), "email") +
         '<div class="pl-b"><input id="plCode" class="pl-code" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="000000" maxlength="6">' +
-        '<button type="button" class="pl-go" id="plVerify">VERIFY</button><button type="button" class="pl-lk" id="plResend">Send a new code</button><div class="pl-msg" role="status"></div></div>';
+        '<button type="button" class="pl-go" id="plVerify">VERIFY</button><button type="button" class="pl-lk" id="plResend">Send a new code</button><p class="pl-f">Check your spam folder if you do not see the email.</p><div class="pl-msg" role="status"></div></div>';
     } else {
       var u = (session && session.user) || {}, m = u.user_metadata || {};
-      var name = m.full_name || m.name || u.email || u.phone || "Player", sub = u.email || (u.phone ? "+" + String(u.phone).replace(/^\+/, "") : "");
+      var name = m.full_name || m.name || u.email || "Player", sub = u.email || "";
       h = head("Your account", "") + '<div class="pl-b"><div class="pl-me"><span class="pl-av">' + (m.avatar_url ? '<img src="' + esc(m.avatar_url) + '" alt="" referrerpolicy="no-referrer">' : esc(String(name).charAt(0).toUpperCase())) + '</span><div><b>' + esc(name) + '</b><small>' + esc(sub) + '</small></div></div>' +
         '<button type="button" class="pl-go pl-out" id="plOut">LOG OUT</button></div>';
     }
@@ -137,11 +133,12 @@
 
   function wire(view) {
     [].forEach.call(panel.querySelectorAll("[data-close]"), function (b) { b.onclick = close; });
-    [].forEach.call(panel.querySelectorAll("[data-go]"), function (b) { b.onclick = function () { render(b.getAttribute("data-go")); var f = $("#plNum", panel); if (f) f.focus(); }; });
+    [].forEach.call(panel.querySelectorAll("[data-go]"), function (b) { b.onclick = function () { render(b.getAttribute("data-go")); var f = $("#plMail", panel); if (f) f.focus(); }; });
     [].forEach.call(panel.querySelectorAll("[data-p]"), function (b) { b.onclick = function () { social(b.getAttribute("data-p"), b); }; });
-    if (view === "phone") {
+    if (view === "email") {
       $("#plSend", panel).onclick = sendCode;
-      $("#plNum", panel).onkeydown = function (e) { if (e.key === "Enter") sendCode(); };
+      $("#plMail", panel).onkeydown = function (e) { if (e.key === "Enter") sendCode(); };
+      $("#plMail", panel).focus();
     }
     if (view === "code") {
       $("#plVerify", panel).onclick = verify;
@@ -157,42 +154,47 @@
     b.disabled = true;
     settings().then(function (s) {
       b.disabled = false;
-      if (s && s[p] === false) { msg((p === "google" ? "Google" : "Apple") + " sign-in is not available yet. Please use another option."); return; }
+      if (s && s[p] === false) { msg("Google sign-in is not available yet. Please use email instead."); return; }
       try { sessionStorage.setItem(BK, location.pathname + location.search); } catch (e) {}
       location.href = URL0 + "/auth/v1/authorize?provider=" + p + "&redirect_to=" + encodeURIComponent(location.origin + "/");
     });
   }
 
   function sendCode() {
-    var cc = $("#plCc", panel), num = $("#plNum", panel), go = $("#plSend", panel) || $("#plResend", panel);
-    if (cc && num) {
-      var d = num.value.replace(/\D/g, "").replace(/^0+/, "");
-      if (d.length < 6) { msg("Please enter a valid phone number."); return; }
-      phone = cc.value + d;
+    var inp = $("#plMail", panel), go = $("#plSend", panel) || $("#plResend", panel);
+    if (inp) {
+      var v = inp.value.trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) { msg("Please enter a valid email address."); return; }
+      mail = v;
     }
-    if (!phone) { render("phone"); return; }
+    if (!mail) { render("email"); return; }
     if (go) go.disabled = true; msg("");
-    call("/auth/v1/otp", "POST", { phone: phone, create_user: true }).then(function (r) {
+    call("/auth/v1/otp", "POST", { email: mail, create_user: true, data: { kind: "player" } }).then(function (r) {
       if (go) go.disabled = false;
       if (r.ok) { if (!$("#plCode", panel)) render("code"); else msg("A new code is on its way.", true); return; }
-      var c = String(r.data.error_code || r.data.code || ""), m = String(r.data.msg || r.data.message || "");
+      var c = String(r.data.error_code || r.data.code || "");
       if (r.status === 0) msg("Could not reach the server. Check your internet connection.");
-      else if (r.status === 429 || /rate/i.test(c)) msg("Please wait a minute before asking for another code.");
-      else if (/provider|sms|disabled/i.test(c + " " + m)) msg("Phone sign-in is not available yet. Please use another option.");
-      else if (/invalid/i.test(c + " " + m)) msg("That phone number does not look right.");
-      else msg("We could not send the code. Please try again.");
+      else if (r.status === 429 || /rate_limit/i.test(c)) msg("Please wait a minute before asking for another code.");
+      else if (c === "signup_disabled") msg("New sign-ups are closed right now.");
+      else msg("We could not send the code. Please try again in a few minutes.");
     });
   }
 
+  /* the code type depends on whether the email is new or already known, so try the 3 types */
   function verify() {
     var c = ($("#plCode", panel).value || "").replace(/\D/g, "");
     if (c.length !== 6) { msg("Enter the 6-digit code."); return; }
     var go = $("#plVerify", panel); go.disabled = true; msg("");
-    call("/auth/v1/verify", "POST", { phone: phone, token: c, type: "sms" }).then(function (r) {
-      go.disabled = false;
-      if (r.ok && r.data.access_token) { session = save(r.data); paintBtn(); render("me"); place(); return; }
-      msg(r.status === 0 ? "Could not reach the server. Check your internet connection." : "That code is not correct or has expired.");
-    });
+    var types = ["email", "signup", "magiclink"];
+    function next(i, last) {
+      if (i >= types.length) { go.disabled = false; msg(last && last.status === 0 ? "Could not reach the server. Check your internet connection." : "That code is not correct or has expired."); return; }
+      call("/auth/v1/verify", "POST", { email: mail, token: c, type: types[i] }).then(function (r) {
+        if (r.ok && r.data.access_token) { go.disabled = false; session = save(r.data); paintBtn(); render("me"); place(); return; }
+        if (r.status === 0 || r.status === 429 || r.status >= 500) { go.disabled = false; msg(r.status === 429 ? "Too many tries. Please wait a minute." : "Could not reach the server. Please try again."); return; }
+        next(i + 1, r);
+      });
+    }
+    next(0, null);
   }
 
   function logout() {
@@ -200,7 +202,7 @@
     if (s) call("/auth/v1/logout", "POST", null, s.access_token);
   }
 
-  /* open the panel again after a failed Google / Apple sign-in so the reason is visible */
+  /* open the panel again after a failed Google sign-in so the reason is visible */
   if (authMsg) setTimeout(open, 400);
   window.UntilsPlayer = { open: open, close: close, getSession: function () { return session; } };
 })();
