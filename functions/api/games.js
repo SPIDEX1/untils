@@ -40,7 +40,9 @@ async function who(req) {
   const r = await fetch(SUPA + "/auth/v1/user", { headers: { apikey: KEY, Authorization: "Bearer " + t } });
   if (!r.ok) return null;
   const u = await r.json();
-  return u && u.id ? u : null;
+  if (!u || !u.id) return null;
+  if (["google", "apple", "phone"].indexOf((u.app_metadata || {}).provider) > -1) return null; /* player accounts are separate from developer accounts */
+  return u;
 }
 
 export async function onRequestGet({ request, env }) {

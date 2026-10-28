@@ -8,6 +8,7 @@ export async function me(req, env) {
   if (!r.ok) return null;
   const u = await r.json();
   if (!u.id || !u.email || !u.email_confirmed_at) return null;
+  if (["google", "apple", "phone"].indexOf((u.app_metadata || {}).provider) > -1) return null; /* player accounts are separate from developer accounts */
   const e = u.email.toLowerCase();
   let role = null;
   if (env.LEADER_EMAIL && e === env.LEADER_EMAIL.trim().toLowerCase()) role = "leader";
