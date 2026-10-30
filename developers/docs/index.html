@@ -20,7 +20,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="/assets/css/style.css?v=5122f816"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap"><link rel="stylesheet" href="/assets/css/theme.v8.css">
 <link rel="stylesheet" href="/assets/css/developers.v8.css">
-<link rel="stylesheet" href="/assets/css/dev-ui.css?v=9">
+<link rel="stylesheet" href="/assets/css/dev-ui.css?v=10">
 </head>
 <body class="dvp"><style>
 .dd-back{display:inline-block;padding:9px 18px;border-radius:30px;background:#e4f0fb;color:#12233d;font-weight:800;font-size:14px;text-decoration:none}
@@ -45,7 +45,7 @@ html{scroll-behavior:smooth}
 <a class="dd-back" href="/developers/dashboard/" aria-label="Back to dashboard" title="Back to dashboard"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span class="tx">Dashboard</span></a>
 <h1>Developer docs</h1>
 <p>Everything you need to publish an HTML5 game on UNTILS: what to prepare, what sizes to use, how review works, and how to use the SDK.</p>
-<div class="toc" id="toc"><a href="#quick">Quick start</a><a href="#package">Game package</a><a href="#size">Game size</a><a href="#icon">Icon</a><a href="#banner">Banner</a><a href="#shots">Screenshots</a><a href="#review">Review</a><a href="#sdk">SDK</a><a href="#api">SDK commands</a><a href="#inspector">Inspector</a><a href="#unity">Unity SDK</a><a href="#engines">Engines</a><a href="#rules">Rules</a></div>
+<div class="toc" id="toc"><a href="#quick">Quick start</a><a href="#package">Game package</a><a href="#size">Game size</a><a href="#icon">Icon</a><a href="#banner">Banner</a><a href="#shots">Screenshots</a><a href="#review">Review</a><a href="#sdk">SDK</a><a href="#api">SDK commands</a><a href="#inspector">Inspector</a><a href="#unity">Unity SDK</a><a href="#cocos">Cocos SDK</a><a href="#engines">Engines</a><a href="#rules">Rules</a></div>
 
 <section class="sec" id="quick">
 <h2>Quick start</h2>
@@ -66,7 +66,7 @@ html{scroll-behavior:smooth}
 <tr><td>Format</td><td>One <code>.zip</code> file. <code>index.html</code> at the top (not inside a sub-folder).</td></tr>
 <tr><td>Max size</td><td>50 MB. We recommend under 20 MB so the game loads fast on mobile data.</td></tr>
 <tr><td>File paths</td><td>Use <b>relative</b> paths: <code>game.js</code>, <code>img/hero.png</code>. Do not start paths with <code>/</code>, because your game runs inside <code>/live/...</code>.</td></tr>
-<tr><td>Technology</td><td>HTML5, JavaScript, Canvas, WebGL, WebAssembly. Web exports from Unity, Godot and Cocos work as long as the export has an <code>index.html</code> (engine plugins for the SDK are coming later).</td></tr>
+<tr><td>Technology</td><td>HTML5, JavaScript, Canvas, WebGL, WebAssembly. Web exports from Unity, Cocos and Godot work as long as the export has an <code>index.html</code>. Unity and Cocos have their own SDK; a Godot plugin is coming later.</td></tr>
 <tr><td>Starts by itself</td><td>No login, no installs, no pop-ups. The game must start from the Play screen.</td></tr>
 </table>
 <div class="tip"><b>Good to know:</b> your game runs in a protected sandbox. It cannot read UNTILS accounts or cookies. Browser <code>localStorage</code> is saved for you automatically, and the SDK gives you a cleaner way to save (see below).</div>
@@ -219,7 +219,7 @@ main();</code></pre>
 <section class="sec" id="unity">
 <h2>Unity SDK <small style="font-size:14px;color:#6b7c93">(beta, Unity 2020.1 to Unity 6, WebGL)</small></h2>
 <p>Pick the package for <b>your Unity version</b> from the list below, newest first (Unity 2019 and older are not supported, they use an older WebGL loader). Every package has everything you need: the C# SDK, the <b>Untils WebGL template</b> (it appears in Player Settings, like other platform SDK templates), <code>UntilsPrefs</code> (a save-safe replacement for <code>PlayerPrefs</code>), an editor menu and a sample script.</p>
-<table>
+<table class="dl-t">
 <tr><th>Your Unity version</th><th>SDK version</th><th>Download</th></tr>
 <tr><td><b>Unity 6 (6000.x)</b> <small>(latest)</small><br><small>Unity 2023.x can use this one too</small></td><td>Unity SDK 1.1.0</td><td><div class="btns"><a href="/sdk/unity/UntilsSDK-Unity6.zip" download aria-label="Download for Unity 6" title="Download for Unity 6"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 20h14"/></svg><span class="tx">Download for Unity 6</span><span class="sh">Unity 6</span></a></div></td></tr>
 <tr><td><b>Unity 2022.3 LTS</b></td><td>Unity SDK 1.1.0</td><td><div class="btns"><a href="/sdk/unity/UntilsSDK-Unity2022.zip" download aria-label="Download for Unity 2022" title="Download for Unity 2022"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 20h14"/></svg><span class="tx">Download for Unity 2022</span><span class="sh">Unity 2022</span></a></div></td></tr>
@@ -301,8 +301,115 @@ public class GameManager : MonoBehaviour
 </ul>
 <p>This SDK is in <b>beta</b>. If you find a problem, please tell us through the <a href="/contact/">contact page</a> and include your Unity version.</p>
 </section>
+<section class="sec" id="cocos">
+<h2>Cocos SDK <small style="font-size:14px;color:#6b7c93">(beta, Cocos Creator 2.4 and 3.x, Web)</small></h2>
+<p>Pick the package for <b>your Cocos Creator version</b>. Both have the same commands. Each one has everything you need: the SDK script, <code>UntilsPrefs</code> (a save-safe replacement for the local storage), a sample script, and <code>untils.js</code> already placed in <code>build-templates</code>, so it is copied into your build for you.</p>
+<table class="dl-t">
+<tr><th>Your Cocos Creator version</th><th>SDK version</th><th>Download</th></tr>
+<tr><td><b>Cocos Creator 3.x</b> <small>(3.0 and newer)</small><br><small>TypeScript</small></td><td>Cocos SDK 1.0.0</td><td><div class="btns"><a href="/sdk/cocos/UntilsSDK-Cocos3.zip" download aria-label="Download for Cocos Creator 3.x" title="Download for Cocos Creator 3.x"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 20h14"/></svg><span class="tx">Download for Cocos Creator 3.x</span><span class="sh">Cocos 3.x</span></a></div></td></tr>
+<tr><td><b>Cocos Creator 2.4.x</b><br><small>JavaScript</small></td><td>Cocos SDK 1.0.0</td><td><div class="btns"><a href="/sdk/cocos/UntilsSDK-Cocos2.zip" download aria-label="Download for Cocos Creator 2.4" title="Download for Cocos Creator 2.4"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 20h14"/></svg><span class="tx">Download for Cocos Creator 2.4</span><span class="sh">Cocos 2.4</span></a></div></td></tr>
+</table>
+<h3>Install and build</h3>
+<ol>
+<li>Unzip the file <b>into your Cocos project folder</b> (the one that contains <code>assets</code>). Merge the folders. You get <code>assets/UntilsSDK</code> and <code>build-templates/web-mobile/untils.js</code>.</li>
+<li>In your first script call <code>Untils.init()</code> and use <code>UntilsPrefs</code> instead of the local storage (see the code below).</li>
+<li><b>Project &rarr; Build &rarr; Platform: Web Mobile &rarr; Build.</b> Web Mobile works on phones and PC. Set the build <b>Orientation</b> to match the <b>Mobile screen</b> option you choose in the dashboard.</li>
+<li>Open the build folder and check that <code>untils.js</code> is next to <code>index.html</code>.</li>
+<li>Zip the <b>contents</b> of the build folder, so <code>index.html</code> is at the top of the zip, and upload it in your dashboard. UNTILS then opens the <a href="#inspector">Inspector view</a> to check your SDK.</li>
+</ol>
+<p>You do not need to call <code>loadingStart</code> / <code>loadingFinished</code>: the SDK sends them for you (set <code>Untils.autoLoading = false</code> to do it yourself). When the tab is hidden the SDK also pauses the game and sound, and resumes them when the player returns (set <code>Untils.autoPause = false</code> to handle it yourself).</p>
+<h3>Code</h3>
+<p><b>Cocos Creator 3.x (TypeScript)</b></p>
+<pre><code>import { _decorator, Component } from 'cc';
+import { Untils, UntilsPrefs } from './UntilsSDK/Untils';
+const { ccclass } = _decorator;
+
+@ccclass('GameManager')
+export class GameManager extends Component {
+    level = 1;
+
+    start() {
+        Untils.onPause(() =&gt; console.log('paused'));      // optional
+        Untils.onResume(() =&gt; console.log('resumed'));
+
+        Untils.init().then(() =&gt; {
+            this.level = UntilsPrefs.getInt('level', 1);    // saved progress
+            this.startGame();
+        });
+    }
+
+    onPlayPressed() { Untils.gameplayStart(); }
+
+    onGameOver() {
+        Untils.gameplayStop();
+        UntilsPrefs.setInt('level', this.level);            // saved automatically
+        Untils.commercialBreak().then(() =&gt; this.showGameOverScreen());   // ads not live yet: continues at once
+    }
+
+    onRewardButton() {
+        Untils.rewardedBreak().then((rewarded) =&gt; { if (rewarded) this.giveCoins(); });
+    }
+}</code></pre>
+<p><b>Cocos Creator 2.4.x (JavaScript)</b></p>
+<pre><code>const { Untils, UntilsPrefs } = require("Untils");
+
+cc.Class({
+    extends: cc.Component,
+
+    start: function () {
+        var self = this;
+        Untils.onPause(function () { cc.log("paused"); });     // optional
+        Untils.onResume(function () { cc.log("resumed"); });
+
+        Untils.init().then(function () {
+            self.level = UntilsPrefs.getInt("level", 1);       // saved progress
+            self.startGame();
+        });
+    },
+
+    onPlayPressed: function () { Untils.gameplayStart(); },
+
+    onGameOver: function () {
+        Untils.gameplayStop();
+        UntilsPrefs.setInt("level", this.level);               // saved automatically
+        Untils.commercialBreak().then(function () { /* show game over screen */ });
+    },
+
+    onRewardButton: function () {
+        Untils.rewardedBreak().then(function (rewarded) { if (rewarded) { /* give coins */ } });
+    }
+});</code></pre>
+<h3>Commands</h3>
+<table>
+<tr><th>Command</th><th>What it does</th><th>Status</th></tr>
+<tr><td><code>Untils.init({ debug })</code></td><td>Starts the SDK and loads saved data. Call it first. Returns a promise that resolves with <code>{ name, version, env, isMobile, player, language }</code>. Never fails. Waits up to 3 seconds for UNTILS.</td><td>Live</td></tr>
+<tr><td><code>UntilsPrefs.setInt / getInt / setFloat / getFloat / setString / getString / setBool / getBool / setJSON / getJSON / hasKey / keys / deleteKey / deleteAll / save</code></td><td>Save and read your data, like the local storage. Saves itself shortly after each change. About 900 KB per game. <code>setJSON</code> keeps any object or array.</td><td>Live (this browser)</td></tr>
+<tr><td><code>Untils.save(key, value)</code>, <code>load(key, fallback)</code>, <code>remove(key)</code>, <code>clearSave()</code>, <code>keys()</code></td><td>The same saves in the style of the HTML SDK (promises).</td><td>Live (this browser)</td></tr>
+<tr><td><code>Untils.gameplayStart()</code> / <code>gameplayStop()</code></td><td>Real play starts / stops (death, menu, pause). Repeated calls are ignored.</td><td>Live</td></tr>
+<tr><td><code>Untils.loadingStart()</code> / <code>loadingFinished()</code></td><td>Done for you. Only call them yourself if you set <code>autoLoading = false</code>, or if you load more content later.</td><td>Live</td></tr>
+<tr><td><code>Untils.onPause(fn)</code> / <code>onResume(fn)</code> / <code>offPause(fn)</code> / <code>offResume(fn)</code></td><td>Runs when the tab is hidden or shown. With <code>Untils.autoPause = true</code> (default) the SDK also pauses the game loop and sound for you.</td><td>Live</td></tr>
+<tr><td><code>Untils.isMobile</code>, <code>language</code>, <code>env</code>, <code>isReady</code>, <code>player</code>, <code>version</code></td><td>Handy values. <code>env</code> is <code>"untils"</code> on the site and <code>"offline"</code> in the Cocos preview or on your own PC.</td><td>Live</td></tr>
+<tr><td><code>Untils.getPlayer()</code></td><td>Promise with <code>{ guest, name }</code>. Everyone is "Guest" for now.</td><td>Basic</td></tr>
+<tr><td><code>Untils.shareableURL({ level: 5 })</code> / <code>getURLParam("level")</code></td><td>Make a share link with your values, and read them back when the game is opened from that link.</td><td>Live</td></tr>
+<tr><td><code>Untils.requestFullscreen()</code> / <code>exitFullscreen()</code></td><td>Ask UNTILS to enter or leave fullscreen. Call from a button press.</td><td>Live</td></tr>
+<tr><td><code>Untils.track(name, data)</code></td><td>Send your own event, like <code>track("level_complete", { level: 3 })</code>. Name up to 40 characters. Stats come later.</td><td>Reserved</td></tr>
+<tr><td><code>Untils.commercialBreak()</code>, <code>rewardedBreak()</code>, <code>showAd(type)</code></td><td>Ads are not live yet. The interstitial continues at once; the rewarded promise gives <code>false</code>.</td><td>Coming soon</td></tr>
+<tr><td><code>Untils.submitScore(board, score)</code></td><td>Leaderboards. Returns <code>false</code> until they go live.</td><td>Coming soon</td></tr>
+<tr><td><code>Untils.setDebug(true)</code></td><td>Prints SDK activity in the browser console.</td><td>Live</td></tr>
+</table>
+<div class="tip"><b>In the Cocos preview</b> (and on your own PC) nothing is sent to UNTILS: saves stay in your browser, and a rewarded ad returns <code>Untils.editorRewardedResult</code> (default <code>true</code>) so you can test your reward code.</div>
+<h3>If something goes wrong</h3>
+<ul>
+<li><b>"untils.js was not found"</b> in the browser console: the file is not next to <code>index.html</code> in your build. Check that <code>build-templates/web-mobile/untils.js</code> exists in your project and build again.</li>
+<li><b>Progress is not saved:</b> you used the engine's own local storage. Change it to <code>UntilsPrefs</code>. Browser storage is blocked in the UNTILS sandbox.</li>
+<li><b>The game stays on the loading screen:</b> open the browser console (F12). Check that the zip has <code>index.html</code> at the top, with the <code>assets</code> and <code>src</code> (or <code>cocos-js</code>) folders next to it.</li>
+<li><b>Sound does not start:</b> browsers only allow sound after the first tap or click. Start your music from a button press.</li>
+<li><b>Very large builds:</b> keep the zip under 50 MB. Compress textures and audio.</li>
+</ul>
+<p>This SDK is in <b>beta</b>. If you find a problem, please tell us through the <a href="/contact/">contact page</a> and include your Cocos Creator version.</p>
+</section>
 <section class="sec" id="engines">
-<h2>Unity and other engines</h2>
+<h2>Unity, Cocos and other engines</h2>
 <p>Web (HTML5) exports from game engines work if the zip follows the same rules as above: <code>index.html</code> at the top, relative paths, under 50 MB.</p>
 <h3>Unity (WebGL)</h3>
 <ol>
@@ -312,8 +419,14 @@ public class GameManager : MonoBehaviour
 <li>Make the canvas fill the window so it works on phones and PC.</li>
 </ol>
 <div class="tip"><b>Using Unity?</b> Use the <a href="#unity">Unity SDK</a>. It adds the WebGL template and <code>UntilsPrefs</code> so progress is saved.</div>
-<h3>Godot and Cocos</h3>
-<p>Export for Web and zip the export as above. For Godot 4, make sure <b>Thread Support</b> is off (threads need special server headers). Plugins for the UNTILS SDK are planned. We have not tested these engines in depth yet, so please test your game after upload and tell us if something fails.</p>
+<h3>Cocos Creator (Web)</h3>
+<ol>
+<li>Project &rarr; Build &rarr; Platform <b>Web Mobile</b> &rarr; Build.</li>
+<li>Zip the <b>contents</b> of the build folder, so <code>index.html</code> is at the top of the zip.</li>
+</ol>
+<div class="tip"><b>Using Cocos Creator?</b> Use the <a href="#cocos">Cocos SDK</a>. It adds <code>UntilsPrefs</code> so progress is saved, and sends loading and pause events for you.</div>
+<h3>Godot</h3>
+<p>Export for Web and zip the export as above. For Godot 4, make sure <b>Thread Support</b> is off (threads need special server headers). A plugin for the UNTILS SDK is planned. We have not tested Godot in depth yet, so please test your game after upload and tell us if something fails.</p>
 </section>
 <section class="sec" id="rules">
 <h2>Rules</h2>

@@ -133,3 +133,8 @@ a.dv-back,a.dd-back,.dv-back,.dd-back{display:inline-flex!important;align-items:
 .dv-back .ic,.dd-back .ic{display:inline-flex;margin:0}
 .dv-back .ic-s,.dd-back .ic-s{width:20px;height:20px;display:block;flex:none}
 .dv-back .tx,.dd-back .tx{display:inline-block;line-height:1}
+@media(max-width:820px){
+ .dl-t th:nth-child(2),.dl-t td:nth-child(2){display:none}
+ .dl-t td:last-child{min-width:0}
+ .dl-t .btns a{padding:9px 12px;font-size:13px}
+}
