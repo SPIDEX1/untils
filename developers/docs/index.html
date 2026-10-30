@@ -45,7 +45,7 @@ html{scroll-behavior:smooth}
 <a class="dd-back" href="/developers/dashboard/" aria-label="Back to dashboard" title="Back to dashboard"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span class="tx">Dashboard</span></a>
 <h1>Developer docs</h1>
 <p>Everything you need to publish an HTML5 game on UNTILS: what to prepare, what sizes to use, how review works, and how to use the SDK.</p>
-<div class="toc" id="toc"><a href="#quick">Quick start</a><a href="#package">Game package</a><a href="#size">Game size</a><a href="#icon">Icon</a><a href="#banner">Banner</a><a href="#shots">Screenshots</a><a href="#review">Review</a><a href="#sdk">SDK</a><a href="#api">SDK commands</a><a href="#inspector">Inspector</a><a href="#unity">Unity SDK</a><a href="#cocos">Cocos SDK</a><a href="#engines">Engines</a><a href="#rules">Rules</a></div>
+<div class="toc" id="toc"><a href="#quick">Quick start</a><a href="#package">Game package</a><a href="#size">Game size</a><a href="#icon">Icon</a><a href="#banner">Banner</a><a href="#shots">Screenshots</a><a href="#review">Review</a><a href="#sdk">SDK</a><a href="#api">SDK commands</a><a href="#inspector">Inspector</a><a href="#unity">Unity SDK</a><a href="#cocos">Cocos SDK</a><a href="#godot">Godot SDK</a><a href="#engines">Engines</a><a href="#rules">Rules</a></div>
 
 <section class="sec" id="quick">
 <h2>Quick start</h2>
@@ -66,7 +66,7 @@ html{scroll-behavior:smooth}
 <tr><td>Format</td><td>One <code>.zip</code> file. <code>index.html</code> at the top (not inside a sub-folder).</td></tr>
 <tr><td>Max size</td><td>50 MB. We recommend under 20 MB so the game loads fast on mobile data.</td></tr>
 <tr><td>File paths</td><td>Use <b>relative</b> paths: <code>game.js</code>, <code>img/hero.png</code>. Do not start paths with <code>/</code>, because your game runs inside <code>/live/...</code>.</td></tr>
-<tr><td>Technology</td><td>HTML5, JavaScript, Canvas, WebGL, WebAssembly. Web exports from Unity, Cocos and Godot work as long as the export has an <code>index.html</code>. Unity and Cocos have their own SDK; a Godot plugin is coming later.</td></tr>
+<tr><td>Technology</td><td>HTML5, JavaScript, Canvas, WebGL, WebAssembly. Web exports from Unity, Cocos and Godot work as long as the export has an <code>index.html</code>. Unity, Cocos and Godot each have their own SDK.</td></tr>
 <tr><td>Starts by itself</td><td>No login, no installs, no pop-ups. The game must start from the Play screen.</td></tr>
 </table>
 <div class="tip"><b>Good to know:</b> your game runs in a protected sandbox. It cannot read UNTILS accounts or cookies. Browser <code>localStorage</code> is saved for you automatically, and the SDK gives you a cleaner way to save (see below).</div>
@@ -408,8 +408,106 @@ cc.Class({
 </ul>
 <p>This SDK is in <b>beta</b>. If you find a problem, please tell us through the <a href="/contact/">contact page</a> and include your Cocos Creator version.</p>
 </section>
+<section class="sec" id="godot">
+<h2>Godot SDK <small style="font-size:14px;color:#6b7c93">(beta, Godot 3.x and 4.x, Web)</small></h2>
+<p>Pick the package for <b>your Godot version</b>. Both have the same commands. Each one is a Godot plugin: it adds the <code>Untils</code> Autoload for you, with saves (like <code>PlayerPrefs</code>), loading and gameplay events, pause handling, and a sample script. The web SDK is already inside it, so there is nothing else to copy.</p>
+<table class="dl-t">
+<tr><th>Your Godot version</th><th>SDK version</th><th>Download</th></tr>
+<tr><td><b>Godot 4.x</b><br><small>GDScript 2, "Web" export</small></td><td>Godot SDK 1.0.0</td><td><div class="btns"><a href="/sdk/godot/UntilsSDK-Godot4.zip" download aria-label="Download for Godot 4.x" title="Download for Godot 4.x"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 20h14"/></svg><span class="tx">Download for Godot 4.x</span><span class="sh">Godot 4</span></a></div></td></tr>
+<tr><td><b>Godot 3.x</b> <small>(3.5 recommended)</small><br><small>GDScript, "HTML5" export</small></td><td>Godot SDK 1.0.0</td><td><div class="btns"><a href="/sdk/godot/UntilsSDK-Godot3.zip" download aria-label="Download for Godot 3.x" title="Download for Godot 3.x"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 20h14"/></svg><span class="tx">Download for Godot 3.x</span><span class="sh">Godot 3</span></a></div></td></tr>
+</table>
+<h3>Install and export</h3>
+<ol>
+<li>Unzip the file <b>into your Godot project folder</b> (the one that contains <code>project.godot</code>). Merge the folders. You get <code>addons/untils_sdk</code>.</li>
+<li><b>Project &rarr; Project Settings &rarr; Plugins</b>: tick <b>Enable</b> for <b>UNTILS SDK</b>. This adds the Autoload <code>Untils</code>. (You can also add <code>addons/untils_sdk/Untils.gd</code> yourself as an Autoload named <code>Untils</code>.)</li>
+<li>In your first script call <code>Untils.init()</code> and use <code>Untils.set_int / get_int ...</code> instead of <code>user://</code> files (see the code below).</li>
+<li><b>Project &rarr; Export &rarr; Add... &rarr; Web</b> (Godot 3: <b>HTML5</b>). Turn <b>Thread Support off</b> (Godot 3: Export Type <b>Regular</b>), because threads need special server headers. In <b>Project Settings &rarr; Display &rarr; Window &rarr; Stretch</b> use Mode <code>canvas_items</code> (Godot 3: <code>2d</code>) and Aspect <code>expand</code> so the game fits phones and PC.</li>
+<li>Click <b>Export Project</b>, name the file <code>index.html</code>, and export into an empty folder. Zip the <b>contents</b> of that folder, so <code>index.html</code> is at the top of the zip, and upload it in your dashboard. UNTILS then opens the <a href="#inspector">Inspector view</a> to check your SDK.</li>
+</ol>
+<p>You do not need to call <code>loading_start</code> / <code>loading_finished</code>: the SDK sends them for you (set <code>Untils.auto_loading = false</code> to do it yourself). When the tab is hidden the SDK also pauses the game and sound, and resumes them when the player returns (set <code>Untils.auto_pause = false</code> to handle it yourself).</p>
+<h3>Code</h3>
+<p><b>Godot 4.x</b></p>
+<pre><code>extends Node
+
+var level = 1
+
+func _ready():
+    Untils.paused.connect(func(): print("paused"))       # optional
+    Untils.resumed.connect(func(): print("resumed"))
+
+    var info = await Untils.init()
+    level = Untils.get_int("level", 1)                   # saved progress
+    start_game()
+
+func on_play_pressed():
+    Untils.gameplay_start()
+
+func on_game_over():
+    Untils.gameplay_stop()
+    Untils.set_int("level", level)                       # saved automatically
+    await Untils.commercial_break()                      # ads not live yet: continues at once
+    show_game_over_screen()
+
+func on_reward_button():
+    var rewarded = await Untils.rewarded_break()
+    if rewarded:
+        give_coins()</code></pre>
+<p><b>Godot 3.x</b></p>
+<pre><code>extends Node
+
+var level = 1
+
+func _ready():
+    Untils.connect("paused", self, "_on_paused")         # optional
+    Untils.connect("resumed", self, "_on_resumed")
+
+    var info = yield(Untils.init(), "completed")
+    level = Untils.get_int("level", 1)                   # saved progress
+    start_game()
+
+func on_play_pressed():
+    Untils.gameplay_start()
+
+func on_game_over():
+    Untils.gameplay_stop()
+    Untils.set_int("level", level)                       # saved automatically
+    yield(Untils.commercial_break(), "completed")        # ads not live yet: continues at once
+    show_game_over_screen()
+
+func on_reward_button():
+    var rewarded = yield(Untils.rewarded_break(), "completed")
+    if rewarded:
+        give_coins()</code></pre>
+<h3>Commands</h3>
+<table>
+<tr><th>Command</th><th>What it does</th><th>Status</th></tr>
+<tr><td><code>Untils.init(debug)</code></td><td>Starts the SDK and loads saved data. Call it first. Returns a Dictionary <code>{ name, version, env, isMobile, player, language }</code> (also sent with the <code>initialized</code> signal). Never fails. Waits up to 3 seconds for UNTILS.</td><td>Live</td></tr>
+<tr><td><code>Untils.set_int / get_int / set_float / get_float / set_string / get_string / set_bool / get_bool / set_json / get_json / has_key / keys / delete_key / delete_all / save_now</code></td><td>Save and read your data, like <code>PlayerPrefs</code>. Saves itself shortly after each change. About 900 KB per game. <code>set_json</code> keeps any Dictionary or Array (JSON types only).</td><td>Live (this browser)</td></tr>
+<tr><td><code>Untils.gameplay_start()</code> / <code>gameplay_stop()</code></td><td>Real play starts / stops (death, menu, pause). Repeated calls are ignored.</td><td>Live</td></tr>
+<tr><td><code>Untils.loading_start()</code> / <code>loading_finished()</code></td><td>Done for you. Only call them yourself if you set <code>auto_loading = false</code>, or if you load more content later.</td><td>Live</td></tr>
+<tr><td>Signals <code>paused</code> / <code>resumed</code></td><td>Run when the tab is hidden or shown. With <code>Untils.auto_pause = true</code> (default) the SDK also pauses the game (<code>get_tree().paused</code>) and mutes the Master audio bus for you.</td><td>Live</td></tr>
+<tr><td><code>Untils.is_mobile</code>, <code>language</code>, <code>env</code>, <code>is_ready</code>, <code>player</code></td><td>Handy values. <code>env</code> is <code>"untils"</code> on the site, <code>"offline"</code> in a web build on your own PC, and <code>"editor"</code> when you run from the Godot editor.</td><td>Live</td></tr>
+<tr><td><code>Untils.get_player()</code></td><td>Dictionary with <code>guest</code> and <code>name</code>. Everyone is "Guest" for now.</td><td>Basic</td></tr>
+<tr><td><code>Untils.shareable_url({ "level": 5 })</code> / <code>get_url_param("level")</code></td><td>Make a share link with your values, and read them back when the game is opened from that link.</td><td>Live</td></tr>
+<tr><td><code>Untils.request_fullscreen()</code> / <code>exit_fullscreen()</code></td><td>Ask UNTILS to enter or leave fullscreen. Call from a button press.</td><td>Live</td></tr>
+<tr><td><code>Untils.track(name, data)</code></td><td>Send your own event, like <code>track("level_complete", {"level": 3})</code>. Name up to 40 characters. Stats come later.</td><td>Reserved</td></tr>
+<tr><td><code>Untils.commercial_break()</code>, <code>rewarded_break()</code>, <code>show_ad(type)</code></td><td>Ads are not live yet. The interstitial continues at once; <code>rewarded_break()</code> gives <code>false</code>. Also sends the <code>ad_finished</code> signal. In the editor and offline, a rewarded ad gives <code>Untils.editor_rewarded_result</code> (default <code>true</code>) so you can test your reward code.</td><td>Coming soon</td></tr>
+<tr><td><code>Untils.submit_score(board, score)</code></td><td>Leaderboards. Returns <code>false</code> until they go live.</td><td>Coming soon</td></tr>
+<tr><td><code>Untils.set_debug(true)</code></td><td>Prints SDK activity in the Output panel and the browser console.</td><td>Live</td></tr>
+</table>
+<h3>If something goes wrong</h3>
+<ul>
+<li><b>"Call Untils.init() first"</b> warning: you used a save or event command before <code>init()</code> finished. Wait for <code>await Untils.init()</code> (Godot 3: <code>yield(Untils.init(), "completed")</code>) in your first script.</li>
+<li><b><code>Untils</code> is not found:</b> the plugin is not enabled. Tick <b>Enable</b> in <b>Project Settings &rarr; Plugins</b>, or add <code>Untils.gd</code> as an Autoload named <code>Untils</code>.</li>
+<li><b>Progress is not saved:</b> you used <code>user://</code> files or <code>ConfigFile</code>. Browser storage is blocked in the UNTILS sandbox. Use <code>Untils.set_int</code> and the other save commands.</li>
+<li><b>The game does not start, or shows a "SharedArrayBuffer" error:</b> Thread Support is on. Turn it off in the export settings and export again (Godot 3: Export Type <b>Regular</b>).</li>
+<li><b>Sound does not start:</b> browsers only allow sound after the first tap or click. Start your music from a button press.</li>
+<li><b>Large exports:</b> keep the zip under 50 MB. Compress textures and audio, and remove unused export templates.</li>
+</ul>
+<p>This SDK is in <b>beta</b>. If you find a problem, please tell us through the <a href="/contact/">contact page</a> and include your Godot version.</p>
+</section>
 <section class="sec" id="engines">
-<h2>Unity, Cocos and other engines</h2>
+<h2>Unity, Cocos, Godot and other engines</h2>
 <p>Web (HTML5) exports from game engines work if the zip follows the same rules as above: <code>index.html</code> at the top, relative paths, under 50 MB.</p>
 <h3>Unity (WebGL)</h3>
 <ol>
@@ -426,7 +524,7 @@ cc.Class({
 </ol>
 <div class="tip"><b>Using Cocos Creator?</b> Use the <a href="#cocos">Cocos SDK</a>. It adds <code>UntilsPrefs</code> so progress is saved, and sends loading and pause events for you.</div>
 <h3>Godot</h3>
-<p>Export for Web and zip the export as above. For Godot 4, make sure <b>Thread Support</b> is off (threads need special server headers). A plugin for the UNTILS SDK is planned. We have not tested Godot in depth yet, so please test your game after upload and tell us if something fails.</p>
+<div class="tip"><b>Using Godot?</b> Use the <a href="#godot">Godot SDK</a>. It is a plugin that adds saves, loading and pause events for you. Export for Web (Godot 3: HTML5), turn Thread Support off, and zip the export as above.</div>
 </section>
 <section class="sec" id="rules">
 <h2>Rules</h2>
