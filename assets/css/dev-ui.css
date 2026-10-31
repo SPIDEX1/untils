@@ -158,7 +158,7 @@ a.dv-back,a.dd-back,.dv-back,.dd-back{display:inline-flex!important;align-items:
 .dm-media{display:grid;place-items:center;background:#f2f8ff;border-radius:18px;padding:14px;min-height:140px}
 .dm-media.dm-chk{background:#fff linear-gradient(45deg,#e8eef7 25%,transparent 25%,transparent 75%,#e8eef7 75%),linear-gradient(45deg,#e8eef7 25%,transparent 25%,transparent 75%,#e8eef7 75%);background-size:20px 20px;background-position:0 0,10px 10px}
 .dm-media img{max-width:100%;max-height:58vh;border-radius:12px;display:block}
-.dm-media img.sq{width:min(260px,70vw);height:auto;border-radius:22%;box-shadow:0 10px 24px rgba(10,60,150,.25)}
+.dm-media img.sq{width:min(260px,70vw);height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:14%;box-shadow:0 10px 24px rgba(10,60,150,.25)}
 .dm-media video{max-width:100%;max-height:58vh;border-radius:12px;background:#000;display:block}
 .dm-none{margin:0;font-weight:800;color:#5d7390;text-align:center}
 .dm-spec{margin:12px 2px 4px;font-weight:700;color:#3a4f6d;font-size:14px}
@@ -167,3 +167,16 @@ a.dv-back,a.dd-back,.dv-back,.dd-back{display:inline-flex!important;align-items:
 .dm-close:hover{transform:translateY(-3px) scale(1.05)}
 @media(max-width:560px){.dm{padding:8px}.dm-h h3{font-size:18px}.dm-close{width:100%}}
 @keyframes dmIn{from{opacity:0;transform:translateY(-12px) scale(.96)}to{opacity:1;transform:none}}
+
+/* screenshots gallery in the demo panel */
+.dm-gal{gap:10px}
+.dm-gw{position:relative;display:grid;place-items:center;width:100%}
+.dm-gw img{max-width:100%;max-height:52vh;border-radius:12px;display:block;box-shadow:0 8px 20px rgba(10,60,150,.2)}
+.dm-nav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:#0d1b34;display:grid;place-items:center;cursor:pointer;padding:0;box-shadow:0 4px 12px rgba(10,60,150,.3);transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.dm-nav:hover{transform:translateY(-50%) scale(1.15)}
+.dm-nav .ic{margin:0}.dm-nav .ic-s{width:20px;height:20px}
+.dm-prev{left:6px}.dm-next{right:6px}
+.dm-cnt{font-weight:800;font-size:14px;color:#3a4f6d}
+.dm-dots{display:flex;gap:8px;justify-content:center}
+.dm-dot{width:10px;height:10px;border-radius:50%;border:0;padding:0;background:#c3d6ee;cursor:pointer}
+.dm-dot.on{background:#0a6cff;transform:scale(1.25)}

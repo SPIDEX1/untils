@@ -4,7 +4,8 @@
    DELETE ?kind=... */
 import { J, SUPA, me } from "../../_lib.js";
 const MB = 1024 * 1024;
-const LIM = { icon: 2 * MB, banner: 2 * MB, thumb: 2 * MB, logo: 2 * MB, video: 20 * MB };
+const LIM = { icon: 2 * MB, banner: 2 * MB, thumb: 2 * MB, shots: 2 * MB, logo: 2 * MB, video: 20 * MB };
+const LIST = { shots: 5 };   /* kinds that hold several files */
 const KINDS = Object.keys(LIM);
 const BUCKET = "docs-demo", MAX_SEC = 15;
 
@@ -31,7 +32,8 @@ function mp4Seconds(u) {
   }
   return null;
 }
-const item = d => ({ url: SUPA + "/storage/v1/object/public/" + BUCKET + "/" + d.path, type: d.type, size: d.size, at: d.at, dur: d.dur || null });
+const item = d => ({ url: SUPA + "/storage/v1/object/public/" + BUCKET + "/" + d.path, name: d.path, type: d.type, size: d.size, at: d.at, dur: d.dur || null });
+const view = (k, d) => LIST[k] ? { list: ((d && d.list) || []).map(item) } : (d && d.path ? item(d) : null);
 
 async function store(env, method, path, opts) {
   return fetch(SUPA + "/storage/v1/" + path, Object.assign({ method }, opts, { headers: Object.assign({ apikey: env.SUPABASE_SERVICE_KEY, Authorization: "Bearer " + env.SUPABASE_SERVICE_KEY }, (opts && opts.headers) || {}) }));
@@ -62,14 +64,24 @@ export async function onRequest({ request, env }) {
 
   if (request.method === "GET") {
     const items = {};
-    await Promise.all(KINDS.map(async k => { const d = await env.GAMES.get("demo:" + k, "json"); if (d && d.path) items[k] = item(d); }));
-    return J({ items, limits: { image: LIM.icon, video: LIM.video, seconds: MAX_SEC } });
+    await Promise.all(KINDS.map(async k => { const v = view(k, await env.GAMES.get("demo:" + k, "json")); if (v) items[k] = v; }));
+    return J({ items, limits: { image: LIM.icon, video: LIM.video, seconds: MAX_SEC, shots: LIST.shots } });
   }
   if (KINDS.indexOf(kind) < 0) return J({ error: "Unknown demo type." }, 400);
   if (!env.SUPABASE_SERVICE_KEY) return J({ error: "SUPABASE_SERVICE_KEY not set." }, 500);
   const old = await env.GAMES.get("demo:" + kind, "json");
 
   if (request.method === "DELETE") {
+    if (LIST[kind]) {
+      const cur = (old && old.list) || [], n = String(new URL(request.url).searchParams.get("n") || "");
+      if (n) {
+        if (!/^[a-z0-9-]+\.(png|jpg|webp)$/.test(n)) return J({ error: "Bad file name." }, 400);
+        const gone = cur.filter(x => x.path === n), keep = cur.filter(x => x.path !== n);
+        await Promise.all(gone.map(x => removeFile(env, x.path)));
+        if (keep.length) await env.GAMES.put("demo:" + kind, JSON.stringify({ list: keep })); else await env.GAMES.delete("demo:" + kind);
+      } else { await Promise.all(cur.map(x => removeFile(env, x.path))); await env.GAMES.delete("demo:" + kind); }
+      return J({ ok: true });
+    }
     if (old) { await removeFile(env, old.path); await env.GAMES.delete("demo:" + kind); }
     return J({ ok: true });
   }
@@ -88,9 +100,12 @@ export async function onRequest({ request, env }) {
     dur = kindInfo.ext === "mp4" ? mp4Seconds(bytes) : (+request.headers.get("X-Duration") || null);
     if (dur != null && dur > MAX_SEC + 0.5) return J({ error: "The video is " + dur.toFixed(1) + " seconds. Maximum is " + MAX_SEC + " seconds." }, 400);
   }
-  const path = kind + "-" + Date.now().toString(36) + "." + kindInfo.ext;
+  const cur = LIST[kind] ? ((old && old.list) || []) : [];
+  if (LIST[kind] && cur.length >= LIST[kind]) return J({ error: "Maximum " + LIST[kind] + " screenshots. Remove one first." }, 400);
+  const path = kind + "-" + Date.now().toString(36) + (LIST[kind] ? Math.random().toString(36).slice(2, 6) : "") + "." + kindInfo.ext;
   if (!(await upload(env, path, buf, kindInfo.type))) return J({ error: "Could not save the file. Check SUPABASE_SERVICE_KEY." }, 502);
   const rec = { path, type: kindInfo.type, size: buf.byteLength, at: Date.now(), dur: dur };
+  if (LIST[kind]) { await env.GAMES.put("demo:" + kind, JSON.stringify({ list: cur.concat([rec]) })); return J({ ok: true, item: item(rec), count: cur.length + 1 }); }
   await env.GAMES.put("demo:" + kind, JSON.stringify(rec));
   if (old && old.path !== path) await removeFile(env, old.path);
   return J({ ok: true, item: item(rec) });
