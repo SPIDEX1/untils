@@ -20,7 +20,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="/assets/css/style.css?v=5122f816"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap"><link rel="stylesheet" href="/assets/css/theme.v8.css">
 <link rel="stylesheet" href="/assets/css/developers.v8.css">
-<link rel="stylesheet" href="/assets/css/dev-ui.css?v=13">
+<link rel="stylesheet" href="/assets/css/dev-ui.css?v=14">
 <style>.dv-dgrid{grid-template-columns:1fr!important}.dv-acc{display:inline-flex;align-items:center;gap:8px;background:#e4f0fb;color:var(--navy);padding:9px 16px;border-radius:30px;font-weight:800;font-size:14px;text-decoration:none;margin:0 10px 0 auto}.dv-acc svg{width:18px;height:18px}.dv-acc+.dv-signin{margin-left:0}a.dv-back{display:inline-block;padding:10px 18px;border-radius:30px;background:#e4f0fb;font-weight:800;text-decoration:none;color:var(--navy);margin-bottom:14px}.dv-add{cursor:pointer!important}.dv-gl li{cursor:pointer;transition:background .15s}.dv-gl li.sel{background:#0a6cff!important;color:#fff}.dv-gl li.sel small{color:#dbe9ff}.dv-play{background:#1fa24a;color:#fff;font-weight:800;font-size:12px;padding:6px 12px;border-radius:99px;text-decoration:none}.dv-info{background:#f2f8ff;border-radius:16px;padding:14px 16px;margin:0 0 14px}.dv-info[hidden],.dv-ok[hidden]{display:none!important}.dv-ih{display:flex;gap:12px;align-items:center}.dv-ih h3{margin:0}.dv-ih p{margin:2px 0 0}.dv-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:8px;margin:12px 0}.dv-stat{background:#fff;border-radius:12px;padding:10px;text-align:center}.dv-stat b{display:block;font-size:22px}.dv-stat small{color:#6b7c93;font-weight:700}.dv-links{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.dv-links .dv-play{border:0;cursor:pointer;font:inherit;font-size:13px;font-weight:800}.dv-lk{background:#e4f0fb;color:#12233d;border:0;border-radius:99px;padding:6px 12px;font:inherit;font-size:13px;font-weight:800;cursor:pointer}.dv-msg{background:#fff6dc;border-left:4px solid #ffb020;padding:8px 12px;border-radius:8px;margin:10px 0}.dv-ok{background:#c9f5d3;padding:10px 14px;border-radius:12px;font-weight:700;margin:0 0 12px}.dv-meta{color:#6b7c93;font-size:13px;margin:8px 0 0}.dv-bell{font-size:12px;font-weight:800;background:#ffe9b8;color:#12233d;padding:4px 8px;border-radius:99px}.dv-gl li.sel .dv-bell{background:#fff}.dv-gf[hidden]{display:none!important}.dv-gf{display:grid;gap:12px;margin:0 0 18px}.dv-gf label{display:grid;gap:6px;font-weight:800;font-size:14px}.dv-gf input,.dv-gf select,.dv-gf textarea{font:inherit;padding:10px 12px;border:2px solid #d5e3f5;border-radius:12px}.dv-gl{list-style:none;margin:0;padding:0;display:grid;gap:10px}.dv-gl li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 14px;border-radius:14px;background:#f2f8ff}.dv-gl small{display:block;color:#6b7c93}.dv-st{font-weight:800;font-size:12px;padding:4px 10px;border-radius:99px;background:#ffe9b8}.dv-st.live{background:#b7e4ff}.dv-st.approved{background:#c9f5d3}.dv-st.rejected{background:#ffd0d6}.dv-or{display:grid;gap:6px;font-size:14px}.dv-or[hidden]{display:none!important}.dv-or small{color:#6b7c93;font-weight:600}.dv-or .row{display:flex;gap:18px;flex-wrap:wrap}.dv-gf .dv-or label.dv-ck{display:flex;gap:8px;align-items:center;font-weight:700}.dv-gf .dv-or input{width:auto;padding:0}.dv-vers{background:#fff;border-radius:14px;padding:12px 14px;margin:12px 0}.dv-vers[hidden]{display:none!important}.dv-vers h4{margin:0}.dv-vr{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-top:1px solid #e4f0fb;flex-wrap:wrap}.dv-vr:first-of-type{margin-top:8px}.dv-vr small{display:block;color:#6b7c93}.dv-vt{font-size:12px;font-weight:800;padding:3px 9px;border-radius:99px;background:#e4f0fb;margin-left:8px}.dv-vt.lv{background:#b7e4ff}.dv-vt.rv{background:#ffe9b8}</style>
 </head>
 <body class="dvp">
@@ -60,32 +60,6 @@
       <div class="dv-links"><a id="inLink" class="dv-play" href="#">Open Inspector view</a><a id="inDocs" class="dv-lk" href="/developers/docs/#sdk" style="display:none;text-decoration:none">How to add the SDK</a></div>
       <div id="inHold" aria-hidden="true" style="position:fixed;left:-9999px;top:0;width:360px;height:640px;overflow:hidden"></div>
     </section>
-    <section id="dvInfo" class="dv-info" hidden>
-      <div class="dv-ih"><img id="iIc" alt="" width="56" height="56" style="border-radius:14px"><div><h3 id="iTitle"></h3><p id="iStatus"></p></div></div>
-      <div id="iStats" class="dv-stats"></div>
-      <div id="iLinks" class="dv-links"></div>
-      <div id="iVers" class="dv-vers" hidden></div>
-      <div id="iMsgs"></div>
-      <p id="iMeta" class="dv-meta"></p>
-    </section>
-    <form id="dvEdit" class="dv-gf" hidden>
-      <h3 id="eTitle" style="margin:0"></h3>
-      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><img id="eIc" alt="" width="64" height="64" style="border-radius:14px"><img id="eBn" alt="" style="max-width:240px;border-radius:10px"></div>
-      <label>Game name<input id="eName" maxlength="60"></label>
-      <label>Description<textarea id="eDesc" rows="3" maxlength="500"></textarea></label>
-      <label>Category (tag)<select id="eCat"></select></label>
-      <label>This game is for<select id="eDev"><option value="all">Mobile game (plays on phone and PC)</option><option value="desktop">Desktop game (PC only)</option></select></label>
-      <div id="eOr" class="dv-or"><b>Mobile screen</b><small>Tick how your game can be played on a phone. Only Landscape: it opens in landscape automatically. Both ticked: works in both.</small><div class="row"><label class="dv-ck"><input type="checkbox" id="eOrL" checked> Landscape</label><label class="dv-ck"><input type="checkbox" id="eOrP" checked> Portrait</label></div></div>
-      <label>Change icon (optional): square, at least 512 x 512 px<input id="eIcon" type="file" accept="image/png,image/jpeg,image/webp"></label>
-      <label>Change / add popular banner (optional): 1920 x 400 px<input id="eBan" type="file" accept="image/png,image/jpeg,image/webp"></label>
-      <label style="display:flex;gap:8px;align-items:center;font-weight:600"><input id="eRm" type="checkbox" style="width:auto"> Remove current banner</label>
-      <div id="eShots" style="display:flex;gap:10px;flex-wrap:wrap"></div>
-      <label>Add screenshots (optional): up to 5 in total, min 640 px wide, under 2 MB each<input id="eShotsNew" type="file" multiple accept="image/png,image/jpeg,image/webp"></label>
-      <label>Upload new version (optional): .zip, max 50 MB. A new version of a live game is reviewed before it goes live<input id="eZip" type="file" accept=".zip,application/zip"></label>
-      <p class="dv-err" id="eErr" role="alert"></p>
-      <div id="eDelBox" class="dv-delbox" hidden><p>Delete this game permanently? It will be removed from UNTILS and from your dashboard, along with all its versions and files. This cannot be undone.</p><div class="row"><button type="button" class="dv-sbtn dv-danger" id="eDelYes"><i data-ic="trash"></i>YES, DELETE</button><button type="button" class="dv-sbtn" id="eDelNo" style="background:#e4f0fb;color:#12233d">NO, KEEP IT</button></div></div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="submit" class="dv-sbtn" id="eGo" disabled>SAVE CHANGES</button><button type="button" class="dv-sbtn" id="eCancel" style="background:#e4f0fb;color:#12233d">CANCEL</button><button type="button" class="dv-sbtn dv-danger" id="eDel"><i data-ic="trash"></i>DELETE GAME</button></div>
-    </form>
     <ul id="dvList" class="dv-gl"></ul>
     <div class="dv-empty" id="dvEmpty">
       <div class="dv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="11" rx="4"/><path d="M8 12h4M10 10v4M16 11.5h.01M18 13.5h.01"/></svg></div>
@@ -107,6 +81,34 @@
 </section>
 
 </main>
+<main class="dv dv-game" id="dvGame" hidden>
+<section class="dv-sec dv-gsec">
+  <a href="/developers/dashboard/" class="dv-bk" id="gBack"><i data-ic="left"></i><span>Back to dashboard</span></a>
+  <h1 class="dv-gh">Game Edits</h1>
+  <article class="dv-panel dv-gp">
+    <p id="gNote" class="dv-ok" hidden></p>
+    <h2 id="eTitle" class="dv-et"></h2>
+    <div id="eStatus" class="dv-gstat"></div>
+    <div id="eMsgs"></div>
+    <form id="dvEdit" class="dv-gf" novalidate>
+      <section class="dv-blk">
+        <h3>Basic Info</h3>
+        <label>Game name<input id="eName" maxlength="60"></label>
+        <label>Description<textarea id="eDesc" rows="4" maxlength="500"></textarea></label>
+        <label>Category<select id="eCat"></select></label>
+        <label>Devices<select id="eDev"><option value="all">Mobile game (plays on phone and PC)</option><option value="desktop">Desktop game (PC only)</option></select></label>
+        <div id="eOr" class="dv-or"><b>Dimension</b><small>Tick how your game can be played on a phone. Only Landscape: it opens in landscape automatically. Both ticked: works in both.</small><div class="row"><label class="dv-ck"><input type="checkbox" id="eOrL" checked> Landscape</label><label class="dv-ck"><input type="checkbox" id="eOrP" checked> Portrait</label></div></div>
+      </section>
+      <section class="dv-blk"><h3>Digital Kit</h3><div id="eKit"></div></section>
+      <section class="dv-blk"><h3>Versions</h3><div id="eVers"></div></section>
+      <p class="dv-err" id="eErr" role="alert"></p>
+      <button type="submit" class="dv-sbtn" id="eGo" disabled>SAVE CHANGES</button>
+      <button type="button" class="dv-sbtn dv-danger" id="eDel"><i data-ic="trash"></i>DELETE GAME</button>
+      <div id="eDelBox" class="dv-delbox" hidden><p>Delete this game permanently? It will be removed from UNTILS and from your dashboard, along with all its versions and files. This cannot be undone.</p><div class="row"><button type="button" class="dv-sbtn dv-danger" id="eDelYes"><i data-ic="trash"></i>YES, DELETE</button><button type="button" class="dv-sbtn" id="eDelNo" style="background:#e4f0fb;color:#12233d">NO, KEEP IT</button></div></div>
+    </form>
+  </article>
+</section>
+</main>
 <noscript><div class="legal"><h1>Dashboard</h1><p>Please enable JavaScript to use your dashboard.</p></div></noscript>
 <footer class="sf">
 <div class="sf-brand ab-brand"><img class="ab-logo" src="/assets/img/untils-logo.png?v=2" alt="UNTILS" width="230" height="56"><span class="ab-chip">More Than Just Games</span></div>
@@ -120,7 +122,7 @@
 <script src="/assets/js/icons.js?v=1"></script>
 <script src="/assets/js/auth.js?v=8"></script>
 <script src="/assets/js/inspector-core.js"></script>
-<script src="/assets/js/dashboard.v14.js"></script>
+<script src="/assets/js/dashboard.v15.js"></script>
 <script src="/assets/js/fx.v7.js"></script>
 <script src="/assets/js/footer.js?v=1"></script>
 </body>
