@@ -222,3 +222,74 @@ a.dv-bk .ic{margin:0}
 .dv-blk .dv-err,.dk-item .dv-err{margin:0}
 .dv-blk>.dv-fe{margin:-6px 0 0}
 .dk-pv{display:grid;gap:8px;justify-items:start}
+
+/* ---------- v17: notes, visible kit media, preview panel, mobile ---------- */
+.dv-note{display:flex;align-items:flex-start;gap:8px;background:#c9f5d3;color:#0d6b2c;padding:12px 14px;border-radius:14px;font-weight:800;line-height:1.4;margin:0 0 12px;overflow-wrap:anywhere;width:auto;box-sizing:border-box}
+.dv-note .ic{margin:2px 0 0;flex:none}
+.dv-note[hidden]{display:none!important}
+.dk-m{justify-items:start}
+.dk-t{display:block;max-width:100%;border-radius:12px;background:#e9f1fb;object-fit:cover}
+.dk-t.k-icon{width:96px;height:96px}
+.dk-t.k-ban{width:100%;max-width:420px;height:auto}
+.dk-t.k-thumb{width:100%;max-width:300px;height:auto}
+.dk-t.k-logo{max-height:80px;width:auto;object-fit:contain}
+.dk-t.k-video{width:100%;max-width:300px;max-height:190px;background:#000}
+.dk-btns{margin:0}
+.dk-st img{width:96px;height:64px}
+.pv{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:12px;background:rgba(10,25,50,.62);overflow:hidden}
+.pv[hidden]{display:none!important}
+.pv-box{background:#fff;border-radius:22px;width:100%;max-width:860px;max-height:calc(100% - 8px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.pv-h{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;border-bottom:2px solid #e4f0fb}
+.pv-h h3{margin:0;font:800 19px var(--fh);color:var(--navy);overflow-wrap:anywhere}
+.pv-x{flex:none;width:40px;height:40px;border-radius:50%;border:0;background:#e4f0fb;color:#12233d;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.pv-x .ic{margin:0}
+.pv-body{padding:14px;overflow:auto;display:grid;gap:12px;justify-items:center;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+.pv-m{max-width:100%;max-height:68vh;border-radius:14px;background:#e9f1fb;height:auto}
+.pv-m.k-icon{width:min(320px,80vw);height:auto;aspect-ratio:1}
+.pv-m.k-logo{background:repeating-conic-gradient(#dfe8f4 0 25%,#fff 0 50%) 0 0/20px 20px;padding:10px;box-sizing:border-box}
+.pv-m.k-video{background:#000}
+.pv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;width:100%}
+.pv-grid img{width:100%;height:auto;border-radius:12px;background:#e9f1fb}
+@media(max-width:560px){
+ .dv-game .dv-gsec{padding-left:10px;padding-right:10px}
+ .dv-gp{padding:16px 12px!important}
+ .dv-gh{font-size:30px}
+ .dv-et{font-size:20px!important}
+ .dv-gf input,.dv-gf select,.dv-gf textarea{font-size:16px}
+ .dv-blk{padding:12px 10px}
+ .dv-blk>h3{font-size:18px}
+ .dk-item{padding:10px}
+ .dv-gp .dk-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+ .dv-gp .dk-btns>.dv-lk,.dv-gp .dk-btns>.dv-play{width:100%;min-height:42px;justify-content:center;box-sizing:border-box}
+ .dv-gp .dk-btns>.dv-lk:only-child{grid-column:1/-1}
+ .dk-t.k-ban,.dk-t.k-thumb,.dk-t.k-video{max-width:100%}
+ .dk-st img{width:calc((100vw - 120px)/3);min-width:72px;height:auto;aspect-ratio:3/2}
+ .dv-gp .dv-vtop{display:grid}
+ .dv-vtop .dv-play{width:100%;min-height:44px}
+ #eVers .dv-vr{display:grid;gap:8px}
+ #eVers .dv-va{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+ #eVers .dv-va>*{min-height:40px;width:100%;box-sizing:border-box;justify-content:center}
+ #eVers .dv-va>:first-child{grid-column:1/-1}
+ #eVers .dv-vt{margin-left:0;display:inline-flex;margin-top:4px}
+ .dv-gstat .dv-links>*{flex:1 1 140px;justify-content:center}
+ .dv-gp .dv-sbtn{min-height:50px}
+ .dv-delbox .row .dv-sbtn{flex:1 1 100%}
+ .pv{padding:8px}
+ .pv-box{border-radius:18px}
+ .pv-h{padding:10px 12px}
+ .pv-body{padding:10px}
+ .pv-grid{grid-template-columns:1fr}
+}
+
+.dv-gf select{background:#fff;text-overflow:ellipsis}
+@media(max-width:560px){.dv-gp .dv-gstat .dv-links{display:flex}}
+@media(max-width:820px){
+ #eVers .dv-vr{display:grid;gap:8px;flex-wrap:wrap}
+ #eVers .dv-va{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;flex:none}
+ #eVers .dv-va .tx{display:inline}
+ #eVers .dv-va .dv-lk,#eVers .dv-va .dv-play{width:100%;height:auto;min-height:42px;padding:8px 12px!important;border-radius:99px;box-sizing:border-box;justify-content:center}
+ #eVers .dv-va>:first-child{grid-column:1/-1}
+ #eVers .dv-vt{margin-left:8px;display:inline-flex}
+}
+
+.dv-vtop .dv-play{border:0}

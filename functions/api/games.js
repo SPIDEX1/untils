@@ -3,7 +3,7 @@ import { sign } from "../_lib.js";
    Binding chahiye: GAMES (KV namespace). Zip file browser se seedha Supabase Storage me jaati hai. */
 const SUPA = "https://fjfkwfklglovuxeecxsg.supabase.co";
 const KEY = "sb_publishable_HUSSW4Xiau3suUYMfcTjtQ_h083WJbS";
-const CATS = ["Arcade", "Action", "Adventure", "Puzzle", "Racing", "Space", "Casual", "Other"];
+const CATS = ["Action", "Adventure", "Arcade", "Board", "Card", "Casual", "Educational", "Endless Runner", "Fighting", "Horror", "Idle", "Kids", "Multiplayer", "Music", "Platformer", "Puzzle", "Racing", "Role Playing", "Sandbox", "Shooter", "Simulation", "Space", "Sports", "Strategy", "Survival", "Tower Defense", "Trivia", "Word", "Other"];
 const MAX_GAMES = 20;
 const cleanTitle = t => String(t || "").replace(/[<>&"'`\\$]/g, "").replace(/\s+/g, " ").trim();
 const slugOf = t => String(t).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
