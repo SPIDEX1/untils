@@ -12,11 +12,12 @@ button.ok{background:#1fa24a}button.no{background:#e0334c}button:disabled{opacit
 .err{color:#d0213a;font-weight:700;min-height:1.2em}.m{color:#6b7c93;font-size:14px}[hidden]{display:none!important}
 .fr{display:block;margin:10px auto;border:3px solid #12233d;border-radius:14px;background:#000;width:100%;height:70vh}.fr.ph{width:375px;max-width:100%;height:667px;max-height:75vh}
 .rv{border-left:4px solid #0a6cff;padding:6px 10px;margin:8px 0;background:#f7faff}
+.dg{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:10px}.dc{background:#f7faff;border-radius:14px;padding:14px;border:2px solid #e3eefc}.dc h3{margin:0 0 4px}.dp{min-height:60px}.dp img,.dp video{max-width:100%;max-height:200px;border-radius:10px;display:block;margin:8px 0;background:#000}.dp img{background:#fff;border:1px solid #d5e3f5}.dc input[type=file]{width:100%;border:2px dashed #b9cfee;background:#fff}.dc .ok2{color:#14803c;font-weight:700;min-height:1.2em}
 </style></head><body><div class="w">
 <div class="c"><h1>UNTILS Review Portal</h1><div class="row" id="bar" hidden><span id="who" class="m"></span><span class="b" id="role"></span><button class="g" id="out">Log out</button></div></div>
 <div class="c" id="login"><h2>Staff sign in</h2><div id="s1"><input type="email" id="em" placeholder="Your email"><div class="row"><button id="send">SEND CODE</button></div></div>
 <div id="s2" hidden><p class="m">Enter the code sent to your email.</p><input type="text" id="cd" inputmode="numeric" maxlength="10" placeholder="Code"><div class="row"><button id="ver">VERIFY</button></div></div><div class="err" id="le"></div></div>
 <div class="c" id="deny" hidden><h2>No access</h2><p>This account is not on the review team. Ask the leader to add your email.</p></div>
-<div id="app" hidden><div class="c"><div class="row"><button class="g" data-t="pending">Pending</button><button class="g" data-t="done">Decided</button><button class="g" data-t="team" id="tt" hidden>Team</button></div><div id="list"></div></div>
+<div id="app" hidden><div class="c"><div class="row"><button class="g" data-t="pending">Pending</button><button class="g" data-t="done">Decided</button><button class="g" data-t="team" id="tt" hidden>Team</button><button class="g" data-t="demo" id="td" hidden>Docs demo</button></div><div id="list"></div></div>
 <div class="c" id="det" hidden></div></div>
-</div><script src="/assets/js/auth.js?v=8"></script><script src="/assets/js/admin.v6.js"></script></body></html>
+</div><script src="/assets/js/auth.js?v=8"></script><script src="/assets/js/admin.v7.js"></script></body></html>

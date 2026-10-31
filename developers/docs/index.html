@@ -20,7 +20,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="/assets/css/style.css?v=5122f816"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap"><link rel="stylesheet" href="/assets/css/theme.v8.css">
 <link rel="stylesheet" href="/assets/css/developers.v8.css">
-<link rel="stylesheet" href="/assets/css/dev-ui.css?v=10">
+<link rel="stylesheet" href="/assets/css/dev-ui.css?v=11">
 </head>
 <body class="dvp"><style>
 .dd-back{display:inline-block;padding:9px 18px;border-radius:30px;background:#e4f0fb;color:#12233d;font-weight:800;font-size:14px;text-decoration:none}
@@ -45,7 +45,7 @@ html{scroll-behavior:smooth}
 <a class="dd-back" href="/developers/dashboard/" aria-label="Back to dashboard" title="Back to dashboard"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span class="tx">Dashboard</span></a>
 <h1>Developer docs</h1>
 <p>Everything you need to publish an HTML5 game on UNTILS: what to prepare, what sizes to use, how review works, and how to use the SDK.</p>
-<div class="toc" id="toc"><a href="#quick">Quick start</a><a href="#package">Game package</a><a href="#size">Game size</a><a href="#icon">Icon</a><a href="#banner">Banner</a><a href="#shots">Screenshots</a><a href="#review">Review</a><a href="#sdk">SDK</a><a href="#api">SDK commands</a><a href="#inspector">Inspector</a><a href="#unity">Unity SDK</a><a href="#cocos">Cocos SDK</a><a href="#godot">Godot SDK</a><a href="#engines">Engines</a><a href="#rules">Rules</a></div>
+<div class="toc" id="toc"><a href="#quick">Quick start</a><a href="#package">Game package</a><a href="#size">Game size</a><a href="#icon">Icon</a><a href="#banner">Banner</a><a href="#shots">Screenshots</a><a href="#logo">Text logo</a><a href="#video">Video</a><a href="#review">Review</a><a href="#sdk">SDK</a><a href="#api">SDK commands</a><a href="#inspector">Inspector</a><a href="#unity">Unity SDK</a><a href="#cocos">Cocos SDK</a><a href="#godot">Godot SDK</a><a href="#engines">Engines</a><a href="#rules">Rules</a></div>
 
 <section class="sec" id="quick">
 <h2>Quick start</h2>
@@ -103,6 +103,7 @@ html{scroll-behavior:smooth}
 <li>Only artwork you made or are allowed to use. No copied characters or logos.</li>
 </ul>
 <p>The icon is shown on the game card, the Play screen, "More games" and the popular banner.</p>
+<p><button type="button" class="demo-btn" data-demo="icon"><i data-ic="eye"></i><span>Demo</span></button></p>
 </section>
 <section class="sec" id="banner">
 <h2>Popular banner - optional</h2>
@@ -115,6 +116,7 @@ html{scroll-behavior:smooth}
 <tr><td>Text</td><td>Do <b>not</b> write the game name or a Play button on it. UNTILS adds the title and a Play Now button on the left, with a dark fade for readability. Keep the left side calm.</td></tr>
 </table>
 <p><b>How to upload:</b> choose it in the <b>Popular banner</b> field when you add the game. You can also add or change it later: open your dashboard, click the game, pick a new banner, and press <b>SAVE CHANGES</b>.</p>
+<p><button type="button" class="demo-btn" data-demo="banner"><i data-ic="eye"></i><span>Demo</span></button></p>
 </section>
 <section class="sec" id="shots">
 <h2>Screenshots - optional</h2>
@@ -126,6 +128,35 @@ html{scroll-behavior:smooth}
 </table>
 <p><b>What to show:</b> real in-game screens (menu, gameplay, a level, a win or upgrade screen). No fake or edited-in screens, no device frames, no big promo text, no screens from other games.</p>
 <p>Screenshots appear at the very bottom of your game page. Click one to see it large. You can remove or add screenshots later from the dashboard.</p>
+<p><button type="button" class="demo-btn" data-demo="thumb"><i data-ic="eye"></i><span>Demo</span></button></p>
+</section>
+<section class="sec" id="logo">
+<h2>Text logo - optional</h2>
+<p>The text logo is your game name drawn as a logo (a wordmark). UNTILS can show it on top of your popular banner and on your game page, so players see a clean title instead of plain text.</p>
+<table>
+<tr><th>Item</th><th>Rule</th></tr>
+<tr><td>File size</td><td><b>Under 1 MB.</b></td></tr>
+<tr><td>Format</td><td><b>PNG or WebP with a transparent background.</b> Do not use a white or coloured box behind it.</td></tr>
+<tr><td>Size</td><td>Wide shape. We recommend <b>1200 x 400 px</b>. Minimum 600 px wide.</td></tr>
+<tr><td>Content</td><td>Only your <b>game name</b> in large, easy-to-read letters. No slogan, no small text, no other logos or store badges. Keep about 10% empty space around it.</td></tr>
+<tr><td>Colours</td><td>It must stay readable on a dark fade and on a bright background. Add a thin outline or shadow if needed.</td></tr>
+</table>
+<div class="tip"><b>Coming soon:</b> the upload field for the text logo is not in the dashboard yet. Prepare your file now so it is ready.</div>
+<p><button type="button" class="demo-btn" data-demo="logo"><i data-ic="eye"></i><span>Demo</span></button></p>
+</section>
+<section class="sec" id="video">
+<h2>Gameplay video - optional</h2>
+<p>A short video that shows how your game plays. UNTILS can show it on your game page before the screenshots.</p>
+<table>
+<tr><th>Item</th><th>Rule</th></tr>
+<tr><td>Length</td><td><b>Maximum 15 seconds.</b> Longer videos are rejected.</td></tr>
+<tr><td>Format</td><td><b>MP4 (H.264)</b> or <b>WebM</b>. Under 20 MB.</td></tr>
+<tr><td>Size</td><td><b>1280 x 720</b> (landscape) or <b>720 x 1280</b> (portrait for phone games).</td></tr>
+<tr><td>Sound</td><td>The video starts <b>muted</b>, so sound is optional. If you add sound, keep it quiet and without copyrighted music.</td></tr>
+<tr><td>Content</td><td>Real gameplay only: start with the action in the first second, show the main mechanic, end cleanly. No fake or edited-in screens, no ads or promo banners, no watermarks, no black bars, no screens from other games.</td></tr>
+</table>
+<div class="tip"><b>Coming soon:</b> the upload field for the gameplay video is not in the dashboard yet. Prepare your video now so it is ready.</div>
+<p><button type="button" class="demo-btn" data-demo="video"><i data-ic="play"></i><span>Demo</span></button></p>
 </section>
 <section class="sec" id="review">
 <h2>Review and going live</h2>
@@ -550,5 +581,7 @@ func on_reward_button():
 <script>(function(){var t=document.getElementById("toc"),L=[].slice.call(t.querySelectorAll("a")),S=L.map(function(a){return document.getElementById(a.getAttribute("href").slice(1))});
 L.forEach(function(a,i){a.addEventListener("click",function(e){e.preventDefault();if(S[i]){S[i].scrollIntoView({behavior:"smooth",block:"start"});history.replaceState(null,"",a.getAttribute("href"))}})});
 function act(){var y=window.scrollY+130,k=0;S.forEach(function(el,i){if(el&&el.getBoundingClientRect().top+window.scrollY<=y)k=i});L.forEach(function(a,i){a.classList.toggle("on",i===k)});if(t.scrollWidth>t.clientWidth)t.scrollTo({left:Math.max(L[k].offsetLeft-24,0),behavior:"smooth"})}
-window.addEventListener("scroll",act,{passive:true});act()})();</script><script src="/assets/js/footer.js?v=1"></script>
+window.addEventListener("scroll",act,{passive:true});act()})();</script><script src="/assets/js/icons.js?v=2"></script>
+<script src="/assets/js/docs-demo.js?v=1"></script>
+<script src="/assets/js/footer.js?v=1"></script>
 </body></html>
