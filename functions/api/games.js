@@ -113,6 +113,10 @@ export async function onRequestPost({ request, env }) {
 
   const sh = shotsOk(b.shots, u.id, id);
   if (!sh) return json({ error: "Bad screenshots." }, 400);
+  const okp = (p, re) => typeof p === "string" && p.startsWith(u.id + "/" + id + "-") && re.test(p);
+  if (b.thumb && !okp(b.thumb, /-t\d+\.(png|jpg|webp)$/)) return json({ error: "Bad thumbnail." }, 400);
+  if (b.logo && !okp(b.logo, /-l\d+\.(png|webp)$/)) return json({ error: "Bad text logo." }, 400);
+  if (b.video && !okp(b.video, /-m\d+\.(mp4|webm)$/)) return json({ error: "Bad video." }, 400);
 
   const prefix = "game:" + u.id + ":";
   const existing = await env.GAMES.list({ prefix, limit: MAX_GAMES + 1 });
@@ -121,7 +125,7 @@ export async function onRequestPost({ request, env }) {
   const game = {
     id, title, description: desc, category: cat,
     studio: (u.user_metadata && u.user_metadata.studio) || "",
-    owner: u.id, path: b.path, icon: b.icon, banner: b.banner || "", shots: sh, device: b.device === "desktop" ? "desktop" : "all", orient: b.device === "desktop" ? "both" : ORI(b.orient), versions: [{ n: 1, path: b.path, at: Date.now() }], status: "pending", createdAt: Date.now()
+    owner: u.id, path: b.path, icon: b.icon, banner: b.banner || "", thumb: b.thumb || "", logo: b.logo || "", video: b.video || "", shots: sh, device: b.device === "desktop" ? "desktop" : "all", orient: b.device === "desktop" ? "both" : ORI(b.orient), versions: [{ n: 1, path: b.path, at: Date.now() }], status: "pending", createdAt: Date.now()
   };
   await env.GAMES.put(prefix + id, JSON.stringify(game));
   return json({ ok: true, game });

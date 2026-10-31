@@ -216,3 +216,9 @@ a.dv-bk .ic{margin:0}
 #eVers .dv-vr{background:#fff;padding:10px 12px;border-radius:12px;margin-top:8px;border-top:0}
 #eVers .dv-msg .dv-lk{margin-top:8px}
 @media(max-width:820px){a.dv-bk{width:auto;padding:10px 16px}.dv-blk{padding:14px 10px}.dv-vtop .dv-play{width:100%}.dv-va{width:100%}}
+
+.dv-gp [hidden]{display:none!important}
+.dv-fe:empty{display:none}
+.dv-blk .dv-err,.dk-item .dv-err{margin:0}
+.dv-blk>.dv-fe{margin:-6px 0 0}
+.dk-pv{display:grid;gap:8px;justify-items:start}

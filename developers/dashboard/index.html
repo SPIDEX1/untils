@@ -20,7 +20,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="/assets/css/style.css?v=5122f816"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap"><link rel="stylesheet" href="/assets/css/theme.v8.css">
 <link rel="stylesheet" href="/assets/css/developers.v8.css">
-<link rel="stylesheet" href="/assets/css/dev-ui.css?v=14">
+<link rel="stylesheet" href="/assets/css/dev-ui.css?v=15">
 <style>.dv-dgrid{grid-template-columns:1fr!important}.dv-acc{display:inline-flex;align-items:center;gap:8px;background:#e4f0fb;color:var(--navy);padding:9px 16px;border-radius:30px;font-weight:800;font-size:14px;text-decoration:none;margin:0 10px 0 auto}.dv-acc svg{width:18px;height:18px}.dv-acc+.dv-signin{margin-left:0}a.dv-back{display:inline-block;padding:10px 18px;border-radius:30px;background:#e4f0fb;font-weight:800;text-decoration:none;color:var(--navy);margin-bottom:14px}.dv-add{cursor:pointer!important}.dv-gl li{cursor:pointer;transition:background .15s}.dv-gl li.sel{background:#0a6cff!important;color:#fff}.dv-gl li.sel small{color:#dbe9ff}.dv-play{background:#1fa24a;color:#fff;font-weight:800;font-size:12px;padding:6px 12px;border-radius:99px;text-decoration:none}.dv-info{background:#f2f8ff;border-radius:16px;padding:14px 16px;margin:0 0 14px}.dv-info[hidden],.dv-ok[hidden]{display:none!important}.dv-ih{display:flex;gap:12px;align-items:center}.dv-ih h3{margin:0}.dv-ih p{margin:2px 0 0}.dv-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:8px;margin:12px 0}.dv-stat{background:#fff;border-radius:12px;padding:10px;text-align:center}.dv-stat b{display:block;font-size:22px}.dv-stat small{color:#6b7c93;font-weight:700}.dv-links{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.dv-links .dv-play{border:0;cursor:pointer;font:inherit;font-size:13px;font-weight:800}.dv-lk{background:#e4f0fb;color:#12233d;border:0;border-radius:99px;padding:6px 12px;font:inherit;font-size:13px;font-weight:800;cursor:pointer}.dv-msg{background:#fff6dc;border-left:4px solid #ffb020;padding:8px 12px;border-radius:8px;margin:10px 0}.dv-ok{background:#c9f5d3;padding:10px 14px;border-radius:12px;font-weight:700;margin:0 0 12px}.dv-meta{color:#6b7c93;font-size:13px;margin:8px 0 0}.dv-bell{font-size:12px;font-weight:800;background:#ffe9b8;color:#12233d;padding:4px 8px;border-radius:99px}.dv-gl li.sel .dv-bell{background:#fff}.dv-gf[hidden]{display:none!important}.dv-gf{display:grid;gap:12px;margin:0 0 18px}.dv-gf label{display:grid;gap:6px;font-weight:800;font-size:14px}.dv-gf input,.dv-gf select,.dv-gf textarea{font:inherit;padding:10px 12px;border:2px solid #d5e3f5;border-radius:12px}.dv-gl{list-style:none;margin:0;padding:0;display:grid;gap:10px}.dv-gl li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 14px;border-radius:14px;background:#f2f8ff}.dv-gl small{display:block;color:#6b7c93}.dv-st{font-weight:800;font-size:12px;padding:4px 10px;border-radius:99px;background:#ffe9b8}.dv-st.live{background:#b7e4ff}.dv-st.approved{background:#c9f5d3}.dv-st.rejected{background:#ffd0d6}.dv-or{display:grid;gap:6px;font-size:14px}.dv-or[hidden]{display:none!important}.dv-or small{color:#6b7c93;font-weight:600}.dv-or .row{display:flex;gap:18px;flex-wrap:wrap}.dv-gf .dv-or label.dv-ck{display:flex;gap:8px;align-items:center;font-weight:700}.dv-gf .dv-or input{width:auto;padding:0}.dv-vers{background:#fff;border-radius:14px;padding:12px 14px;margin:12px 0}.dv-vers[hidden]{display:none!important}.dv-vers h4{margin:0}.dv-vr{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-top:1px solid #e4f0fb;flex-wrap:wrap}.dv-vr:first-of-type{margin-top:8px}.dv-vr small{display:block;color:#6b7c93}.dv-vt{font-size:12px;font-weight:800;padding:3px 9px;border-radius:99px;background:#e4f0fb;margin-left:8px}.dv-vt.lv{background:#b7e4ff}.dv-vt.rv{background:#ffe9b8}</style>
 </head>
 <body class="dvp">
@@ -39,19 +39,6 @@
       <h2>Your games</h2>
       <button type="button" class="dv-add" id="dvAddBtn">+ ADD NEW GAME</button>
     </div>
-    <form id="dvGameForm" class="dv-gf" hidden>
-      <label>Game title<input id="gTitle" maxlength="60" required></label>
-      <label>Category<select id="gCat"><option value="">Choose...</option><option>Arcade</option><option>Action</option><option>Adventure</option><option>Puzzle</option><option>Racing</option><option>Space</option><option>Casual</option><option>Other</option></select></label>
-      <label>This game is for<select id="gDev"><option value="all">Mobile game (plays on phone and PC)</option><option value="desktop">Desktop game (PC only)</option></select></label>
-      <div id="gOr" class="dv-or"><b>Mobile screen</b><small>Tick how your game can be played on a phone. Only Landscape: it opens in landscape automatically. Both ticked: works in both.</small><div class="row"><label class="dv-ck"><input type="checkbox" id="gOrL" checked> Landscape</label><label class="dv-ck"><input type="checkbox" id="gOrP" checked> Portrait</label></div></div>
-      <label>Description<textarea id="gDesc" rows="3" maxlength="500" required></textarea></label>
-      <label>Game icon (square, at least 512 x 512 px; PNG, JPG or WebP)<input id="gIcon" type="file" accept="image/png,image/jpeg,image/webp"></label>
-      <label>Popular banner (optional): 1920 x 400 px, PNG, JPG or WebP, under 2 MB<input id="gBan" type="file" accept="image/png,image/jpeg,image/webp"></label>
-      <label>Screenshots (optional, up to 5): PNG, JPG or WebP, min 640 px wide, under 2 MB each<input id="gShots" type="file" multiple accept="image/png,image/jpeg,image/webp"></label>
-      <label>Game zip (index.html at the top, max 50 MB)<input id="gZip" type="file" accept=".zip,application/zip"></label>
-      <p class="dv-err" id="gErr" role="alert"></p>
-      <button type="submit" class="dv-sbtn" id="gGo">UPLOAD GAME</button>
-    </form>
     <p id="dvNote" class="dv-ok" hidden></p>
     <section id="dvInsp" class="dv-info" hidden>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0"><i data-ic="scan"></i>Inspector view</h3><button type="button" class="dv-lk" id="inClose">Close</button></div>
@@ -84,7 +71,7 @@
 <main class="dv dv-game" id="dvGame" hidden>
 <section class="dv-sec dv-gsec">
   <a href="/developers/dashboard/" class="dv-bk" id="gBack"><i data-ic="left"></i><span>Back to dashboard</span></a>
-  <h1 class="dv-gh">Game Edits</h1>
+  <h1 class="dv-gh" id="gHead">Game Edits</h1>
   <article class="dv-panel dv-gp">
     <p id="gNote" class="dv-ok" hidden></p>
     <h2 id="eTitle" class="dv-et"></h2>
@@ -93,18 +80,18 @@
     <form id="dvEdit" class="dv-gf" novalidate>
       <section class="dv-blk">
         <h3>Basic Info</h3>
-        <label>Game name<input id="eName" maxlength="60"></label>
-        <label>Description<textarea id="eDesc" rows="4" maxlength="500"></textarea></label>
-        <label>Category<select id="eCat"></select></label>
+        <label>Game name<input id="eName" maxlength="60"></label><p class="dv-err dv-fe" id="fe-name"></p>
+        <label>Description<textarea id="eDesc" rows="4" maxlength="500"></textarea></label><p class="dv-err dv-fe" id="fe-desc"></p>
+        <label>Category<select id="eCat"></select></label><p class="dv-err dv-fe" id="fe-cat"></p>
         <label>Devices<select id="eDev"><option value="all">Mobile game (plays on phone and PC)</option><option value="desktop">Desktop game (PC only)</option></select></label>
-        <div id="eOr" class="dv-or"><b>Dimension</b><small>Tick how your game can be played on a phone. Only Landscape: it opens in landscape automatically. Both ticked: works in both.</small><div class="row"><label class="dv-ck"><input type="checkbox" id="eOrL" checked> Landscape</label><label class="dv-ck"><input type="checkbox" id="eOrP" checked> Portrait</label></div></div>
+        <div id="eOr" class="dv-or"><b>Dimension</b><small>Tick how your game can be played on a phone. Only Landscape: it opens in landscape automatically. Both ticked: works in both.</small><div class="row"><label class="dv-ck"><input type="checkbox" id="eOrL" checked> Landscape</label><label class="dv-ck"><input type="checkbox" id="eOrP" checked> Portrait</label></div></div><p class="dv-err dv-fe" id="fe-or"></p>
       </section>
       <section class="dv-blk"><h3>Digital Kit</h3><div id="eKit"></div></section>
       <section class="dv-blk"><h3>Versions</h3><div id="eVers"></div></section>
       <p class="dv-err" id="eErr" role="alert"></p>
       <button type="submit" class="dv-sbtn" id="eGo" disabled>SAVE CHANGES</button>
       <button type="button" class="dv-sbtn dv-danger" id="eDel"><i data-ic="trash"></i>DELETE GAME</button>
-      <div id="eDelBox" class="dv-delbox" hidden><p>Delete this game permanently? It will be removed from UNTILS and from your dashboard, along with all its versions and files. This cannot be undone.</p><div class="row"><button type="button" class="dv-sbtn dv-danger" id="eDelYes"><i data-ic="trash"></i>YES, DELETE</button><button type="button" class="dv-sbtn" id="eDelNo" style="background:#e4f0fb;color:#12233d">NO, KEEP IT</button></div></div>
+      <div id="eDelBox" class="dv-delbox" hidden><p id="eDelTx">Delete this game permanently? It will be removed from UNTILS and from your dashboard, along with all its versions and files. This cannot be undone.</p><div class="row"><button type="button" class="dv-sbtn dv-danger" id="eDelYes"><i data-ic="trash"></i>YES, DELETE</button><button type="button" class="dv-sbtn" id="eDelNo" style="background:#e4f0fb;color:#12233d">NO, KEEP IT</button></div></div>
     </form>
   </article>
 </section>
@@ -119,10 +106,10 @@
 </div>
 <div class="sf-b"><span>Small details. Big emotions.</span><span>&copy; 2026 UNTILS</span></div>
 </footer>
-<script src="/assets/js/icons.js?v=1"></script>
+<script src="/assets/js/icons.js?v=2"></script>
 <script src="/assets/js/auth.js?v=8"></script>
 <script src="/assets/js/inspector-core.js"></script>
-<script src="/assets/js/dashboard.v15.js"></script>
+<script src="/assets/js/dashboard.v16.js"></script>
 <script src="/assets/js/fx.v7.js"></script>
 <script src="/assets/js/footer.js?v=1"></script>
 </body>
