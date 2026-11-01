@@ -1,4 +1,4 @@
-import { J, me, sign } from "../../_lib.js";
+import { J, me, sign, withStudio } from "../../_lib.js";
 const ID = /^[a-z0-9-]{8,40}$/, UID = /^[0-9a-f-]{36}$/, EM = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 export async function onRequest({ request, env, params }) {
   if (!env.GAMES) return J({ error: "KV GAMES missing" }, 500);
@@ -18,13 +18,14 @@ export async function onRequest({ request, env, params }) {
     do { const l = await env.GAMES.list({ prefix: "game:", cursor: c });
       out.push(...await Promise.all(l.keys.map(k => env.GAMES.get(k.name, "json"))));
       c = l.list_complete ? null : l.cursor; } while (c);
-    return J({ games: out.filter(Boolean).sort((x, y) => y.createdAt - x.createdAt) });
+    return J({ games: await withStudio(env, out.filter(Boolean).sort((x, y) => y.createdAt - x.createdAt)) });
   }
   if (a === "game") {
     if (!idok) return J({ error: "Bad id." }, 400);
     const g = await env.GAMES.get(gk, "json"); if (!g) return J({ error: "Not found." }, 404);
     const l = await env.GAMES.list({ prefix: "review:" + o + ":" + i + ":" });
     const reviews = (await Promise.all(l.keys.map(k => env.GAMES.get(k.name, "json")))).filter(Boolean);
+    await withStudio(env, [g]);
     return J({ game: g, reviews });
   }
   if (a === "play") {

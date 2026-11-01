@@ -29,7 +29,8 @@
 <section class="dv-dh"><a class="dv-back" href="/developers/dashboard/" aria-label="Back to dashboard" title="Back to dashboard"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span class="tx">Back to dashboard</span></a><br><span class="dv-eyebrow">YOUR ACCOUNT</span><h1>Account details</h1></section>
 <section class="dv-sec"><article class="dv-panel">
 <dl class="dv-dl"><div><dt>STUDIO</dt><dd id="aStudio">-</dd></div><div><dt>EMAIL</dt><dd id="aMail">-</dd></div><div><dt>MEMBER SINCE</dt><dd id="aSince">-</dd></div></dl>
-<form id="aForm" class="dv-gf" style="margin-top:18px"><label>About developer (optional)<textarea id="aAbout" rows="4" maxlength="500"></textarea></label>
+<form id="aForm" class="dv-gf" style="margin-top:18px"><label>Studio name<input type="text" id="aStudioIn" maxlength="60" autocomplete="organization" placeholder="Your studio or developer name"></label>
+<label>About developer (optional)<textarea id="aAbout" rows="4" maxlength="500"></textarea></label>
 <label>Address (optional)<textarea id="aAddr" rows="2" maxlength="300"></textarea></label>
 <p class="dv-err" id="aErr" role="alert"></p><button type="submit" class="dv-sbtn" id="aGo">SAVE</button></form>
 </article></section>
@@ -46,7 +47,7 @@
 </footer>
 <script src="/assets/js/icons.js?v=1"></script>
 <script src="/assets/js/auth.js?v=8"></script>
-<script src="/assets/js/account.js"></script>
+<script src="/assets/js/account.v2.js"></script>
 <script src="/assets/js/fx.v7.js"></script>
 <script src="/assets/js/footer.js?v=1"></script>
 </body>

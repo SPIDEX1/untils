@@ -20,3 +20,20 @@ export async function sign(env, s) {
   const b = await crypto.subtle.sign("HMAC", k, new TextEncoder().encode(s));
   return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join("").slice(0, 32);
 }
+
+/* The studio name shown on games is always the developer's current account name, exactly as typed. */
+export async function withStudio(env, games) {
+  const key = env.SUPABASE_SERVICE_KEY, list = (games || []).filter(Boolean);
+  if (!key || !list.length) return games;
+  const ids = [...new Set(list.map(g => g.owner).filter(Boolean))].slice(0, 30), m = {};
+  await Promise.all(ids.map(async id => {
+    try {
+      const r = await fetch(SUPA + "/auth/v1/admin/users/" + id, { headers: { apikey: key, Authorization: "Bearer " + key } });
+      if (!r.ok) return;
+      const v = ((await r.json()).user_metadata || {}).studio;
+      if (v != null && String(v).trim()) m[id] = String(v).trim();
+    } catch (e) {}
+  }));
+  list.forEach(g => { if (m[g.owner]) g.studio = m[g.owner]; });
+  return games;
+}
