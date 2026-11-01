@@ -85,6 +85,7 @@
     var name = $("dvName").value.trim();
     var em = $("dvEmail").value.trim().toLowerCase();
     if (mode === "signup" && name.length < 2) return bad("dvName", "Please enter your studio or developer name.");
+    if (mode === "signup" && Array.from(name).length > 25) return bad("dvName", "Studio name can be 25 characters at most.");
     if (!emailRe.test(em)) return bad("dvEmail", "Please enter a valid email address.");
     if (mode === "signup" && !$("dvTerms").checked) {
       $("dvErr").textContent = "Please accept the Terms and Privacy Policy to continue.";

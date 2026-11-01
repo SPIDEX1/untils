@@ -20,6 +20,7 @@
     A.getSession().then(function (s) {
       if (!s) return toLogin();
       var st = $("aStudioIn").value.trim();
+      if (Array.from(st).length > 25) { err.textContent = "Studio name can be 25 characters at most."; return; }
       if (st.length < 2) { err.textContent = "Please enter your studio or developer name (at least 2 characters)."; return; }
       var data = { about: $("aAbout").value.trim(), address: $("aAddr").value.trim(), studio: st };
       return fetch(C.URL + "/auth/v1/user", { method: "PUT", headers: { "apikey": C.KEY, "Authorization": "Bearer " + s.access_token, "Content-Type": "application/json" }, body: JSON.stringify({ data: data }) })

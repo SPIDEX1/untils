@@ -31,7 +31,7 @@ export async function withStudio(env, games) {
       const r = await fetch(SUPA + "/auth/v1/admin/users/" + id, { headers: { apikey: key, Authorization: "Bearer " + key } });
       if (!r.ok) return;
       const v = ((await r.json()).user_metadata || {}).studio;
-      if (v != null && String(v).trim()) m[id] = String(v).trim();
+      const t = v == null ? "" : Array.from(String(v).replace(/[\u0000-\u001f]/g, "").trim()).slice(0, 25).join(""); if (t) m[id] = t;
     } catch (e) {}
   }));
   list.forEach(g => { if (m[g.owner]) g.studio = m[g.owner]; });
