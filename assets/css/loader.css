@@ -1,0 +1,9 @@
+/* Blue round loader: spins while loading, becomes a tap-to-retry button when something fails to load */
+.ul{display:flex;justify-content:center;align-items:center;padding:20px 0;width:100%}
+.ul-c{width:48px;height:48px;border-radius:50%;border:0;padding:0;margin:0;background:#0a6cff;color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 18px rgba(10,108,255,.35);transition:transform .2s,box-shadow .2s}
+.ul-c:hover:not(.sp){transform:scale(1.08);box-shadow:0 12px 24px rgba(10,108,255,.45)}
+.ul-c.sp{cursor:default}
+.ul-c svg{width:24px;height:24px;display:block}
+.ul-c.sp svg{animation:ulspin .8s linear infinite}
+@keyframes ulspin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.ul-c.sp svg{animation-duration:2s}}

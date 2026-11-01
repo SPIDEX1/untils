@@ -2,7 +2,7 @@
    GET            -> current demos and limits
    PUT ?kind=...  -> raw file in the body (Content-Type = file type)
    DELETE ?kind=... */
-import { J, SUPA, me } from "../../_lib.js";
+import { J, SUPA, me, unlocked } from "../../_lib.js";
 const MB = 1024 * 1024;
 const LIM = { icon: 2 * MB, banner: 2 * MB, thumb: 2 * MB, shots: 2 * MB, logo: 2 * MB, video: 20 * MB };
 const LIST = { shots: 5 };   /* kinds that hold several files */
@@ -60,6 +60,7 @@ export async function onRequest({ request, env }) {
   const u = await me(request, env);
   if (!u) return J({ error: "Sign in again." }, 401);
   if (u.role !== "leader") return J({ error: "Only the leader can do this." }, 403);
+  if (!(await unlocked(request, env, u))) return J({ error: "Enter the admin code.", locked: true }, 423);
   const kind = String(new URL(request.url).searchParams.get("kind") || "");
 
   if (request.method === "GET") {

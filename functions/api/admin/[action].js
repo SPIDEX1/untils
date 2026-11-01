@@ -1,4 +1,4 @@
-import { J, me, sign, withStudio } from "../../_lib.js";
+import { J, me, sign, withStudio, getLock, unlocked, unlockTok, checkCode, hashCode, rnd } from "../../_lib.js";
 const ID = /^[a-z0-9-]{8,40}$/, UID = /^[0-9a-f-]{36}$/, EM = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 export async function onRequest({ request, env, params }) {
   if (!env.GAMES) return J({ error: "KV GAMES missing" }, 500);
@@ -12,6 +12,27 @@ export async function onRequest({ request, env, params }) {
   const o = String(q.get("owner") || b.owner || ""), i = String(q.get("id") || b.id || "");
   const gk = "game:" + o + ":" + i;
   const idok = UID.test(o) && ID.test(i);
+
+  /* ---- admin code (lock) ---- */
+  if (a === "lock") return J({ set: !!(await getLock(env)), open: await unlocked(request, env, u) });
+  if (a === "unlock" || a === "setcode") {
+    if (request.method !== "POST") return J({ error: "Bad request." }, 405);
+    if (!env.PLAY_SECRET) return J({ error: "PLAY_SECRET is not set on the server." }, 500);
+    const l = await getLock(env), code = String(b.code || "");
+    if (a === "unlock") {
+      if (!l) return J({ ok: true, token: "" });
+      const c = await checkCode(env, u.email, code, l);
+      return c.ok ? J({ ok: true, token: await unlockTok(env, u.email, l) }) : J({ error: c.error }, c.status);
+    }
+    if (!lead) return J({ error: "Only the leader can do this." }, 403);
+    if (l) { const c = await checkCode(env, u.email, String(b.current || ""), l); if (!c.ok) return J({ error: c.status === 429 ? c.error : "Current code is wrong." }, c.status); }
+    if (code.length < 4 || code.length > 64) return J({ error: "The code must be 4 to 64 characters." }, 400);
+    if (code !== String(b.confirm || "")) return J({ error: "The two codes do not match." }, 400);
+    const salt = rnd(16), nl = { salt, hash: await hashCode(code, salt), v: rnd(8), at: Date.now(), by: u.email };
+    await env.GAMES.put("admin:lock", JSON.stringify(nl));
+    return J({ ok: true, token: await unlockTok(env, u.email, nl) });
+  }
+  if (!(await unlocked(request, env, u))) return J({ error: "Enter the admin code.", locked: true }, 423);
 
   if (a === "games") {
     const out = []; let c;
