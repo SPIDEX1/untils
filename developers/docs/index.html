@@ -42,7 +42,7 @@ html{scroll-behavior:smooth}
 @media(max-width:700px){.doc{padding:12px 12px 50px}.doc .toc{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;border-radius:16px;padding:10px}.doc .toc::-webkit-scrollbar{display:none}.doc .sec{padding:16px 14px 6px;border-radius:18px}.doc h2{font-size:22px}.doc ol,.doc ul{padding-left:22px}.doc .btns a{flex:1 1 100%;text-align:center}}
 </style><header><a class="lg" href="/" aria-label="UNTILS home"><img class="logo" src="/assets/img/untils-logo.png?v=2" alt="UNTILS" width="206" height="50"></a></header>
 <main class="doc">
-<a class="dd-back" href="/developers/dashboard/" aria-label="Back to dashboard" title="Back to dashboard"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span class="tx">Dashboard</span></a>
+<a class="dd-back" id="ddBack" href="/developers/" aria-label="Back" title="Back"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span class="tx" id="ddBackTx">Back</span></a>
 <h1>Developer docs</h1>
 <p>Everything you need to publish an HTML5 game on UNTILS: what to prepare, what sizes to use, how review works, and how to use the SDK.</p>
 <div class="toc" id="toc"><a href="#quick">Quick start</a><a href="#package">Game package</a><a href="#size">Game size</a><a href="#icon">Icon</a><a href="#banner">Banner</a><a href="#thumb">Thumbnail</a><a href="#shots">Screenshots</a><a href="#logo">Text logo</a><a href="#video">Video</a><a href="#review">Review</a><a href="#sdk">SDK</a><a href="#api">SDK commands</a><a href="#inspector">Inspector</a><a href="#unity">Unity SDK</a><a href="#cocos">Cocos SDK</a><a href="#godot">Godot SDK</a><a href="#engines">Engines</a><a href="#rules">Rules</a></div>
@@ -155,7 +155,6 @@ html{scroll-behavior:smooth}
 <tr><td>Content</td><td>Only your <b>game name</b> in large, easy-to-read letters. No slogan, no small text, no other logos or store badges. Keep about 10% empty space around it.</td></tr>
 <tr><td>Colours</td><td>It must stay readable on a dark fade and on a bright background. Add a thin outline or shadow if needed.</td></tr>
 </table>
-<div class="tip"><b>Coming soon:</b> the upload field for the text logo is not in the dashboard yet. Prepare your file now so it is ready.</div>
 <p><button type="button" class="demo-btn" data-demo="logo"><i data-ic="eye"></i><span>Demo</span></button></p>
 </section>
 <section class="sec" id="video">
@@ -170,7 +169,6 @@ html{scroll-behavior:smooth}
 <tr><td>No UI</td><td><b>The video must have no UI at all:</b> no text, no buttons, no controls, no score, no joystick, no menus, no tutorials. Show only the <b>core of the game</b>: the main characters and the action.</td></tr>
 <tr><td>Content</td><td>Real gameplay only: start with the action in the first second, show the main mechanic, end cleanly. No fake or edited-in scenes, no ads or promo banners, no watermarks, no black bars, no scenes from other games.</td></tr>
 </table>
-<div class="tip"><b>Coming soon:</b> the upload field for the gameplay video is not in the dashboard yet. Prepare your video now so it is ready.</div>
 <p><button type="button" class="demo-btn" data-demo="video"><i data-ic="play"></i><span>Demo</span></button></p>
 </section>
 <section class="sec" id="review">
@@ -597,6 +595,6 @@ func on_reward_button():
 L.forEach(function(a,i){a.addEventListener("click",function(e){e.preventDefault();if(S[i]){S[i].scrollIntoView({behavior:"smooth",block:"start"});history.replaceState(null,"",a.getAttribute("href"))}})});
 function act(){var y=window.scrollY+130,k=0;S.forEach(function(el,i){if(el&&el.getBoundingClientRect().top+window.scrollY<=y)k=i});L.forEach(function(a,i){a.classList.toggle("on",i===k)});if(t.scrollWidth>t.clientWidth)t.scrollTo({left:Math.max(L[k].offsetLeft-24,0),behavior:"smooth"})}
 window.addEventListener("scroll",act,{passive:true});act()})();</script><script src="/assets/js/icons.js?v=3"></script>
-<script src="/assets/js/docs-demo.js?v=2"></script><script src="/assets/js/docs-copy.js?v=1"></script>
+<script src="/assets/js/docs-demo.js?v=2"></script><script src="/assets/js/docs-copy.js?v=1"></script><script src="/assets/js/docs-back.js"></script>
 <script src="/assets/js/footer.js?v=1"></script>
 </body></html>
