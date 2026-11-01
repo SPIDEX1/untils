@@ -27,7 +27,7 @@
 .doc{max-width:860px;margin:0 auto;padding:20px 16px 60px;line-height:1.65;color:#12233d}
 .doc h1{font-size:clamp(28px,5vw,40px);margin:8px 0 6px}.doc h2{margin:38px 0 8px;font-size:25px}.doc h3{margin:22px 0 6px;font-size:18px}
 .doc p,.doc li{color:#35506e}.doc code{background:#e4f0fb;padding:2px 6px;border-radius:6px;font-size:.92em}
-.doc pre{background:#0b1f3a;color:#e8f2ff;padding:14px 16px;border-radius:14px;overflow-x:auto;font-size:13.5px;line-height:1.5}.doc pre code{background:none;padding:0;color:inherit}
+.doc pre{background:#0b1f3a;color:#e8f2ff;padding:14px 16px;border-radius:14px;overflow-x:auto;font-size:13.5px;line-height:1.5}.doc pre code{background:none;padding:0;color:inherit}.cbox{position:relative;margin:14px 0}.cbox pre{margin:0;padding-right:96px;padding-top:16px}.cpbtn{position:absolute;top:8px;right:8px;z-index:2;display:inline-flex;align-items:center;gap:6px;border:0;border-radius:99px;padding:6px 12px 6px 10px;background:rgba(255,255,255,.14);color:#e8f2ff;font:800 12px/1 var(--fh,inherit);letter-spacing:.04em;cursor:pointer;backdrop-filter:blur(4px);transition:background .2s,transform .15s}.cpbtn:hover{background:rgba(255,255,255,.28)}.cpbtn:active{transform:scale(.94)}.cpbtn:focus-visible{outline:3px solid #4fc3ff;outline-offset:2px}.cpbtn.ok{background:#1fa855;color:#fff}.cpbtn.bad{background:#c0143c;color:#fff}@media(max-width:560px){.cpbtn span{display:none}.cpbtn{padding:8px}.cbox pre{padding-right:56px}.cpbtn.ok span,.cpbtn.bad span{display:inline}.cpbtn.ok,.cpbtn.bad{padding:6px 10px}}
 .doc table{width:100%;border-collapse:collapse;margin:10px 0;font-size:15px;display:block;overflow-x:auto}.doc th,.doc td{text-align:left;padding:9px 12px;border-bottom:1px solid #d5e3f5;vertical-align:top}.doc th{background:#e4f0fb}
 .doc .tip{background:#fff6dc;border-left:5px solid #ffb020;padding:10px 14px;border-radius:10px;margin:14px 0}
 .doc .btns{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.doc .btns a{background:#0a6cff;color:#fff;font-weight:800;text-decoration:none;padding:11px 18px;border-radius:30px}.doc .btns a.g{background:#e4f0fb;color:#12233d}
@@ -597,6 +597,6 @@ func on_reward_button():
 L.forEach(function(a,i){a.addEventListener("click",function(e){e.preventDefault();if(S[i]){S[i].scrollIntoView({behavior:"smooth",block:"start"});history.replaceState(null,"",a.getAttribute("href"))}})});
 function act(){var y=window.scrollY+130,k=0;S.forEach(function(el,i){if(el&&el.getBoundingClientRect().top+window.scrollY<=y)k=i});L.forEach(function(a,i){a.classList.toggle("on",i===k)});if(t.scrollWidth>t.clientWidth)t.scrollTo({left:Math.max(L[k].offsetLeft-24,0),behavior:"smooth"})}
 window.addEventListener("scroll",act,{passive:true});act()})();</script><script src="/assets/js/icons.js?v=3"></script>
-<script src="/assets/js/docs-demo.js?v=2"></script>
+<script src="/assets/js/docs-demo.js?v=2"></script><script src="/assets/js/docs-copy.js?v=1"></script>
 <script src="/assets/js/footer.js?v=1"></script>
 </body></html>

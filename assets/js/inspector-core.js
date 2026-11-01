@@ -12,7 +12,7 @@
       var frame = document.createElement("iframe"), t0 = Date.now(), data = {}, key = "untils_inspect:" + o.id;
       var st = { init: false, via: "", sdk: "", version: "", unityName: "", unityVersion: "", loadingStart: false, loadingFinished: false, gameplayStart: false, gameplayStop: false, saves: 0, tracks: 0, ads: 0, errors: 0, ls: 0 };
       try { data = JSON.parse(localStorage.getItem(key) || "{}") || {}; } catch (e) { data = {}; }
-      function emit(kind, text) { if (o.onEvent) o.onEvent({ t: Date.now() - t0, kind: kind, text: text }); if (o.onState) o.onState(st); }
+      function emit(kind, text) { if (o.onEvent) o.onEvent({ t: Date.now() - t0, at: Date.now(), kind: kind, text: text }); if (o.onState) o.onState(st); }
       function reply(m, ok, d) { try { frame.contentWindow.postMessage({ untils: 1, id: m.id, ok: ok, data: d }, "*"); } catch (e) {} }
 
       function onMsg(ev) {

@@ -8,10 +8,15 @@
   function toLogin() { location.replace("/developers/#signin"); }
   $("dvOut").addEventListener("click", function () { this.disabled = true; A.logout().then(function () { location.href = "/developers/"; }); });
 
-  function time(ms) { var s = ms / 1000; return ("0" + Math.floor(s / 60)).slice(-2) + ":" + ("0" + (s % 60).toFixed(1)).slice(-4); }
+  /* real clock time of this device (hours:minutes:seconds), not the time since the game started */
+  function time(at) {
+    var d = new Date(at || Date.now());
+    try { return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }); }
+    catch (e) { return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2); }
+  }
   function add(e) {
     var L = $("insLog"), d = document.createElement("div"), t = document.createElement("span");
-    d.className = "k-" + e.kind; t.className = "t"; t.textContent = "[" + time(e.t) + "]";
+    d.className = "k-" + e.kind; t.className = "t"; t.textContent = "[" + time(e.at) + "]";
     d.appendChild(t); d.appendChild(document.createTextNode(e.text));
     L.appendChild(d); L.scrollTop = L.scrollHeight;
   }
