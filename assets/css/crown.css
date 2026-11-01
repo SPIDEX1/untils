@@ -22,3 +22,10 @@
 .pv-ic-b.sm .crown{left:5px;top:5px;width:26px;height:26px}
 .pv-ic-b.lg .crown{left:10px;top:10px;width:56px;height:56px}
 .pv-ic-n{margin:0;text-align:center;color:#6b7c93;font-weight:700;font-size:14px;max-width:460px}
+
+/* paused game kept alive behind the CONTINUE screen */
+.gfr.gp{visibility:hidden}
+/* PC: no close button in full screen, press Esc instead (mobile keeps the close button) */
+html:not(.mobdev) .stage.fs:not(.pfs) .fsb{display:none!important}
+.escn{display:none;position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:6;pointer-events:none;padding:3px 10px;border-radius:99px;background:rgba(0,0,0,.4);color:rgba(255,255,255,.72);font:700 10px/1.4 system-ui,sans-serif;letter-spacing:.1em;white-space:nowrap}
+html:not(.mobdev) .stage.fs:not(.pfs) .escn{display:block}
