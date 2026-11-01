@@ -5,6 +5,8 @@ const SUPA = "https://fjfkwfklglovuxeecxsg.supabase.co";
 const KEY = "sb_publishable_HUSSW4Xiau3suUYMfcTjtQ_h083WJbS";
 const CATS = ["Action", "Adventure", "Arcade", "Board", "Card", "Casual", "Educational", "Endless Runner", "Fighting", "Horror", "Idle", "Kids", "Multiplayer", "Music", "Platformer", "Puzzle", "Racing", "Role Playing", "Sandbox", "Shooter", "Simulation", "Space", "Sports", "Strategy", "Survival", "Tower Defense", "Trivia", "Word", "Other"];
 const MAX_GAMES = 20;
+/* studio name exactly as the developer typed it (numbers and symbols too) */
+const studioOf = u => { const v = u && u.user_metadata ? u.user_metadata.studio : ""; return v == null ? "" : String(v).trim(); };
 const cleanTitle = t => String(t || "").replace(/[<>&"'`\\$]/g, "").replace(/\s+/g, " ").trim();
 const slugOf = t => String(t).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 async function titleTaken(env, title, selfKey) {
@@ -77,6 +79,7 @@ export async function onRequestGet({ request, env }) {
   const day7 = new Date(Date.now() - 6 * 86400000).toISOString().slice(0, 10);
   await Promise.all(games.map(async g => {
     g.versions = vlist(g); g.orient = ORI(g.orient);
+    { const st = studioOf(u); if (st && g.studio !== st) { g.studio = st; await env.GAMES.put("game:" + u.id + ":" + g.id, JSON.stringify(g)).catch(() => {}); } }
     const k = g.owner + "~" + g.id;
     const [st, vt] = await Promise.all([env.GAMES.get("stats:" + k, "json"), env.GAMES.get("votes:" + k, "json")]);
     let week = 0; for (const d in ((st && st.d) || {})) if (d >= day7) week += st.d[d];
@@ -124,7 +127,7 @@ export async function onRequestPost({ request, env }) {
 
   const game = {
     id, title, description: desc, category: cat,
-    studio: (u.user_metadata && u.user_metadata.studio) || "",
+    studio: studioOf(u),
     owner: u.id, path: b.path, icon: b.icon, banner: b.banner || "", thumb: b.thumb || "", logo: b.logo || "", video: b.video || "", shots: sh, device: b.device === "desktop" ? "desktop" : "all", orient: b.device === "desktop" ? "both" : ORI(b.orient), versions: [{ n: 1, path: b.path, at: Date.now() }], status: "pending", createdAt: Date.now()
   };
   await env.GAMES.put(prefix + id, JSON.stringify(game));
@@ -173,6 +176,7 @@ export async function onRequestPut({ request, env }) {
   if (b.removeVideo && !b.video) g.video = "";
   if (b.path) { if (!ok(b.path, /-v\d+\.zip$/)) return json({ error: "Bad file path." }, 400); { const vs = vlist(g).slice(); vs.push({ n: Math.max.apply(null, vs.map(v => v.n).concat([0])) + 1, path: b.path, at: Date.now() }); g.versions = vs.slice(-50); } if (g.status === "live") { g.pending = { path: b.path, at: Date.now() }; g.updateNote = ""; }
     else { g.path = b.path; g.version = (g.version || 1) + 1; if (g.status !== "pending") { g.status = "pending"; g.note = ""; } } }
+  { const st = studioOf(u); if (st) g.studio = st; }
   g.updatedAt = Date.now();
   await env.GAMES.put(key, JSON.stringify(g));
   return json({ ok: true, game: g });

@@ -250,7 +250,7 @@ main();</code></pre>
 </section>
 <section class="sec" id="inspector">
 <h2>Inspector view and SDK check</h2>
-<p>Every time you <b>upload a game</b> or a <b>new version (new zip)</b>, UNTILS opens an <b>Inspector view</b> panel in your dashboard. It starts your game in the background and checks whether the Untils SDK is running. If the SDK is found, the panel just confirms it. If not, it tells you the SDK was not detected (the SDK is optional, so your game can still be reviewed).</p>
+<p>Before a <b>game</b> or a <b>new version (new zip)</b> is uploaded, UNTILS checks your zip for the Untils SDK. If the SDK is missing, a red panel appears and the upload does not start, so integrate the SDK first and upload again. After the upload, UNTILS opens an <b>Inspector view</b> panel in your dashboard. It starts your game in the background and checks whether the Untils SDK is running, and the panel confirms the result.</p>
 <p>The panel always has a link to the <b>Inspector page</b>. There your game opens like on UNTILS, with a <b>console on the side</b> that shows each event as it happens:</p>
 <ul>
 <li><b>init</b>: the SDK started (and which SDK and version).</li>
