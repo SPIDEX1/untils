@@ -89,3 +89,27 @@ nav a.sep.on-pl,nav a.sep.pl-in{background:#dbeeff}
 .cm-del{margin-left:auto;border:0;background:none;color:#c0392b;font:inherit;font-weight:800;font-size:12px;cursor:pointer;padding:0}
 .cm-empty{display:block!important;color:#5d7390;font-weight:700;font-size:14px}
 @media(max-width:600px){.cm-box{flex-direction:column;align-items:stretch}}
+
+/* ---- mobile: icon-only toolbar buttons ---- */
+@media(max-width:700px){
+.tb{gap:8px;flex-wrap:wrap}
+.tb .vb .vtx{display:none}
+.tb .vb{padding:9px 13px;gap:5px;min-width:42px;justify-content:center}
+.tb .vb svg{width:17px;height:17px}
+.vb.vx em{margin-left:0}
+}
+
+/* ---- close (exit full screen) button: small, website theme ---- */
+html .fsb{width:38px!important;height:38px!important;background:rgba(255,255,255,.94)!important;border:0!important;color:var(--ac,#0a6cff)!important;box-shadow:0 3px 10px rgba(10,60,140,.35)!important}
+html .fsb:hover{transform:scale(1.1);box-shadow:0 5px 14px rgba(10,108,255,.45)!important}
+html .fsb:active{transform:scale(.92)}
+html .fsb svg{width:16px!important;height:16px!important;filter:none!important;stroke-width:3}
+
+/* ---- mobile: paused game shows a pause icon instead of the play triangle ---- */
+.playbtn .pi{display:none}
+@media(max-width:900px){
+#start.paused .playbtn svg:not(.pi){display:none}
+#start.paused .playbtn .pi{display:block}
+}
+html.mobdev #start.paused .playbtn svg:not(.pi){display:none}
+html.mobdev #start.paused .playbtn .pi{display:block}

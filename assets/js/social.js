@@ -12,10 +12,10 @@
   /* ---------- buttons next to the like buttons ---------- */
   var fv = document.createElement("button");
   fv.type = "button"; fv.className = "vb vx"; fv.id = "fv"; fv.setAttribute("aria-pressed", "false");
-  fv.innerHTML = HEART + '<span id="fvt">FAVOURITE</span>';
+  fv.innerHTML = HEART + '<span id="fvt" class="vtx">FAVOURITE</span>';
   var cm = document.createElement("button");
   cm.type = "button"; cm.className = "vb vx"; cm.id = "cm"; cm.setAttribute("aria-expanded", "false");
-  cm.innerHTML = CHAT + '<span>COMMENTS<em id="cmc"></em></span>';
+  cm.innerHTML = CHAT + '<span class="vtx">COMMENTS</span><em id="cmc"></em>'; cm.setAttribute("aria-label", "Comments");
   var vt = tb.querySelector(".vt");
   if (vt && vt.nextSibling) { tb.insertBefore(fv, vt.nextSibling); tb.insertBefore(cm, fv.nextSibling); } else { tb.appendChild(fv); tb.appendChild(cm); }
 
@@ -57,7 +57,7 @@
   function render() {
     var me = P.userId();
     numE.textContent = count ? "(" + count + ")" : "";
-    cm.querySelector("#cmc").textContent = count ? " " + count : "";
+    cm.querySelector("#cmc").textContent = count ? String(count) : "";
     listE.innerHTML = "";
     if (!items.length) { var e = document.createElement("li"); e.className = "cm-empty"; e.textContent = "No comments yet. Be the first to say something!"; listE.appendChild(e); return; }
     items.forEach(function (c) {
