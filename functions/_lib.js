@@ -69,3 +69,15 @@ export async function checkCode(env, email, code, lock) {
   await env.GAMES.put(tk, JSON.stringify(t), { expirationTtl: 900 });
   return { ok: false, status: 403, error: t.until > now ? "Too many wrong codes. Try again in 15 minutes." : "Wrong code." };
 }
+
+/* Player (website visitor) session check. Developer accounts are not accepted here. */
+export async function playerOf(req) {
+  const t = (req.headers.get("Authorization") || "").replace(/^Bearer /i, "");
+  if (!t) return null;
+  let r; try { r = await fetch(SUPA + "/auth/v1/user", { headers: { apikey: KEY, Authorization: "Bearer " + t } }); } catch (e) { return null; }
+  if (!r.ok) return null;
+  const u = await r.json();
+  if (!u || !u.id) return null;
+  const isPlayer = ["google", "apple", "phone"].indexOf((u.app_metadata || {}).provider) > -1 || (u.user_metadata || {}).kind === "player";
+  return isPlayer ? { id: u.id } : null;
+}
