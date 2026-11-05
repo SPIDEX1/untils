@@ -77,19 +77,22 @@
     listeners.forEach(function (f) { try { f(); } catch (e) {} });
     if (panel && !panel.hidden && curV === "me") { render("me"); place(); }
   }
-  function token() {
+  function token(force) {
     if (!session || !session.refresh_token) return Promise.resolve(null);
-    if (session.expires_at - 60 > Date.now() / 1000) return Promise.resolve(session.access_token);
+    if (!force && session.expires_at - 60 > Date.now() / 1000) return Promise.resolve(session.access_token);
     return call("/auth/v1/token?grant_type=refresh_token", "POST", { refresh_token: session.refresh_token }).then(function (r) {
       if (r.ok && r.data.access_token) { session = save(r.data); return session.access_token; }
       return null;
     });
   }
-  function api(path, method, body) {
-    return token().then(function (t) {
-      if (!t) return { ok: false, status: 401, data: {} };
+  function api(path, method, body, retried) {
+    return token(retried).then(function (t) {
+      if (!t) return { ok: false, status: 401, data: { error: "Please sign in again." } };
       return fetch(path, { method: method, headers: { Authorization: "Bearer " + t, "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined }).then(function (r) {
-        return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, status: r.status, data: d }; });
+        return r.json().catch(function () { return {}; }).then(function (d) {
+          if (r.status === 401 && !retried) return api(path, method, body, true);   /* token may have gone stale: refresh once and retry */
+          return { ok: r.ok, status: r.status, data: d };
+        });
       }, function () { return { ok: false, status: 0, data: {} }; });
     });
   }
@@ -130,9 +133,9 @@
   }
   function avHTML() {
     var u = (session && session.user) || {}, m = u.user_metadata || {}, src = "";
-    if (newAv !== undefined) src = newAv;
-    else if (profile && profile.av) src = "/api/avatar?u=" + profile.id + "&v=" + profile.av;
-    else if (m.avatar_url) src = m.avatar_url;
+    if (newAv) src = newAv;
+    else if (newAv === undefined && profile && profile.av) src = "/api/avatar?u=" + profile.id + "&v=" + profile.av;
+    else src = (profile && profile.pic) || m.avatar_url || m.picture || "";
     return src ? '<img src="' + esc(src) + '" alt="" referrerpolicy="no-referrer">' : esc(String(displayName()).charAt(0).toUpperCase());
   }
   /* game list for the account panel: name + icon from the loaded catalogue, else from the saved copy */
@@ -170,9 +173,10 @@
     img.src = url;
   }
   function saveProfile() {
-    var n = ($("#plName", panel).value || "").trim(), body = {}, go = $("#plSave", panel);
-    if (!/^[A-Za-z0-9_.]{3,20}$/.test(n)) { msg("Username must be 3 to 20 letters, numbers, _ or . (no spaces)."); return; }
-    if (!profile || !profile.hasProfile || n !== profile.name) body.name = n;
+    var n = ($("#plName", panel).value || "").trim(), body = {}, go = $("#plSave", panel), cur = (profile && profile.name) || "";
+    if (n && n !== cur && !/^[A-Za-z0-9_.]{3,20}$/.test(n)) { msg("Username must be 3 to 20 letters, numbers, _ or . (no spaces)."); return; }
+    if (!n && profile && profile.custom) body.name = "";
+    else if (n && n !== cur) body.name = n;
     if (newAv !== undefined) body.avatar = newAv;
     if (!Object.keys(body).length) { render("me"); place(); return; }
     go.disabled = true; msg("");
@@ -180,26 +184,20 @@
       go.disabled = false;
       if (!r.ok) { msg(r.status === 0 ? "Could not reach the server. Check your internet connection." : (r.data.error || "Could not save. Please try again.")); return; }
       var f = rd(FK), rc = rd(RK); profile = r.data; profile.favs = f; profile.recent = rc; newAv = undefined;
-      var cb = afterCb; afterCb = null; afterWhy = "";
       listeners.forEach(function (fn) { try { fn(); } catch (e) {} });
-      if (cb) { close(); if (typeof toast === "function") toast("Profile created"); cb(); } else { render("me"); place(); }
+      render("me"); place();
     });
   }
+  /* commenting only needs a sign-in; name and picture come from the account */
   function needProfile(why, cb) {
     afterCb = cb || null; afterWhy = why || "";
     if (!session || !session.refresh_token) { loginWhy = why || ""; open(); return; }
-    var next = function () {
-      if (profile && profile.hasProfile) { var f = afterCb; afterCb = null; if (f) f(); return; }
-      ensure(); render("edit"); panel.hidden = false; shade.hidden = false; place(); btn.classList.add("on-pl");
-    };
-    if (profile) next(); else loadProfile().then(next);
+    var f = afterCb; afterCb = null; if (f) f();
   }
   function afterLogin() {
     loadProfile().then(function () {
-      if (afterCb) {
-        if (profile && profile.hasProfile) { var f = afterCb; afterCb = null; close(); f(); }
-        else { render("edit"); place(); }
-      } else { render("me"); place(); }
+      if (afterCb) { var f = afterCb; afterCb = null; close(); f(); }
+      else { render("me"); place(); }
     });
   }
 
@@ -262,18 +260,17 @@
         '<button type="button" class="pl-go" id="plVerify">VERIFY</button><button type="button" class="pl-lk" id="plResend">Send a new code</button><p class="pl-f">Check your spam folder if you do not see the email.</p><div class="pl-msg" role="status"></div></div>';
     } else if (view === "edit") {
       newAv = undefined;
-      var has = !!(profile && profile.hasProfile);
-      h = head(has ? "Edit profile" : "Create your profile", has ? "" : esc(afterWhy) || "Pick a username and a picture", has ? "me" : "") +
+      h = head("Edit profile", "", "me") +
         '<div class="pl-b"><div class="pl-ed"><button type="button" class="pl-av pl-avb" id="plAv" aria-label="Change picture">' + avHTML() + '</button>' +
-        '<div class="pl-edt"><button type="button" class="pl-lk" id="plPick">Change picture</button><button type="button" class="pl-lk pl-rm" id="plRm">Remove</button></div></div>' +
+        '<div class="pl-edt"><button type="button" class="pl-lk" id="plPick">Change picture</button><button type="button" class="pl-lk pl-rm" id="plRm">Use default</button></div></div>' +
         '<input id="plFile" type="file" accept="image/*" hidden>' +
         '<label class="pl-lb" for="plName">Username</label>' +
-        '<input id="plName" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="20" placeholder="e.g. cool_gamer" value="' + esc(has ? profile.name : "") + '">' +
-        '<p class="pl-f">3 to 20 letters, numbers, _ or . Your username is shown on your comments.</p>' +
-        '<button type="button" class="pl-go" id="plSave">' + (has ? "SAVE" : "CREATE") + '</button><div class="pl-msg" role="status"></div></div>';
+        '<input id="plName" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="25" placeholder="Your username" value="' + esc((profile && profile.name) || displayName()) + '">' +
+        '<p class="pl-f">3 to 20 letters, numbers, _ or . Leave it empty to use your default name. This name and picture show on your comments.</p>' +
+        '<button type="button" class="pl-go" id="plSave">SAVE</button><div class="pl-msg" role="status"></div></div>';
     } else {
-      var u = (session && session.user) || {}, hasP = !!(profile && profile.hasProfile);
-      h = head("Your account", "") + '<div class="pl-b"><div class="pl-me"><span class="pl-av">' + avHTML() + '</span><div><b>' + esc(displayName()) + '</b><small>' + esc(hasP ? (u.email || "") : "Tap Edit to choose a username") + '</small></div>' +
+      var u = (session && session.user) || {};
+      h = head("Your account", "") + '<div class="pl-b"><div class="pl-me"><span class="pl-av">' + avHTML() + '</span><div><b>' + esc(displayName()) + '</b><small>' + esc(u.email || "") + '</small></div>' +
         '<button type="button" class="pl-ed2" data-go="edit">Edit</button></div>' +
         listHTML("FAVOURITES", rd(FK), "No favourites yet. Tap the heart under any game.") +
         listHTML("RECENTLY PLAYED", rd(RK), "Games you play will show up here.") +
@@ -307,7 +304,7 @@
       $("#plSave", panel).onclick = saveProfile;
       nm.onkeydown = function (e) { if (e.key === "Enter") saveProfile(); };
       $("#plPick", panel).onclick = $("#plAv", panel).onclick = function () { fl.click(); };
-      $("#plRm", panel).onclick = function () { newAv = ""; $("#plAv", panel).innerHTML = avHTML(); };
+      $("#plRm", panel).onclick = function () { newAv = ""; $("#plAv", panel).innerHTML = avHTML(); msg("Default picture will be used. Press SAVE."); };
       fl.onchange = function () { var f = fl.files && fl.files[0]; fl.value = ""; pickFile(f, function (d) { newAv = d; $("#plAv", panel).innerHTML = '<img src="' + d + '" alt="">'; msg(""); }); };
       nm.focus();
     }

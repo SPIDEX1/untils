@@ -70,7 +70,7 @@ export async function checkCode(env, email, code, lock) {
   return { ok: false, status: 403, error: t.until > now ? "Too many wrong codes. Try again in 15 minutes." : "Wrong code." };
 }
 
-/* Player (website visitor) session check. Developer accounts are not accepted here. */
+/* Website visitor session check. Any valid sign-in works; the default name and picture come from the Google or email account. */
 export async function playerOf(req) {
   const t = (req.headers.get("Authorization") || "").replace(/^Bearer /i, "");
   if (!t) return null;
@@ -78,6 +78,10 @@ export async function playerOf(req) {
   if (!r.ok) return null;
   const u = await r.json();
   if (!u || !u.id) return null;
-  const isPlayer = ["google", "apple", "phone"].indexOf((u.app_metadata || {}).provider) > -1 || (u.user_metadata || {}).kind === "player";
-  return isPlayer ? { id: u.id } : null;
+  const m = u.user_metadata || {};
+  let dn = String(m.full_name || m.name || "").replace(/[\u0000-\u001f<>&"'`\\$]/g, "").replace(/\s+/g, " ").trim();
+  if (!dn && u.email) dn = String(u.email).split("@")[0].replace(/[^A-Za-z0-9_.\-]/g, "");
+  dn = Array.from(dn).slice(0, 25).join("") || "Player";
+  const pc = String(m.avatar_url || m.picture || "");
+  return { id: u.id, dname: dn, pic: /^https:\/\/[^\s"'<>]{4,400}$/.test(pc) ? pc : "" };
 }

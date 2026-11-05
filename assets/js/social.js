@@ -63,7 +63,8 @@
     items.forEach(function (c) {
       var li = document.createElement("li"), av = document.createElement("span"), body = document.createElement("div"), top = document.createElement("div"), nm = document.createElement("b"), tm = document.createElement("small"), tx = document.createElement("p");
       av.className = "cm-av"; av.textContent = String(c.n || "?").charAt(0).toUpperCase();
-      if (c.v) { var im = document.createElement("img"); im.alt = ""; im.loading = "lazy"; im.src = "/api/avatar?u=" + encodeURIComponent(c.u) + "&v=" + c.v; im.onload = function () { av.textContent = ""; av.appendChild(im); }; }
+      var src = c.v ? "/api/avatar?u=" + encodeURIComponent(c.u) + "&v=" + c.v : (/^https:\/\//.test(c.p || "") ? c.p : "");
+      if (src) { var im = document.createElement("img"); im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer"; im.src = src; im.onload = function () { av.textContent = ""; av.appendChild(im); }; }
       nm.textContent = c.n; tm.textContent = ago(c.at); tx.textContent = c.t; top.className = "cm-top"; top.appendChild(nm); top.appendChild(tm);
       if (me && c.u === me) { var d = document.createElement("button"); d.type = "button"; d.className = "cm-del"; d.textContent = "Delete"; d.onclick = function () { del(c.id); }; top.appendChild(d); }
       body.className = "cm-body"; body.appendChild(top); body.appendChild(tx); li.appendChild(av); li.appendChild(body); listE.appendChild(li);
@@ -85,7 +86,6 @@
     P.api("/api/comments", "POST", { g: k, text: t }).then(function (r) {
       sendB.disabled = false;
       if (r.ok) { ta.value = ""; try { sessionStorage.removeItem(DK); } catch (e) {} apply(r.data); say("Comment posted.", true); return; }
-      if (r.data && r.data.need === "profile") { P.need("Create your profile to comment", doSend); return; }
       if (r.status === 401) { P.need("Sign up or log in to comment", doSend); return; }
       say(r.status === 0 ? "Could not reach the server. Check your internet connection." : (r.data.error || "Could not post your comment."));
     });
