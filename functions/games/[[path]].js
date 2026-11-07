@@ -20,7 +20,7 @@ export async function onRequestGet({ request, env, params }) {
     "@context": "https://schema.org",
     "@graph": [
       { "@type": "VideoGame", "name": g.title, "url": url, "description": desc, "image": img,
-        "genre": g.category || "Game", "gamePlatform": "Web browser", "applicationCategory": "Game",
+        "genre": g.category || "Game", ...(g.launched ? { "datePublished": new Date(g.launched).toISOString().slice(0, 10) } : {}), ...(g.updated ? { "dateModified": new Date(g.updated).toISOString().slice(0, 10) } : {}), "gamePlatform": "Web browser", "applicationCategory": "Game",
         "operatingSystem": "Any", "inLanguage": "en", "isAccessibleForFree": true,
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
         "publisher": { "@type": "Organization", "name": "UNTILS", "url": "https://untils.in/" } },

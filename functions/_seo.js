@@ -6,7 +6,7 @@ const cleanTitle = t => String(t || "").replace(/[<>&"'`\\$]/g, "").trim();
 
 /* Live games list, cached for 5 minutes so crawlers do not hammer KV. */
 export async function liveGames(env) {
-  const ck = new Request("https://seo-cache.invalid/live-games-v1"), cache = caches.default;
+  const ck = new Request("https://seo-cache.invalid/live-games-v2"), cache = caches.default;
   const hit = await cache.match(ck);
   if (hit) { try { return await hit.json(); } catch (e) {} }
   const out = []; let c;
@@ -24,7 +24,9 @@ export async function liveGames(env) {
     games.push({
       title, slug, category: g.category || "", description: String(g.description || "").replace(/\s+/g, " ").trim(),
       icon: g.icon ? ICON_BASE + g.icon : "", shot: (g.shots && g.shots[0]) ? ICON_BASE + g.shots[0] : "",
-      banner: g.banner ? ICON_BASE + g.banner : "", at: g.decidedAt || g.createdAt || 0
+      banner: g.banner ? ICON_BASE + g.banner : "", at: g.decidedAt || g.createdAt || 0,
+      launched: g.launchedAt || g.decidedAt || g.createdAt || 0,
+      updated: g.versionAt || ((g.version || 1) > 1 && g.updatedAt) || g.launchedAt || g.decidedAt || g.createdAt || 0
     });
   }
   await cache.put(ck, new Response(JSON.stringify(games), { headers: { "Content-Type": "application/json", "Cache-Control": "max-age=300" } }));
