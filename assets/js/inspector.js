@@ -2,7 +2,7 @@
 (function () {
   "use strict";
   var A = window.UntilsAuth, $ = function (id) { return document.getElementById(id); };
-  var q = new URLSearchParams(location.search), id = q.get("id") || "", ver = parseInt(q.get("ver"), 10) || 0, which = ver ? "ver" : q.get("v") === "new" ? "new" : "cur", suffix = ver ? " (version " + ver + ")" : which === "new" ? " (new version)" : "";
+  var q = new URLSearchParams(location.search), id = q.get("id") || "", ver = parseInt(q.get("ver"), 10) || 0, which = ver ? "ver" : q.get("v") === "new" ? "new" : q.get("v") === "staged" ? "staged" : "cur", suffix = ver ? " (version " + ver + ")" : (which === "new" || which === "staged") ? " (new version)" : "";
   var ctl = null, tok = "", reported = false, warnT = 0, session = null;
 
   function toLogin() { location.replace("/developers/#signin"); }
@@ -32,7 +32,8 @@
     if (det && !reported && !ver) {
       reported = true;
       fetch("/api/games", { method: "PUT", headers: { "Authorization": "Bearer " + session.access_token, "Content-Type": "application/json" },
-        body: JSON.stringify({ id: id, sdk: { ok: true, name: st.unityName || st.sdk, version: st.unityName ? st.unityVersion : st.version, which: which } }) }).catch(function () {});
+        body: JSON.stringify({ id: id, sdk: { ok: true, name: st.unityName || st.sdk, version: st.unityName ? st.unityVersion : st.version, which: which } }) })
+        .then(function (r) { if (r.ok && which === "staged") add({ at: Date.now(), kind: "ok", text: "Untils SDK initialised for the new version. Go back to the dashboard and press Save Changes." }); }).catch(function () {});
     }
   }
   function run() {
@@ -60,7 +61,7 @@
     if (!s) return toLogin();
     session = s;
     var H = { "Authorization": "Bearer " + s.access_token };
-    fetch("/api/games?preview=" + encodeURIComponent(id) + (ver ? "&ver=" + ver : which === "new" ? "&v=new" : ""), { headers: H })
+    fetch("/api/games?preview=" + encodeURIComponent(id) + (ver ? "&ver=" + ver : which === "new" ? "&v=new" : which === "staged" ? "&v=staged" : ""), { headers: H })
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (r) {
         $("ins").hidden = false;

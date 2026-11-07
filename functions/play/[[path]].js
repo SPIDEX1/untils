@@ -9,6 +9,7 @@ export async function onRequestGet({ params, env }) {
   if (!g) return new Response("Game not found", { status: 404 });
   let path;
   if (flag === "n") path = g.pending && g.pending.path;
+  else if (flag === "s") path = g.staged && g.staged.path;
   else if (/^v\d+$/.test(flag || "")) { const vs = (g.versions && g.versions.length) ? g.versions : [{ n: g.version || 1, path: g.path }], f = vs.find(v => v.n === +flag.slice(1)); path = f && f.path; }
   else path = g.path || (o + "/" + i + ".zip");
   if (!path) return new Response("No such version", { status: 404 });

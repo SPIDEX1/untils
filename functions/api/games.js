@@ -47,6 +47,12 @@ async function who(req) {
   return u;
 }
 
+/* best-effort: remove an unused zip from storage */
+async function dropZip(env, path) {
+  if (!env.SUPABASE_SERVICE_KEY) return;
+  try { await fetch(SUPA + "/storage/v1/object/game-zips/" + path, { method: "DELETE", headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: "Bearer " + env.SUPABASE_SERVICE_KEY } }); } catch (e) {}
+}
+
 export async function onRequestGet({ request, env }) {
   if (!env.GAMES) return json({ error: "KV binding GAMES missing" }, 500);
   const u = await who(request);
@@ -55,11 +61,12 @@ export async function onRequestGet({ request, env }) {
   if (pv) {
     const pg = /^[a-z0-9-]{8,40}$/.test(pv) ? await env.GAMES.get("game:" + u.id + ":" + pv, "json") : null;
     if (!pg) return json({ error: "Game not found." }, 404);
-    const nv = new URL(request.url).searchParams.get("v") === "new", vn = +new URL(request.url).searchParams.get("ver") || 0;
+    const nv = new URL(request.url).searchParams.get("v") === "new", sv = new URL(request.url).searchParams.get("v") === "staged", vn = +new URL(request.url).searchParams.get("ver") || 0;
     if (nv && !pg.pending) return json({ error: "No new version waiting." }, 404);
+    if (sv && !pg.staged) return json({ error: "No new version waiting." }, 404);
     if (vn && !vlist(pg).some(v => v.n === vn)) return json({ error: "Version not found." }, 404);
     if (!env.PLAY_SECRET || !env.SUPABASE_SERVICE_KEY) return json({ error: "PLAY_SECRET / SUPABASE_SERVICE_KEY not set." }, 500);
-    const s = [u.id, pv, Math.floor(Date.now() / 1000) + 86400].concat(vn ? ["v" + vn] : nv ? ["n"] : []).join("~");
+    const s = [u.id, pv, Math.floor(Date.now() / 1000) + 86400].concat(vn ? ["v" + vn] : nv ? ["n"] : sv ? ["s"] : []).join("~");
     return json({ token: s + "~" + await sign(env, s) });
   }
   const dl = new URL(request.url).searchParams.get("download");
@@ -144,7 +151,24 @@ export async function onRequestPut({ request, env }) {
   const key = "game:" + u.id + ":" + id, g = await env.GAMES.get(key, "json");
   if (!g) return json({ error: "Game not found." }, 404);
   if (b.seen) { g.msgSeen = Date.now(); await env.GAMES.put(key, JSON.stringify(g)); return json({ ok: true }); }
+  /* a new version is uploaded first ("staged"); it only becomes a real version when the Untils SDK was seen starting in the Inspector and the developer presses Save */
+  if (b.cancelStage) { const old = g.staged && g.staged.path; delete g.staged; await env.GAMES.put(key, JSON.stringify(g)); if (old) await dropZip(env, old); return json({ ok: true }); }
+  if (b.stage && typeof b.stage === "object") {
+    const sp = b.stage.path;
+    if (!(typeof sp === "string" && sp.startsWith(u.id + "/" + id + "-") && /-v\d+\.zip$/.test(sp))) return json({ error: "Bad file path." }, 400);
+    const old = g.staged && g.staged.path;
+    g.staged = { path: sp, at: Date.now(), name: String(b.stage.name || "").slice(0, 120), size: Math.max(0, +b.stage.size || 0), sdk: null };
+    await env.GAMES.put(key, JSON.stringify(g));
+    if (old && old !== sp) await dropZip(env, old);
+    return json({ ok: true, staged: g.staged });
+  }
   if (b.sdk && typeof b.sdk === "object") {
+    if (b.sdk.which === "staged") {
+      if (!g.staged) return json({ error: "No new version waiting." }, 400);
+      g.staged.sdk = { ok: !!b.sdk.ok, name: String(b.sdk.name || "").slice(0, 40), version: String(b.sdk.version || "").slice(0, 20), at: Date.now() };
+      await env.GAMES.put(key, JSON.stringify(g));
+      return json({ ok: true });
+    }
     const path = b.sdk.which === "new" ? (g.pending && g.pending.path) : g.path;
     if (!path) return json({ error: "No such version." }, 400);
     g.sdk = { path, ok: !!b.sdk.ok, name: String(b.sdk.name || "").slice(0, 40), version: String(b.sdk.version || "").slice(0, 20), at: Date.now() };
@@ -174,8 +198,16 @@ export async function onRequestPut({ request, env }) {
   if (b.removeThumb && !b.thumb) g.thumb = "";
   if (b.removeLogo && !b.logo) g.logo = "";
   if (b.removeVideo && !b.video) g.video = "";
-  if (b.path) { if (!ok(b.path, /-v\d+\.zip$/)) return json({ error: "Bad file path." }, 400); { const vs = vlist(g).slice(); vs.push({ n: Math.max.apply(null, vs.map(v => v.n).concat([0])) + 1, path: b.path, at: Date.now() }); g.versions = vs.slice(-50); } if (g.status === "live") { g.pending = { path: b.path, at: Date.now() }; g.updateNote = ""; }
-    else { g.path = b.path; g.version = (g.version || 1) + 1; if (g.status !== "pending") { g.status = "pending"; g.note = ""; } } }
+  let np = b.path, fromStage = false;
+  if (b.publishStaged) {
+    const st = g.staged;
+    if (!st) return json({ error: "No new version is waiting. Please upload your zip again." }, 400);
+    if (!(st.sdk && st.sdk.ok)) return json({ error: "Please check that the Untils SDK is initialised in the Inspector view, then press Save again.", code: "sdk" }, 400);
+    np = st.path; fromStage = true;
+  }
+  if (np) { if (!fromStage && !ok(np, /-v\d+\.zip$/)) return json({ error: "Bad file path." }, 400); { const vs = vlist(g).slice(); vs.push({ n: Math.max.apply(null, vs.map(v => v.n).concat([0])) + 1, path: np, at: Date.now() }); g.versions = vs.slice(-50); } if (g.status === "live") { g.pending = { path: np, at: Date.now() }; g.updateNote = ""; }
+    else { g.path = np; g.version = (g.version || 1) + 1; if (g.status !== "pending") { g.status = "pending"; g.note = ""; } } }
+  if (fromStage) { g.sdk = { path: np, ok: true, name: g.staged.sdk.name, version: g.staged.sdk.version, at: Date.now() }; delete g.staged; }
   { const st = studioOf(u); if (st) g.studio = st; }
   g.updatedAt = Date.now();
   await env.GAMES.put(key, JSON.stringify(g));
