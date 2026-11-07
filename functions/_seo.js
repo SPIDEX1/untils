@@ -30,3 +30,20 @@ export async function liveGames(env) {
   await cache.put(ck, new Response(JSON.stringify(games), { headers: { "Content-Type": "application/json", "Cache-Control": "max-age=300" } }));
   return games;
 }
+
+/* Plain, crawlable links to every live game (the game cards on the page are buttons that need JavaScript). */
+export function gameLinksHTML(games) {
+  if (!games || !games.length) return "";
+  return '<section class="gl-seo" aria-label="All games"><h2>ALL UNTILS GAMES</h2><ul>' +
+    games.slice(0, 300).map(g => '<li><a href="/games/' + esc(g.slug) + '/">' + esc(g.title) + '</a></li>').join("") + "</ul></section>";
+}
+/* Adds that list right after the games grid. If anything goes wrong the original page is returned untouched. */
+export async function withGameLinks(res, env) {
+  try {
+    const html = gameLinksHTML(await liveGames(env));
+    if (!html) return res;
+    const out = new HTMLRewriter().on("div#grid", { element(e) { e.after(html, { html: true }); } }).transform(res);
+    const h = new Headers(out.headers); h.set("Cache-Control", "public, max-age=300");
+    return new Response(out.body, { status: res.status, headers: h });
+  } catch (e) { return res; }
+}

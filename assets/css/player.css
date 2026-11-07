@@ -113,3 +113,14 @@ html .fsb svg{width:16px!important;height:16px!important;filter:none!important;s
 }
 html.mobdev #start.paused .playbtn svg:not(.pi){display:none}
 html.mobdev #start.paused .playbtn .pi{display:block}
+
+/* ---- contact email ---- */
+#copyMail{margin-left:10px;padding:8px 18px;font-size:13px;vertical-align:middle}
+#mailMsg{min-height:22px;margin:0;font-weight:800;color:#1b9a50}
+
+/* ---- crawlable list of all games (also helps Google find every game page) ---- */
+.gl-seo{max-width:1200px;margin:36px auto 12px;padding:0 20px}
+.gl-seo h2{margin:0;font-size:13px;letter-spacing:.14em;color:#5d7390}
+.gl-seo ul{list-style:none;display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:12px 0 0}
+.gl-seo a{display:inline-block;padding:7px 14px;border-radius:999px;background:#fff;color:#0a6cff;font-weight:800;font-size:13px;text-decoration:none;box-shadow:0 2px 8px rgba(20,90,170,.12);transition:transform .2s,background .2s}
+.gl-seo a:hover{background:#eaf3ff;transform:translateY(-2px)}
