@@ -82,7 +82,7 @@ export async function onRequestGet({ request, env }) {
     return new Response(r.body, { headers: { "Content-Type": "application/zip", "Content-Disposition": 'attachment; filename="' + (slugOf(dg.title) || "game") + "-v" + n + '.zip"', "Cache-Control": "no-store" } });
   }
   const l = await env.GAMES.list({ prefix: "game:" + u.id + ":", limit: 50 });
-  const games = (await Promise.all(l.keys.map(k => env.GAMES.get(k.name, "json")))).filter(Boolean);
+  const games = (await Promise.all(l.keys.map(k => env.GAMES.get(k.name, "json")))).filter(g => g && g.status !== "draft");
   const day7 = new Date(Date.now() - 6 * 86400000).toISOString().slice(0, 10);
   await Promise.all(games.map(async g => {
     g.versions = vlist(g); g.orient = ORI(g.orient);
@@ -109,11 +109,26 @@ export async function onRequestPost({ request, env }) {
   const cat = String(b.category || "");
 
   if (!/^[a-z0-9-]{8,40}$/.test(id)) return json({ error: "Bad game id." }, 400);
+  /* draft = the zip was uploaded first so the developer can use Inspector and Preview before pressing Upload Game. Not shown anywhere, auto-removed after 7 days. */
+  if (b.draft) {
+    const sp = String(b.path || ""), dk = "game:" + u.id + ":" + id;
+    if (!(sp.startsWith(u.id + "/" + id + "-") && /-v\d+\.zip$/.test(sp))) return json({ error: "Bad file path." }, 400);
+    const ex = await env.GAMES.get(dk, "json");
+    if (ex && ex.status !== "draft") return json({ error: "Bad game id." }, 400);
+    if (!ex) { const l = await env.GAMES.list({ prefix: "game:" + u.id + ":", limit: MAX_GAMES + 1 }); if (l.keys.length >= MAX_GAMES) return json({ error: "Game limit reached." }, 400); }
+    await env.GAMES.put(dk, JSON.stringify({ id, owner: u.id, path: sp, status: "draft", name: String(b.name || "").slice(0, 120), size: Math.max(0, +b.size || 0), sdk: null, versions: [{ n: 1, path: sp, at: Date.now() }], createdAt: Date.now() }), { expirationTtl: 604800 });
+    if (ex && ex.path && ex.path !== sp) await dropZip(env, ex.path);
+    return json({ ok: true });
+  }
   if (title.length < 2 || title.length > 60) return json({ error: "Title must be 2 to 60 characters." }, 400);
   if (await titleTaken(env, title, null)) return json({ error: "Another game already uses this name. Please choose a different name." }, 400);
   if (desc.length < 10 || desc.length > 500) return json({ error: "Description must be 10 to 500 characters." }, 400);
   if (CATS.indexOf(cat) < 0) return json({ error: "Please choose a category." }, 400);
-  if (b.path !== u.id + "/" + id + ".zip") return json({ error: "Bad file path." }, 400);
+  const dr = await env.GAMES.get("game:" + u.id + ":" + id, "json");
+  if (dr && dr.status !== "draft") return json({ error: "Bad game id." }, 400);
+  const fromDraft = !!(dr && dr.path === b.path);
+  if (b.path !== u.id + "/" + id + ".zip" && !fromDraft) return json({ error: "Bad file path." }, 400);
+  if (fromDraft && !(dr.sdk && dr.sdk.ok)) return json({ error: "Please click Inspector view first and let the Untils SDK init be detected, then press Upload Game.", code: "sdk" }, 400);
 
   const ext = (String(b.icon || "").match(/\.(png|jpg|webp)$/) || [])[1];
   if (!ext || b.icon !== u.id + "/" + id + "." + ext) return json({ error: "Game icon is required." }, 400);
@@ -130,13 +145,14 @@ export async function onRequestPost({ request, env }) {
 
   const prefix = "game:" + u.id + ":";
   const existing = await env.GAMES.list({ prefix, limit: MAX_GAMES + 1 });
-  if (existing.keys.length >= MAX_GAMES) return json({ error: "Game limit reached." }, 400);
+  if (existing.keys.filter(k => k.name !== prefix + id).length >= MAX_GAMES) return json({ error: "Game limit reached." }, 400);
 
   const game = {
     id, title, description: desc, category: cat,
     studio: studioOf(u),
     owner: u.id, path: b.path, icon: b.icon, banner: b.banner || "", thumb: b.thumb || "", logo: b.logo || "", video: b.video || "", shots: sh, device: b.device === "desktop" ? "desktop" : "all", orient: b.device === "desktop" ? "both" : ORI(b.orient), versions: [{ n: 1, path: b.path, at: Date.now() }], status: "pending", createdAt: Date.now()
   };
+  if (fromDraft) game.sdk = { path: b.path, ok: true, name: dr.sdk.name || "", version: dr.sdk.version || "", at: dr.sdk.at || Date.now() };
   await env.GAMES.put(prefix + id, JSON.stringify(game));
   return json({ ok: true, game });
 }
@@ -151,6 +167,7 @@ export async function onRequestPut({ request, env }) {
   const key = "game:" + u.id + ":" + id, g = await env.GAMES.get(key, "json");
   if (!g) return json({ error: "Game not found." }, 404);
   if (b.seen) { g.msgSeen = Date.now(); await env.GAMES.put(key, JSON.stringify(g)); return json({ ok: true }); }
+  if (b.dropDraft) { if (g.status === "draft") { await env.GAMES.delete(key); await dropZip(env, g.path); } return json({ ok: true }); }
   /* a new version is uploaded first ("staged"); it only becomes a real version when the Untils SDK was seen starting in the Inspector and the developer presses Save */
   if (b.cancelStage) { const old = g.staged && g.staged.path; delete g.staged; await env.GAMES.put(key, JSON.stringify(g)); if (old) await dropZip(env, old); return json({ ok: true }); }
   if (b.stage && typeof b.stage === "object") {

@@ -39,7 +39,7 @@ export async function onRequest({ request, env, params }) {
     do { const l = await env.GAMES.list({ prefix: "game:", cursor: c });
       out.push(...await Promise.all(l.keys.map(k => env.GAMES.get(k.name, "json"))));
       c = l.list_complete ? null : l.cursor; } while (c);
-    return J({ games: await withStudio(env, out.filter(Boolean).sort((x, y) => y.createdAt - x.createdAt)) });
+    return J({ games: await withStudio(env, out.filter(g => g && g.status !== "draft").sort((x, y) => y.createdAt - x.createdAt)) });
   }
   if (a === "game") {
     if (!idok) return J({ error: "Bad id." }, 400);
