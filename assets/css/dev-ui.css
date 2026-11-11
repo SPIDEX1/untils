@@ -303,3 +303,8 @@ a.dv-bk .ic{margin:0}
 .dv-rdy{display:inline-flex;align-items:center;gap:6px;color:#0a8a4a;font-size:17px}
 .dv-ra{margin:0}
 .dv-rs{margin:8px 0;font-weight:700}
+
+/* developer portal navbar logo */
+header .logo.dvlogo{height:56px;width:auto;max-width:100%}
+@media(max-width:700px){header .logo.dvlogo{height:46px}}
+@media(max-width:420px){header .logo.dvlogo{height:40px}}
