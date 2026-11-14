@@ -1,8 +1,7 @@
 import { liveGames, esc } from "./_seo.js";
 const STATIC = [
   ["/", "2026-11-04", "1.0"], ["/games/", "2026-11-04", "0.9"], ["/about/", "2026-10-16", "0.6"],
-  ["/contact/", "2026-11-01", "0.4"], ["/privacy/", "2026-11-01", "0.3"], ["/terms/", "2026-11-01", "0.3"],
-  ["/developers/", "2026-10-16", "0.6"], ["/developers/docs/", "2026-11-02", "0.6"]
+  ["/contact/", "2026-11-01", "0.4"], ["/privacy/", "2026-11-01", "0.3"], ["/terms/", "2026-11-01", "0.3"]
 ];
 export async function onRequestGet({ env }) {
   let games = []; try { games = await liveGames(env); } catch (e) {}

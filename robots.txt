@@ -1,9 +1,6 @@
 User-agent: *
 Allow: /
-Disallow: /developers/dashboard/
 Disallow: /admin/
-Disallow: /developers/inspector/
-Disallow: /developers/account/
 Disallow: /play/
 
 Sitemap: https://untils.in/sitemap.xml

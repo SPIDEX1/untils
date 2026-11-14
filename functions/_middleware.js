@@ -6,6 +6,10 @@ import { adsHead } from "./_ads.js";
 const DEV_HOST = "developer.untils.in";
 const MAIN = /^(www\.)?untils\.in$/;
 const DEV_PATHS = /^\/(dashboard|account|inspector|docs)(\/|$)/;
+const PASS = /^\/(api|assets|play|sdk)(\/|$)|^\/(favicon\.ico|favicon-32\.png|apple-touch-icon\.png|icon-192\.png)$/;
+const MAIN_URL = "https://untils.in";
+const DEV_ROBOTS = "User-agent: *\nAllow: /\nDisallow: /dashboard/\nDisallow: /account/\nDisallow: /inspector/\nDisallow: /play/\n\nSitemap: https://" + DEV_HOST + "/sitemap.xml\n";
+const DEV_SITEMAP = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n<url><loc>https://' + DEV_HOST + '/</loc><priority>1.0</priority></url>\n<url><loc>https://' + DEV_HOST + '/docs/</loc><priority>0.8</priority></url>\n</urlset>\n';
 const SKIP = /^\/(admin|api|live|play|sdk|assets)(\/|$)|^\/developers\/(dashboard|account|inspector)(\/|$)/;
 const strip = q => (q.replace(/^\/developers/, "") || "/");
 export async function onRequest(ctx) {
@@ -14,10 +18,15 @@ export async function onRequest(ctx) {
     return Response.redirect("https://" + DEV_HOST + strip(p) + url.search, 301);
   let res, path = p;
   if (host === DEV_HOST) {
+    if (p === "/robots.txt") return new Response(DEV_ROBOTS, { headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "public, max-age=3600" } });
+    if (p === "/sitemap.xml") return new Response(DEV_SITEMAP, { headers: { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=3600" } });
     if (/^\/developers(\/|$)/.test(p)) return Response.redirect(url.origin + strip(p) + url.search, 301);
     if (p === "/" || DEV_PATHS.test(p)) {
       path = "/developers" + p;
       res = await ctx.env.ASSETS.fetch(new Request(new URL(path, url), ctx.request));
+    } else if (!PASS.test(p) && (ctx.request.method === "GET" || ctx.request.method === "HEAD")) {
+      /* games, about, contact... belong to untils.in only (no duplicate copies on the subdomain) */
+      return Response.redirect(MAIN_URL + p + url.search, 301);
     }
   }
   if (!res) res = await ctx.next();

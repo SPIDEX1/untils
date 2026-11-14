@@ -201,9 +201,21 @@
       btn.disabled = false;
       btn.textContent = "VERIFY";
       if (!r.ok) { $("dvErr2").textContent = r.message; return; }
-      showDone();
+      ensureStudio(r.session).then(showDone);
     });
   });
+
+  /* an email that already existed (for example a Gmail used as a player) has no studio name yet: save one so it works as a developer account */
+  function ensureStudio(s) {
+    var u = (s && s.user) || {}, m = u.user_metadata || {};
+    if (m.studio) return Promise.resolve();
+    var nm = mode === "signup" ? $("dvName").value.trim() : "";
+    if (!nm) nm = String(m.full_name || m.name || (u.email ? u.email.split("@")[0] : "")).trim();
+    nm = Array.from(nm.replace(/[\u0000-\u001f<>&"'`\\$]/g, "")).slice(0, 25).join("");
+    if (!nm || !s.access_token) return Promise.resolve();
+    return fetch(A.cfg.URL + "/auth/v1/user", { method: "PUT", headers: { apikey: A.cfg.KEY, Authorization: "Bearer " + s.access_token, "Content-Type": "application/json" }, body: JSON.stringify({ data: { studio: nm } }) })
+      .then(function () {}, function () {});
+  }
 
   /* ---- step 3: done -> dashboard ---- */
   function showDone() {

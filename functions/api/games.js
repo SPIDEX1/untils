@@ -44,10 +44,10 @@ async function who(req, why) {
   if (!r.ok) { if (why) why.r = "token"; return null; }
   const u = await r.json();
   if (!u || !u.id) { if (why) why.r = "token"; return null; }
-  if (["google", "apple", "phone"].indexOf((u.app_metadata || {}).provider) > -1 || (u.user_metadata || {}).kind === "player") { if (why) why.r = "player"; return null; } /* player accounts are separate from developer accounts */
+  if (!u.email) { if (why) why.r = "email"; return null; } /* any account with an email works (Gmail / Google / player accounts too) */
   return u;
 }
-const NO = w => json({ error: w && w.r === "player" ? "This email is already used for a UNTILS player account. Developer accounts are separate, so please create your developer account with a different email." : "Please sign in again.", code: (w && w.r) || "token" }, 401);
+const NO = w => json({ error: w && w.r === "email" ? "Please sign in with your email address to use the Developer Portal." : "Please sign in again.", code: (w && w.r) || "token" }, 401);
 
 /* best-effort: remove an unused zip from storage */
 async function dropZip(env, path) {

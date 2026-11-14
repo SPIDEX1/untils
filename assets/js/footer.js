@@ -2,7 +2,9 @@
 (function () {
   function norm(p) { return p.replace(/index\.html$/, "").replace(/\/+$/, "") || "/"; }
   function sync() {
-    var p = norm(location.pathname), dev = /^\/developers(\/|$)/.test(p) && p !== "/developers/docs";
+    var p = norm(location.pathname);
+    if (location.hostname === "developer.untils.in") p = "/developers" + (p === "/" ? "" : p); /* developer pages live at the root of the subdomain */
+    var dev = /^\/developers(\/|$)/.test(p) && p !== "/developers/docs";
     [].forEach.call(document.querySelectorAll("footer.sf .sf-c a[href]"), function (a) {
       var h = a.getAttribute("href"); if (h.charAt(0) !== "/") return;
       var t = norm(h), hide = false;
