@@ -36,16 +36,18 @@ const json = (o, s) => new Response(JSON.stringify(o), {
   headers: { "Content-Type": "application/json", "Cache-Control": "no-store" }
 });
 
-async function who(req) {
+/* why (optional object) gets why.r = "token" (login not valid) or "player" (this email is a player account) */
+async function who(req, why) {
   const t = (req.headers.get("Authorization") || "").replace(/^Bearer /i, "");
-  if (!t) return null;
+  if (!t) { if (why) why.r = "token"; return null; }
   const r = await fetch(SUPA + "/auth/v1/user", { headers: { apikey: KEY, Authorization: "Bearer " + t } });
-  if (!r.ok) return null;
+  if (!r.ok) { if (why) why.r = "token"; return null; }
   const u = await r.json();
-  if (!u || !u.id) return null;
-  if (["google", "apple", "phone"].indexOf((u.app_metadata || {}).provider) > -1 || (u.user_metadata || {}).kind === "player") return null; /* player accounts are separate from developer accounts */
+  if (!u || !u.id) { if (why) why.r = "token"; return null; }
+  if (["google", "apple", "phone"].indexOf((u.app_metadata || {}).provider) > -1 || (u.user_metadata || {}).kind === "player") { if (why) why.r = "player"; return null; } /* player accounts are separate from developer accounts */
   return u;
 }
+const NO = w => json({ error: w && w.r === "player" ? "This email is already used for a UNTILS player account. Developer accounts are separate, so please create your developer account with a different email." : "Please sign in again.", code: (w && w.r) || "token" }, 401);
 
 /* best-effort: remove an unused zip from storage */
 async function dropZip(env, path) {
@@ -55,8 +57,8 @@ async function dropZip(env, path) {
 
 export async function onRequestGet({ request, env }) {
   if (!env.GAMES) return json({ error: "KV binding GAMES missing" }, 500);
-  const u = await who(request);
-  if (!u) return json({ error: "Please sign in again." }, 401);
+  const why = {}, u = await who(request, why);
+  if (!u) return NO(why);
   const pv = new URL(request.url).searchParams.get("preview");
   if (pv) {
     const pg = /^[a-z0-9-]{8,40}$/.test(pv) ? await env.GAMES.get("game:" + u.id + ":" + pv, "json") : null;
@@ -98,8 +100,8 @@ export async function onRequestGet({ request, env }) {
 
 export async function onRequestPost({ request, env }) {
   if (!env.GAMES) return json({ error: "KV binding GAMES missing" }, 500);
-  const u = await who(request);
-  if (!u) return json({ error: "Please sign in again." }, 401);
+  const why = {}, u = await who(request, why);
+  if (!u) return NO(why);
 
   let b;
   try { b = await request.json(); } catch (e) { return json({ error: "Bad request." }, 400); }
@@ -159,8 +161,8 @@ export async function onRequestPost({ request, env }) {
 
 export async function onRequestPut({ request, env }) {
   if (!env.GAMES) return json({ error: "KV binding GAMES missing" }, 500);
-  const u = await who(request);
-  if (!u) return json({ error: "Please sign in again." }, 401);
+  const why = {}, u = await who(request, why);
+  if (!u) return NO(why);
   let b; try { b = await request.json(); } catch (e) { return json({ error: "Bad request." }, 400); }
   const id = String(b.id || "");
   if (!/^[a-z0-9-]{8,40}$/.test(id)) return json({ error: "Bad game id." }, 400);
@@ -234,8 +236,8 @@ export async function onRequestPut({ request, env }) {
 /* Delete a game: removes it from the platform (KV) and its files from storage. Owner only. */
 export async function onRequestDelete({ request, env }) {
   if (!env.GAMES) return json({ error: "KV binding GAMES missing" }, 500);
-  const u = await who(request);
-  if (!u) return json({ error: "Please sign in again." }, 401);
+  const why = {}, u = await who(request, why);
+  if (!u) return NO(why);
   let b; try { b = await request.json(); } catch (e) { return json({ error: "Bad request." }, 400); }
   const id = String(b.id || "");
   if (!/^[a-z0-9-]{8,40}$/.test(id)) return json({ error: "Bad game id." }, 400);
