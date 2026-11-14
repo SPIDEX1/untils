@@ -1,6 +1,7 @@
+import { notify } from "../../_mail.js";
 import { J, me, sign, withStudio, getLock, unlocked, unlockTok, checkCode, hashCode, rnd } from "../../_lib.js";
 const ID = /^[a-z0-9-]{8,40}$/, UID = /^[0-9a-f-]{36}$/, EM = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-export async function onRequest({ request, env, params }) {
+export async function onRequest({ request, env, params, waitUntil }) {
   if (!env.GAMES) return J({ error: "KV GAMES missing" }, 500);
   const u = await me(request, env);
   if (!u) return J({ error: "Sign in again." }, 401);
@@ -71,8 +72,11 @@ export async function onRequest({ request, env, params }) {
     if (["approved", "rejected", "pending", "live"].indexOf(d) < 0 || !idok) return J({ error: "Bad request." }, 400);
     const g = await env.GAMES.get(gk, "json"); if (!g) return J({ error: "Not found." }, 404);
     if (d === "live" && g.status !== "approved" && g.status !== "live") return J({ error: "Approve the game first." }, 400);
+    const prev = g.status, prevNote = g.note;
     g.status = d; g.note = String(b.note || "").slice(0, 500); g.decidedAt = Date.now(); if (d === "live" && !g.launchedAt) g.launchedAt = Date.now();
     await env.GAMES.put(gk, JSON.stringify(g));
+    if (d === "rejected" && (prev !== "rejected" || prevNote !== g.note)) await notify(env, waitUntil, "rejected", g, { reason: g.note });   /* email: sorry + the leader's reason */
+    if (d === "live" && prev !== "live") await notify(env, waitUntil, "live", g);                                                          /* email: hurray */
     return J({ ok: true });
   }
   if (a === "update" && request.method === "POST") {
@@ -84,6 +88,7 @@ export async function onRequest({ request, env, params }) {
     else return J({ error: "Bad request." }, 400);
     delete g.pending; g.updatedAt = Date.now();
     await env.GAMES.put(gk, JSON.stringify(g));
+    await notify(env, waitUntil, b.decision === "approve" ? "update_live" : "update_rejected", g, { reason: g.updateNote });
     return J({ ok: true });
   }
   if (a === "message" && request.method === "POST") {
@@ -93,6 +98,7 @@ export async function onRequest({ request, env, params }) {
     const g = await env.GAMES.get(gk, "json"); if (!g) return J({ error: "Not found." }, 404);
     g.msgs = (g.msgs || []).concat([{ text, at: Date.now() }]).slice(-20);
     await env.GAMES.put(gk, JSON.stringify(g));
+    await notify(env, waitUntil, "message", g, { text });   /* email: Message from UNTILS Team */
     return J({ ok: true });
   }
   if (a === "popular" && request.method === "POST") {

@@ -1,4 +1,5 @@
 import { sign } from "../_lib.js";
+import { notify } from "../_mail.js";
 /* UNTILS games API (Cloudflare Pages Function)
    Binding chahiye: GAMES (KV namespace). Zip file browser se seedha Supabase Storage me jaati hai. */
 const SUPA = "https://fjfkwfklglovuxeecxsg.supabase.co";
@@ -98,7 +99,7 @@ export async function onRequestGet({ request, env }) {
   return json({ games });
 }
 
-export async function onRequestPost({ request, env }) {
+export async function onRequestPost({ request, env, waitUntil }) {
   if (!env.GAMES) return json({ error: "KV binding GAMES missing" }, 500);
   const why = {}, u = await who(request, why);
   if (!u) return NO(why);
@@ -156,10 +157,11 @@ export async function onRequestPost({ request, env }) {
   };
   if (fromDraft) game.sdk = { path: b.path, ok: true, name: dr.sdk.name || "", version: dr.sdk.version || "", at: dr.sdk.at || Date.now() };
   await env.GAMES.put(prefix + id, JSON.stringify(game));
+  await notify(env, waitUntil, "submitted", game);   /* email: thanks for submitting, result within 2 days */
   return json({ ok: true, game });
 }
 
-export async function onRequestPut({ request, env }) {
+export async function onRequestPut({ request, env, waitUntil }) {
   if (!env.GAMES) return json({ error: "KV binding GAMES missing" }, 500);
   const why = {}, u = await who(request, why);
   if (!u) return NO(why);
@@ -230,6 +232,7 @@ export async function onRequestPut({ request, env }) {
   { const st = studioOf(u); if (st) g.studio = st; }
   g.updatedAt = Date.now();
   await env.GAMES.put(key, JSON.stringify(g));
+  if (np) await notify(env, waitUntil, g.pending ? "submitted_update" : "submitted", g);   /* email: new version / resubmission received */
   return json({ ok: true, game: g });
 }
 
