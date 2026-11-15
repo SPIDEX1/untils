@@ -1,5 +1,6 @@
 import { liveGames, esc, slugOf } from "../_seo.js";
 import { withHome } from "../_home.js";
+import { canon } from "../_cats.js";
 
 /* /games/ and /games/<slug>/ both serve the SPA shell (/games/index.html).
    For a real game, the shell is rewritten on the server so Google sees the game's own
@@ -50,7 +51,7 @@ export async function onRequestGet({ request, env, params }) {
       const same = rest.filter(x => x.category === g.category).slice(0, 8), other = rest.filter(x => x.category !== g.category).slice(0, 8);
       e.setInnerContent('<div class="legal"><h1>' + esc(g.title) + '</h1><p>' + esc(g.description || desc) + '</p>' +
         (g.howto ? '<h2>How to play ' + esc(g.title) + '</h2><p>' + esc(g.howto) + '</p>' : '') +
-        '<p>Category: ' + (g.category ? '<a href="/genre/' + slugOf(g.category) + '/">' + esc(g.category) + '</a>' : 'Game') + '. Platforms: ' + (g.device === "desktop" ? "desktop browser" : "mobile and desktop browsers") + '. Play ' + esc(g.title) + ' free online on UNTILS with no download. Please enable JavaScript to play.</p>' +
+        '<p>Category: ' + (g.category ? '<a href="/genre/' + slugOf(canon(g.category)) + '/">' + esc(canon(g.category)) + '</a>' : 'Game') + '. Platforms: ' + (g.device === "desktop" ? "desktop browser" : "mobile and desktop browsers") + '. Play ' + esc(g.title) + ' free online on UNTILS with no download. Please enable JavaScript to play.</p>' +
         (same.length ? '<h2>More ' + esc(g.category) + ' games</h2><ul>' + same.map(li).join("") + '</ul>' : '') +
         (other.length ? '<h2>Other games to try</h2><ul>' + other.map(li).join("") + '</ul>' : '') + '</div>', { html: true });
     } });

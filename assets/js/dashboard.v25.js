@@ -546,7 +546,7 @@
   }
 
   function gnote(t) { var n = $("gNote"); UI.set(n, "check", t); n.hidden = false; n.scrollIntoView({ behavior: "smooth", block: "center" }); }
-  var CATS = ["Action", "Adventure", "Arcade", "Board", "Card", "Casual", "Educational", "Endless Runner", "Fighting", "Horror", "Idle", "Kids", "Multiplayer", "Music", "Platformer", "Puzzle", "Racing", "Role Playing", "Sandbox", "Shooter", "Simulation", "Space", "Sports", "Strategy", "Survival", "Tower Defense", "Trivia", "Word", "Other"], GX = null, MAPF = { eName: "name", eDesc: "desc", eHow: "how", eCat: "cat", eDev: "or", eOrL: "or", eOrP: "or" };
+  var CATS = ["Arcade", "Board", "Casual", "Educational", "Fighting", "Horror", "Platformer", "Puzzle", "Racing", "Runner", "Shooting", "Sports", "Stickman", "Tower Defense", "Adventure"], GX = null, MAPF = { eName: "name", eDesc: "desc", eHow: "how", eCat: "cat", eDev: "or", eOrL: "or", eOrP: "or" };
   function blank() { return { id: null, title: "", description: "", howto: "", category: "", device: "all", orient: "both", shots: [], versions: [], status: "new" }; }
   function setFe(k, m) { var n = $("fe-" + k); if (n) n.textContent = m || ""; }
   function clearErrs() { ["name", "desc", "cat", "or"].forEach(function (k) { setFe(k, ""); }); kerr = {}; vErr = ""; $("eErr").textContent = ""; }
@@ -562,7 +562,8 @@
     $("eTitle").hidden = $("eStatus").hidden = $("eMsgs").hidden = !!isNew;
     if (isNew) { $("eStatus").innerHTML = ""; $("eMsgs").innerHTML = ""; } else { $("eTitle").textContent = "Edit: " + x.title; renderStatus(x); }
     $("eName").value = x.title; $("eDesc").value = x.description; $("eHow").value = x.howto || "";
-    $("eCat").innerHTML = (isNew ? '<option value="">Choose...</option>' : "") + CATS.map(function (c) { return "<option>" + c + "</option>"; }).join(""); $("eCat").value = x.category;
+    var cl = CATS.slice(); if (x.category && cl.indexOf(x.category) < 0) cl.push(x.category); /* a game with an older category keeps it until the developer picks a new one */
+    $("eCat").innerHTML = (isNew ? '<option value="">Choose...</option>' : "") + cl.map(function (c) { return "<option>" + c + "</option>"; }).join(""); $("eCat").value = x.category;
     $("eDev").value = x.device || "all"; $("eOrL").checked = x.orient !== "portrait"; $("eOrP").checked = x.orient !== "landscape"; syncOr();
     $("eGo").textContent = goText(); UI.set($("eDel"), "trash", isNew ? "REMOVE GAME" : "DELETE GAME");
     renderKit(x); renderVers(x); eSnap = eState(); syncSave();

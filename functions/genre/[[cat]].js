@@ -11,7 +11,7 @@ export async function onRequestGet({ request, env, params }) {
   const ld = { "@context": "https://schema.org", "@graph": [Object.assign({ "@type": "CollectionPage" }, pg.ld), { "@type": "BreadcrumbList", itemListElement: [
     { "@type": "ListItem", position: 1, name: "UNTILS", item: "https://untils.in/" }, { "@type": "ListItem", position: 2, name: "Categories", item: "https://untils.in/genre/" } ].concat(seg[0] ? [{ "@type": "ListItem", position: 3, name: pg.h1, item: url }] : []) }] };
   const setAttr = (a, v) => ({ element(e) { e.setAttribute(a, v); } });
-  const rw = new HTMLRewriter()
+  let rw = new HTMLRewriter()
     .on("title", { element(e) { e.setInnerContent(pg.title); } })
     .on('meta[name="description"]', setAttr("content", pg.desc))
     .on('link[rel="canonical"]', setAttr("href", url))
@@ -19,7 +19,8 @@ export async function onRequestGet({ request, env, params }) {
     .on('meta[name="twitter:title"]', setAttr("content", pg.title)).on('meta[name="twitter:description"]', setAttr("content", pg.desc))
     .on('script[type="application/ld+json"]', { element(e) { e.remove(); } })
     .on("head", { element(e) { e.append('<script type="application/ld+json">' + JSON.stringify(ld).replace(/</g, "\\u003c") + "</script>", { html: true }); } })
-    .on("main.legal", { element(e) { e.setInnerContent(pg.html, { html: true }); } });
+    .on("main.legal", { element(e) { e.setAttribute("class", "gx-main"); e.setInnerContent(pg.html, { html: true }); } });
+  if (pg.noindex) rw.on('meta[name="robots"]', setAttr("content", "noindex,follow"));
   const res = rw.transform(frame), h = new Headers(res.headers); h.set("Cache-Control", "public, max-age=300");
   return new Response(res.body, { status: 200, headers: h });
 }

@@ -4,7 +4,7 @@ import { notify } from "../_mail.js";
    Binding chahiye: GAMES (KV namespace). Zip file browser se seedha Supabase Storage me jaati hai. */
 const SUPA = "https://fjfkwfklglovuxeecxsg.supabase.co";
 const KEY = "sb_publishable_HUSSW4Xiau3suUYMfcTjtQ_h083WJbS";
-const CATS = ["Action", "Adventure", "Arcade", "Board", "Card", "Casual", "Educational", "Endless Runner", "Fighting", "Horror", "Idle", "Kids", "Multiplayer", "Music", "Platformer", "Puzzle", "Racing", "Role Playing", "Sandbox", "Shooter", "Simulation", "Space", "Sports", "Strategy", "Survival", "Tower Defense", "Trivia", "Word", "Other"];
+const CATS = ["Action", "Adventure", "Arcade", "Board", "Card", "Casual", "Educational", "Endless Runner", "Fighting", "Horror", "Idle", "Kids", "Multiplayer", "Music", "Platformer", "Puzzle", "Racing", "Role Playing", "Sandbox", "Shooter", "Runner", "Shooting", "Stickman", "Simulation", "Space", "Sports", "Strategy", "Survival", "Tower Defense", "Trivia", "Word", "Other"];
 const MAX_GAMES = 20;
 /* studio name exactly as the developer typed it (numbers and symbols too) */
 const studioOf = u => { const v = u && u.user_metadata ? u.user_metadata.studio : ""; return v == null ? "" : Array.from(String(v).replace(/[\u0000-\u001f]/g, "").trim()).slice(0, 25).join(""); };
