@@ -6,7 +6,7 @@ const cleanTitle = t => String(t || "").replace(/[<>&"'`\\$]/g, "").trim();
 
 /* Live games list, cached for 5 minutes so crawlers do not hammer KV. */
 export async function liveGames(env) {
-  const ck = new Request("https://seo-cache.invalid/live-games-v2"), cache = caches.default;
+  const ck = new Request("https://seo-cache.invalid/live-games-v3"), cache = caches.default;
   const hit = await cache.match(ck);
   if (hit) { try { return await hit.json(); } catch (e) {} }
   const out = []; let c;
@@ -22,7 +22,7 @@ export async function liveGames(env) {
     if (!title || !slug || seen.has(slug)) continue;
     seen.add(slug);
     games.push({
-      title, slug, category: g.category || "", description: String(g.description || "").replace(/\s+/g, " ").trim(),
+      title, slug, category: g.category || "", description: String(g.description || "").replace(/\s+/g, " ").trim(), howto: String(g.howto || "").replace(/\s+/g, " ").trim(), device: g.device || "all",
       icon: g.icon ? ICON_BASE + g.icon : "", shot: (g.shots && g.shots[0]) ? ICON_BASE + g.shots[0] : "",
       banner: g.banner ? ICON_BASE + g.banner : "", at: g.decidedAt || g.createdAt || 0,
       launched: g.launchedAt || g.decidedAt || g.createdAt || 0,
@@ -36,7 +36,9 @@ export async function liveGames(env) {
 /* Plain, crawlable links to every live game (the game cards on the page are buttons that need JavaScript). */
 export function gameLinksHTML(games) {
   if (!games || !games.length) return "";
-  return '<section class="gl-seo" aria-label="All games"><h2>ALL UNTILS GAMES</h2><ul>' +
+  const cats = [...new Set(games.map(g => g.category).filter(Boolean))].sort();
+  const catHTML = cats.length ? '<h2>BROWSE BY CATEGORY</h2><ul>' + cats.map(c => '<li><a href="/genre/' + slugOf(c) + '/">' + esc(c) + " games</a></li>").join("") + "</ul>" : "";
+  return '<section class="gl-seo" aria-label="All games">' + catHTML + '<h2>ALL UNTILS GAMES</h2><ul>' +
     games.slice(0, 300).map(g => '<li><a href="/games/' + esc(g.slug) + '/">' + esc(g.title) + '</a></li>').join("") + "</ul></section>";
 }
 /* Adds that list right after the games grid. If anything goes wrong the original page is returned untouched. */

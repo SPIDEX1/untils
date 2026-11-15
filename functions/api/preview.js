@@ -7,5 +7,5 @@ export async function onRequestGet({ request, env }) {
   if (!g) return J({ error: "Not found." }, 404);
   await withStudio(env, [g]);
   const dr = g.status === "draft"; /* a draft (zip uploaded, game not created yet) has no title or text */
-  return J({ key: o + "~" + i, title: g.title || (dr ? "Draft Preview" : ""), category: g.category || (dr ? "Preview" : ""), description: g.description || (dr ? "Draft preview of your game. It is not published yet." : ""), studio: g.studio, device: g.device || "all", orient: g.orient || "both", icon: g.icon || "", shots: g.shots || [], status: g.status });
+  return J({ key: o + "~" + i, title: g.title || (dr ? "Draft Preview" : ""), category: g.category || (dr ? "Preview" : ""), description: g.description || (dr ? "Draft preview of your game. It is not published yet." : ""), howto: g.howto || "", studio: g.studio, device: g.device || "all", orient: g.orient || "both", icon: g.icon || "", shots: g.shots || [], status: g.status });
 }

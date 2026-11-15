@@ -1,4 +1,4 @@
-import { liveGames, esc, withGameLinks } from "../_seo.js";
+import { liveGames, esc, slugOf, withGameLinks } from "../_seo.js";
 
 /* /games/ and /games/<slug>/ both serve the SPA shell (/games/index.html).
    For a real game, the shell is rewritten on the server so Google sees the game's own
@@ -8,8 +8,8 @@ export async function onRequestGet({ request, env, params }) {
   const shell = await env.ASSETS.fetch(new Request(u, request));
   const seg = (params.path || []).filter(Boolean);
   if (!seg.length) return withGameLinks(shell, env);
-  let g = null;
-  try { g = (await liveGames(env)).find(x => x.slug === String(seg[0]).toLowerCase()); } catch (e) {}
+  let g = null, all = [];
+  try { all = await liveGames(env); g = all.find(x => x.slug === String(seg[0]).toLowerCase()); } catch (e) {}
   if (!g) return shell;
 
   const url = "https://untils.in/games/" + g.slug + "/";
@@ -44,7 +44,15 @@ export async function onRequestGet({ request, env, params }) {
     .on('meta[name="twitter:image"]', setAttr("content", img))
     .on('script[type="application/ld+json"]', { element(e) { e.remove(); } })
     .on("head", { element(e) { e.append('<script type="application/ld+json">' + JSON.stringify(ld).replace(/</g, "\\u003c") + "</script>", { html: true }); } })
-    .on("noscript", { element(e) { e.setInnerContent('<div class="legal"><h1>' + esc(g.title) + '</h1><p>' + esc(desc) + '</p><p>Play ' + esc(g.title) + ' free online on UNTILS. Please enable JavaScript to play.</p></div>', { html: true }); } });
+    .on("noscript", { element(e) {
+      const li = x => '<li><a href="/games/' + esc(x.slug) + '/">' + esc(x.title) + "</a></li>", rest = all.filter(x => x.slug !== g.slug);
+      const same = rest.filter(x => x.category === g.category).slice(0, 8), other = rest.filter(x => x.category !== g.category).slice(0, 8);
+      e.setInnerContent('<div class="legal"><h1>' + esc(g.title) + '</h1><p>' + esc(g.description || desc) + '</p>' +
+        (g.howto ? '<h2>How to play ' + esc(g.title) + '</h2><p>' + esc(g.howto) + '</p>' : '') +
+        '<p>Category: ' + (g.category ? '<a href="/genre/' + slugOf(g.category) + '/">' + esc(g.category) + '</a>' : 'Game') + '. Platforms: ' + (g.device === "desktop" ? "desktop browser" : "mobile and desktop browsers") + '. Play ' + esc(g.title) + ' free online on UNTILS with no download. Please enable JavaScript to play.</p>' +
+        (same.length ? '<h2>More ' + esc(g.category) + ' games</h2><ul>' + same.map(li).join("") + '</ul>' : '') +
+        (other.length ? '<h2>Other games to try</h2><ul>' + other.map(li).join("") + '</ul>' : '') + '</div>', { html: true });
+    } });
   const res = rw.transform(shell);
   const h = new Headers(res.headers); h.set("Cache-Control", "public, max-age=300");
   return new Response(res.body, { status: 200, headers: h });

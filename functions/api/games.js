@@ -109,6 +109,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
   const id = String(b.id || "");
   const title = cleanTitle(b.title);
   const desc = String(b.description || "").trim();
+  const how = String(b.howto || "").replace(/[ \t]+/g, " ").trim();
   const cat = String(b.category || "");
 
   if (!/^[a-z0-9-]{8,40}$/.test(id)) return json({ error: "Bad game id." }, 400);
@@ -125,7 +126,8 @@ export async function onRequestPost({ request, env, waitUntil }) {
   }
   if (title.length < 2 || title.length > 60) return json({ error: "Title must be 2 to 60 characters." }, 400);
   if (await titleTaken(env, title, null)) return json({ error: "Another game already uses this name. Please choose a different name." }, 400);
-  if (desc.length < 10 || desc.length > 500) return json({ error: "Description must be 10 to 500 characters." }, 400);
+  if (desc.length < 60 || desc.length > 500) return json({ error: "Description must be 60 to 500 characters." }, 400);
+  if (how.length < 20 || how.length > 600) return json({ error: "How to play must be 20 to 600 characters." }, 400);
   if (CATS.indexOf(cat) < 0) return json({ error: "Please choose a category." }, 400);
   const dr = await env.GAMES.get("game:" + u.id + ":" + id, "json");
   if (dr && dr.status !== "draft") return json({ error: "Bad game id." }, 400);
@@ -151,7 +153,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
   if (existing.keys.filter(k => k.name !== prefix + id).length >= MAX_GAMES) return json({ error: "Game limit reached." }, 400);
 
   const game = {
-    id, title, description: desc, category: cat,
+    id, title, description: desc, howto: how, category: cat,
     studio: studioOf(u),
     owner: u.id, path: b.path, icon: b.icon, banner: b.banner || "", thumb: b.thumb || "", logo: b.logo || "", video: b.video || "", shots: sh, device: b.device === "desktop" ? "desktop" : "all", orient: b.device === "desktop" ? "both" : ORI(b.orient), versions: [{ n: 1, path: b.path, at: Date.now() }], status: "pending", createdAt: Date.now()
   };
@@ -204,7 +206,8 @@ export async function onRequestPut({ request, env, waitUntil }) {
       g.title = t;
     }
   }
-  if (b.description !== undefined) { const d = String(b.description).trim(); if (d.length < 10 || d.length > 500) return json({ error: "Description must be 10 to 500 characters." }, 400); g.description = d; }
+  if (b.description !== undefined) { const d = String(b.description).trim(); if (d.length > 500 || (d !== g.description && d.length < 60)) return json({ error: "Description must be 60 to 500 characters." }, 400); g.description = d; }
+  if (b.howto !== undefined) { const h = String(b.howto).replace(/[ \t]+/g, " ").trim(); if (h && (h.length < 20 || h.length > 600)) return json({ error: "How to play must be 20 to 600 characters." }, 400); g.howto = h; }
   if (b.category !== undefined) { if (CATS.indexOf(b.category) < 0) return json({ error: "Please choose a category." }, 400); g.category = b.category; }
   if (b.device !== undefined) g.device = b.device === "desktop" ? "desktop" : "all";
   if (b.orient !== undefined || b.device !== undefined) g.orient = g.device === "desktop" ? "both" : ORI(b.orient !== undefined ? b.orient : g.orient);
