@@ -1,4 +1,5 @@
-import { liveGames, esc, slugOf, withGameLinks } from "../_seo.js";
+import { liveGames, esc, slugOf } from "../_seo.js";
+import { withHome } from "../_home.js";
 
 /* /games/ and /games/<slug>/ both serve the SPA shell (/games/index.html).
    For a real game, the shell is rewritten on the server so Google sees the game's own
@@ -7,7 +8,7 @@ export async function onRequestGet({ request, env, params }) {
   const u = new URL(request.url); u.pathname = "/games/"; u.search = "";
   const shell = await env.ASSETS.fetch(new Request(u, request));
   const seg = (params.path || []).filter(Boolean);
-  if (!seg.length) return withGameLinks(shell, env);
+  if (!seg.length) return withHome(shell, env);
   let g = null, all = [];
   try { all = await liveGames(env); g = all.find(x => x.slug === String(seg[0]).toLowerCase()); } catch (e) {}
   if (!g) return shell;
