@@ -1,5 +1,6 @@
 import { sign } from "../_lib.js";
 import { notify } from "../_mail.js";
+import { catNames } from "../_cats.js";
 /* UNTILS games API (Cloudflare Pages Function)
    Binding chahiye: GAMES (KV namespace). Zip file browser se seedha Supabase Storage me jaati hai. */
 const SUPA = "https://fjfkwfklglovuxeecxsg.supabase.co";
@@ -128,7 +129,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
   if (await titleTaken(env, title, null)) return json({ error: "Another game already uses this name. Please choose a different name." }, 400);
   if (desc.length < 60 || desc.length > 500) return json({ error: "Description must be 60 to 500 characters." }, 400);
   if (how.length < 20 || how.length > 600) return json({ error: "How to play must be 20 to 600 characters." }, 400);
-  if (CATS.indexOf(cat) < 0) return json({ error: "Please choose a category." }, 400);
+  if (CATS.indexOf(cat) < 0 && (await catNames(env)).indexOf(cat) < 0) return json({ error: "Please choose a category." }, 400);
   const dr = await env.GAMES.get("game:" + u.id + ":" + id, "json");
   if (dr && dr.status !== "draft") return json({ error: "Bad game id." }, 400);
   const fromDraft = !!(dr && dr.path === b.path);
@@ -208,7 +209,7 @@ export async function onRequestPut({ request, env, waitUntil }) {
   }
   if (b.description !== undefined) { const d = String(b.description).trim(); if (d.length > 500 || (d !== g.description && d.length < 60)) return json({ error: "Description must be 60 to 500 characters." }, 400); g.description = d; }
   if (b.howto !== undefined) { const h = String(b.howto).replace(/[ \t]+/g, " ").trim(); if (h && (h.length < 20 || h.length > 600)) return json({ error: "How to play must be 20 to 600 characters." }, 400); g.howto = h; }
-  if (b.category !== undefined) { if (CATS.indexOf(b.category) < 0) return json({ error: "Please choose a category." }, 400); g.category = b.category; }
+  if (b.category !== undefined) { if (CATS.indexOf(b.category) < 0 && (await catNames(env)).indexOf(b.category) < 0) return json({ error: "Please choose a category." }, 400); g.category = b.category; }
   if (b.device !== undefined) g.device = b.device === "desktop" ? "desktop" : "all";
   if (b.orient !== undefined || b.device !== undefined) g.orient = g.device === "desktop" ? "both" : ORI(b.orient !== undefined ? b.orient : g.orient);
   const ok = (p, re) => typeof p === "string" && p.startsWith(u.id + "/" + id + "-") && re.test(p);

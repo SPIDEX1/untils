@@ -1,10 +1,12 @@
 import { liveGames, esc } from "../_seo.js";
 import { indexPage, catPage } from "../_genre.js";
+import { loadCats } from "../_cats.js";
 /* /genre/ and /genre/<category>/ : real server-rendered pages (title, text, links) built from the live games. Uses the privacy page as the page frame. */
 export async function onRequestGet({ request, env, params }) {
   let games = []; try { games = await liveGames(env); } catch (e) {}
   const seg = (params.cat || []).filter(Boolean).map(s => String(s).toLowerCase());
-  const pg = seg.length === 0 ? indexPage(games) : seg.length === 1 ? catPage(games, seg[0]) : null;
+  const cats = await loadCats(env);
+  const pg = seg.length === 0 ? indexPage(games, cats) : seg.length === 1 ? catPage(games, seg[0], cats) : null;
   const frame = await env.ASSETS.fetch(new Request(new URL("/privacy/", request.url), { headers: request.headers }));
   if (!pg) return new Response("Not found", { status: 404, headers: { "Content-Type": "text/plain" } });
   const url = "https://untils.in/genre/" + (seg[0] ? seg[0] + "/" : "");
@@ -18,7 +20,7 @@ export async function onRequestGet({ request, env, params }) {
     .on('meta[property="og:title"]', setAttr("content", pg.title)).on('meta[property="og:description"]', setAttr("content", pg.desc)).on('meta[property="og:url"]', setAttr("content", url))
     .on('meta[name="twitter:title"]', setAttr("content", pg.title)).on('meta[name="twitter:description"]', setAttr("content", pg.desc))
     .on('script[type="application/ld+json"]', { element(e) { e.remove(); } })
-    .on("head", { element(e) { e.append('<script type="application/ld+json">' + JSON.stringify(ld).replace(/</g, "\\u003c") + "</script>", { html: true }); } })
+    .on("head", { element(e) { e.append('<link rel="stylesheet" href="/assets/css/live.v9.css"><link rel="stylesheet" href="/assets/css/hover.v1.css">', { html: true }); e.append('<script type="application/ld+json">' + JSON.stringify(ld).replace(/</g, "\\u003c") + "</script>", { html: true }); } })
     .on("main.legal", { element(e) { e.setAttribute("class", "gx-main"); e.setInnerContent(pg.html, { html: true }); } });
   if (pg.noindex) rw.on('meta[name="robots"]', setAttr("content", "noindex,follow"));
   const res = rw.transform(frame), h = new Headers(res.headers); h.set("Cache-Control", "public, max-age=300");

@@ -1,4 +1,5 @@
 import { notify } from "../../_mail.js";
+import { loadCats, saveCats, cleanCatName, decodeImg } from "../../_cats.js";
 import { J, me, sign, withStudio, getLock, unlocked, unlockTok, checkCode, hashCode, rnd } from "../../_lib.js";
 const ID = /^[a-z0-9-]{8,40}$/, UID = /^[0-9a-f-]{36}$/, EM = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 export async function onRequest({ request, env, params, waitUntil }) {
@@ -107,6 +108,33 @@ export async function onRequest({ request, env, params, waitUntil }) {
     const g = await env.GAMES.get(gk, "json"); if (!g) return J({ error: "Not found." }, 404);
     g.popular = !!b.popular; await env.GAMES.put(gk, JSON.stringify(g));
     return J({ ok: true });
+  }
+  /* ---- categories: name + picture only, "Games" is added when it is shown ---- */
+  if (a === "cats") return J({ categories: await loadCats(env) });
+  if (a === "cat_add" && request.method === "POST") {
+    if (!lead) return J({ error: "Only the leader can do this." }, 403);
+    const list = await loadCats(env), nm = cleanCatName(b.name);
+    if (nm.error) return J({ error: nm.error }, 400);
+    if (list.length >= 40) return J({ error: "You can have at most 40 categories." }, 400);
+    if (list.some(c => c.slug === nm.slug || String(c.name).toLowerCase() === nm.name.toLowerCase())) return J({ error: "This category already exists." }, 400);
+    const small = decodeImg(b.img), big = decodeImg(b.big);
+    if (!small || !big) return J({ error: "Please choose a valid picture (PNG, JPG or WebP)." }, 400);
+    const v = Date.now();
+    await env.GAMES.put("catimg:" + nm.slug, small.bytes, { metadata: { type: small.type } });
+    await env.GAMES.put("catimg:" + nm.slug + "-lg", big.bytes, { metadata: { type: big.type } });
+    list.push({ name: nm.name, slug: nm.slug, img: "/cat-img/" + nm.slug + ".webp?v=" + v, big: "/cat-img/" + nm.slug + "-lg.webp?v=" + v });
+    await saveCats(env, list);
+    return J({ ok: true, categories: list });
+  }
+  if (a === "cat_del" && request.method === "POST") {
+    if (!lead) return J({ error: "Only the leader can do this." }, 403);
+    const slug = String(b.slug || ""), list = await loadCats(env), c = list.find(x => x.slug === slug);
+    if (!c) return J({ error: "Category not found." }, 404);
+    if (list.length <= 1) return J({ error: "Keep at least one category." }, 400);
+    const rest = list.filter(x => x.slug !== slug);
+    await saveCats(env, rest);
+    if (/^\/cat-img\//.test(c.img || "")) { await env.GAMES.delete("catimg:" + slug); await env.GAMES.delete("catimg:" + slug + "-lg"); }
+    return J({ ok: true, categories: rest });
   }
   if (a === "staff") {
     if (!lead) return J({ error: "Only the leader can do this." }, 403);

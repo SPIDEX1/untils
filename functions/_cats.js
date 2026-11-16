@@ -1,16 +1,48 @@
 import { esc, slugOf } from "./_seo.js";
 /* The 15 UNTILS categories (order = order on the site), their pictures, texts and the shared category CSS. Not a route. */
-export const CATEGORIES = ["Arcade", "Board", "Casual", "Educational", "Fighting", "Horror", "Platformer", "Puzzle", "Racing", "Runner", "Shooting", "Sports", "Stickman", "Tower Defense", "Adventure"].map(name => ({ name, slug: slugOf(name) }));
+const NAMES = ["Arcade", "Board", "Casual", "Educational", "Fighting", "Horror", "Platformer", "Puzzle", "Racing", "Runner", "Shooting", "Sports", "Stickman", "Tower Defense", "Adventure"];
+const FALLBACK_IMG = "/assets/img/u-icon.png?v=2";
+/* the built-in categories (used until the leader changes the list in the admin portal) */
+export const DEFAULT_CATS = NAMES.map(n => ({ name: n, slug: slugOf(n), img: "/assets/img/cat/" + slugOf(n) + ".webp?v=1", big: "/assets/img/cat/" + slugOf(n) + "-lg.webp?v=1" }));
+/* "Arcade" and "Arcade Games" are the same: the word Games is added automatically when a name is shown */
+export const base = n => String(n || "").replace(/\s*games?\s*$/i, "").trim();
+export const label = n => base(n) + " Games";
+export async function loadCats(env) {
+  try { const raw = await env.GAMES.get("cfg:cats", "json"); if (Array.isArray(raw) && raw.length) return raw.filter(c => c && c.name && c.slug); } catch (e) {}
+  return DEFAULT_CATS;
+}
+export const saveCats = (env, list) => env.GAMES.put("cfg:cats", JSON.stringify(list));
+export const catNames = async env => (await loadCats(env)).map(c => c.name);
 const ALIAS = { "endless runner": "Runner", "shooter": "Shooting", "sport": "Sports", "tower defence": "Tower Defense", "stick man": "Stickman" };
 /* old category names are mapped to the new ones */
 export const canon = c => { const t = String(c || "").trim(); return ALIAS[t.toLowerCase()] || t; };
-export const catImg = (name, big) => CATEGORIES.some(c => c.name === name) ? "/assets/img/cat/" + slugOf(name) + (big ? "-lg" : "") + ".webp?v=1" : "/assets/img/u-icon.png?v=2";
-/* categories that have games: the 15 first (in order), then any other old category */
-export function catsOf(games) {
-  const have = new Set(games.map(g => canon(g.category)).filter(Boolean)), main = CATEGORIES.map(c => c.name);
+/* categories that have games: the listed ones first (in order), then any other old category */
+export function catsOf(games, cats) {
+  const have = new Set(games.map(g => canon(g.category)).filter(Boolean)), main = cats.map(c => c.name);
   return main.filter(n => have.has(n)).concat([...have].filter(n => main.indexOf(n) < 0).sort());
 }
 export const gamesIn = (games, name) => games.filter(g => canon(g.category) === name);
+export const imgOf = (cats, name, big) => { const c = cats.find(c => c.name === name); return c ? (big ? c.big || c.img : c.img) || FALLBACK_IMG : FALLBACK_IMG; };
+
+/* admin helpers: a clean category name and a picture sent as base64 */
+export function cleanCatName(raw) {
+  const nm = base(String(raw || "").replace(/\s+/g, " ").trim()).replace(/(^|[\s-])(\p{L})/gu, (m, a, b) => a + b.toUpperCase()); /* Title Case */
+  if (nm.length < 2 || nm.length > 30) return { error: "The name must be 2 to 30 characters." };
+  if (!/^[\p{L}\p{N} &'-]+$/u.test(nm)) return { error: "Use only letters, numbers, spaces and - in the name." };
+  const slug = slugOf(nm);
+  if (!slug) return { error: "Please use English letters or numbers in the name." };
+  return { name: nm, slug };
+}
+export function decodeImg(b64) {
+  try {
+    const t = String(b64 || "").replace(/^data:[^,]*,/, "");
+    if (!t || t.length > 600000) return null;
+    const bin = atob(t), bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const h = i => String.fromCharCode(...bytes.slice(i, i + 4));
+    const type = h(0) === "RIFF" && h(8) === "WEBP" ? "image/webp" : bytes[0] === 0x89 && h(1) === "PNG\r" ? "image/png" : bytes[0] === 0xff && bytes[1] === 0xd8 ? "image/jpeg" : "";
+    return type && bytes.length > 100 ? { bytes: bytes.buffer, type } : null;
+  } catch (e) { return null; }
+}
 
 export const CAT_INFO = {
   "Arcade": "Arcade games are easy to start and hard to put down. Short rounds, simple controls and one more try for a higher score.",
@@ -38,6 +70,8 @@ export const CAT_INFO = {
   "Trivia": "Trivia games test what you know. Answer quickly and learn something new.", "Word": "Word games exercise your vocabulary. Find, guess and build words.",
   "Other": "These games do not fit a single box. Try them for something different."
 };
+export const infoOf = n => CAT_INFO[n] || ("Play free " + base(n).toLowerCase() + " games on UNTILS. Pick a game, tap to start and enjoy it right in your browser.");
+export const tipOf = n => CAT_TIPS[n] || "";
 export const CAT_TIPS = {
   "Arcade": "Arcade games reward practice. Learn the pattern of the first few rounds, stay calm when the speed picks up, and try to beat your own high score instead of rushing.",
   "Board": "In board games, think a few moves ahead. Watch what your opponent is building, keep your pieces safe and do not rush a move that you can plan.",
@@ -67,13 +101,14 @@ export const UI_CSS = '<style>' +
   '.hm-wrap{max-width:1200px;margin:30px auto 12px;padding:0 3vw}.hm-text{background:#fff;border-radius:24px;box-shadow:var(--sh);padding:30px 32px}' +
   '.gx-main{max-width:1200px;margin:0 auto;padding:26px 3vw 60px}.gx-main h1{margin:0 0 6px;font-size:clamp(30px,5vw,46px);line-height:1.15}.gx-lead{max-width:760px;color:var(--mut);margin:0 0 4px}' +
   '.gx-main .grid{padding:16px 0 6px}.gx-main .th img{width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit}.gx-main .cx-sec{padding:0;margin:30px 0 0}' +
-  '.gx-empty{background:#fff;border-radius:20px;box-shadow:var(--sh);padding:26px;color:var(--mut);margin:16px 0}' +
+  '.gx-bar{position:sticky;top:86px;z-index:40;pointer-events:none;margin:0 0 12px}.gx-back{pointer-events:auto;display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--navy);font-family:var(--fh);font-weight:800;font-size:15px;padding:9px 18px;border-radius:99px;box-shadow:var(--sh);text-decoration:none;transition:transform .2s,box-shadow .2s}.gx-back:hover{transform:translateX(-3px);box-shadow:0 10px 22px rgba(10,108,255,.28)}' +
+  '.gx-main a.card{text-decoration:none}.gx-empty{background:#fff;border-radius:20px;box-shadow:var(--sh);padding:26px;color:var(--mut);margin:16px 0}' +
   '.gx-info{display:flex;gap:32px;align-items:flex-start;background:#fff;border-radius:26px;box-shadow:var(--sh);padding:30px 32px;margin-top:34px}' +
-  '.gx-logo{width:clamp(130px,22vw,240px);height:auto;aspect-ratio:1;border-radius:28px;box-shadow:0 10px 26px rgba(10,60,160,.25);flex:none}' +
+  '.gx-logo{width:clamp(130px,22vw,240px);height:auto;aspect-ratio:1;border-radius:28px;box-shadow:0 10px 26px rgba(10,60,160,.25);flex:none;order:2}.gx-info .tx{flex:1;order:1}' +
   '@media(max-width:700px){.cx-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.cx{padding:8px 10px 8px 8px;gap:9px;font-size:13.5px;border-radius:16px}.cx img{width:50px;height:50px;border-radius:12px}' +
-  '.hm-text{padding:22px 18px}.tx h2{font-size:24px}.gx-info{flex-direction:column;gap:18px;padding:22px 18px}.gx-logo{width:130px}}' +
+  '.hm-text{padding:22px 18px}.tx h2{font-size:24px}.gx-info{flex-direction:column;gap:18px;padding:22px 18px}.gx-logo{width:130px;order:0;align-self:center}.gx-info .tx{order:1}}' +
   '</style>';
 
-/* the category tiles: picture on the left, name on the right. `except` = the category page you are on (left out) */
-export const tilesHTML = except => CATEGORIES.filter(c => c.name !== except).map(c =>
-  '<a class="cx" href="/genre/' + c.slug + '/"><img src="' + catImg(c.name) + '" alt="" width="64" height="64" loading="lazy"><span>' + esc(c.name) + "</span></a>").join("");
+/* the category tiles: picture on the left, name + "Games" on the right. `except` = the category page you are on (left out) */
+export const tilesHTML = (cats, except) => cats.filter(c => c.name !== except).map(c =>
+  '<a class="cx" href="/genre/' + esc(c.slug) + '/"><img src="' + esc(c.img || FALLBACK_IMG) + '" alt="" width="64" height="64" loading="lazy"><span>' + esc(label(c.name)) + "</span></a>").join("");
