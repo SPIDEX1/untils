@@ -8,6 +8,6 @@ export async function onRequestGet({ env }) {
     c = l.list_complete ? null : l.cursor; } while (c);
   const live = await withStudio(env, out.filter(g => g && g.status === "live").sort((a, b) => b.decidedAt - a.decidedAt));
   const games = live
-    .map(g => ({ key: g.owner + "~" + g.id, title: g.title, category: g.category, description: g.description, howto: g.howto || "", studio: g.studio, device: g.device, orient: g.orient || "both", icon: g.icon || "", banner: g.banner || "", thumb: g.thumb || "", logo: g.logo || "", video: g.video || "", shots: g.shots || [], popular: !!g.popular, launched: launchedOf(g), updated: updatedOf(g) }));
+    .map(g => ({ key: g.owner + "~" + g.id, title: g.title, category: g.category, categories: (Array.isArray(g.categories) && g.categories.length ? g.categories : [g.category]).filter(Boolean), description: g.description, howto: g.howto || "", studio: g.studio, device: g.device, orient: g.orient || "both", icon: g.icon || "", banner: g.banner || "", thumb: g.thumb || "", logo: g.logo || "", video: g.video || "", shots: g.shots || [], popular: !!g.popular, launched: launchedOf(g), updated: updatedOf(g) }));
   return new Response(JSON.stringify({ games }), { headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=60" } });
 }

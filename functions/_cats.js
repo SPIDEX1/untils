@@ -18,10 +18,12 @@ const ALIAS = { "endless runner": "Runner", "shooter": "Shooting", "sport": "Spo
 export const canon = c => { const t = String(c || "").trim(); return ALIAS[t.toLowerCase()] || t; };
 /* categories that have games: the listed ones first (in order), then any other old category */
 export function catsOf(games, cats) {
-  const have = new Set(games.map(g => canon(g.category)).filter(Boolean)), main = cats.map(c => c.name);
+  const have = new Set(games.flatMap(g => gameCats(g))), main = cats.map(c => c.name);
   return main.filter(n => have.has(n)).concat([...have].filter(n => main.indexOf(n) < 0).sort());
 }
-export const gamesIn = (games, name) => games.filter(g => canon(g.category) === name);
+/* every category of a game (1 to 5); old games only have one */
+export const gameCats = g => [...new Set((Array.isArray(g.categories) && g.categories.length ? g.categories : [g.category]).map(canon).filter(Boolean))];
+export const gamesIn = (games, name) => games.filter(g => gameCats(g).indexOf(name) > -1);
 export const imgOf = (cats, name, big) => { const c = cats.find(c => c.name === name); return c ? (big ? c.big || c.img : c.img) || FALLBACK_IMG : FALLBACK_IMG; };
 
 /* admin helpers: a clean category name and a picture sent as base64 */

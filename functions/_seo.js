@@ -22,7 +22,7 @@ export async function liveGames(env) {
     if (!title || !slug || seen.has(slug)) continue;
     seen.add(slug);
     games.push({
-      title, slug, category: g.category || "", description: String(g.description || "").replace(/\s+/g, " ").trim(), howto: String(g.howto || "").replace(/\s+/g, " ").trim(), device: g.device || "all", popular: !!g.popular,
+      title, slug, category: g.category || "", categories: (Array.isArray(g.categories) && g.categories.length ? g.categories : [g.category]).filter(Boolean), description: String(g.description || "").replace(/\s+/g, " ").trim(), howto: String(g.howto || "").replace(/\s+/g, " ").trim(), device: g.device || "all", popular: !!g.popular,
       icon: g.icon ? ICON_BASE + g.icon : "", shot: (g.shots && g.shots[0]) ? ICON_BASE + g.shots[0] : "",
       banner: g.banner ? ICON_BASE + g.banner : "", at: g.decidedAt || g.createdAt || 0,
       launched: g.launchedAt || g.decidedAt || g.createdAt || 0,

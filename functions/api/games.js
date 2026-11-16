@@ -111,7 +111,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
   const title = cleanTitle(b.title);
   const desc = String(b.description || "").trim();
   const how = String(b.howto || "").replace(/[ \t]+/g, " ").trim();
-  const cat = String(b.category || "");
+  const catIn = Array.isArray(b.categories) ? b.categories : [b.category];
 
   if (!/^[a-z0-9-]{8,40}$/.test(id)) return json({ error: "Bad game id." }, 400);
   /* draft = the zip was uploaded first so the developer can use Inspector and Preview before pressing Upload Game. Not shown anywhere, auto-removed after 7 days. */
@@ -129,7 +129,11 @@ export async function onRequestPost({ request, env, waitUntil }) {
   if (await titleTaken(env, title, null)) return json({ error: "Another game already uses this name. Please choose a different name." }, 400);
   if (desc.length < 60 || desc.length > 500) return json({ error: "Description must be 60 to 500 characters." }, 400);
   if (how.length < 20 || how.length > 600) return json({ error: "How to play must be 20 to 600 characters." }, 400);
-  if (CATS.indexOf(cat) < 0 && (await catNames(env)).indexOf(cat) < 0) return json({ error: "Please choose a category." }, 400);
+  /* 1 to 5 categories; the first one is the main category */
+  const catOk = await catNames(env), cl = [...new Set(catIn.map(c => String(c || "").trim()).filter(Boolean))];
+  if (cl.length < 1 || cl.length > 5) return json({ error: "Please choose 1 to 5 categories." }, 400);
+  if (cl.some(c => CATS.indexOf(c) < 0 && catOk.indexOf(c) < 0)) return json({ error: "Please choose a valid category." }, 400);
+  const cat = cl[0];
   const dr = await env.GAMES.get("game:" + u.id + ":" + id, "json");
   if (dr && dr.status !== "draft") return json({ error: "Bad game id." }, 400);
   const fromDraft = !!(dr && dr.path === b.path);
@@ -154,7 +158,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
   if (existing.keys.filter(k => k.name !== prefix + id).length >= MAX_GAMES) return json({ error: "Game limit reached." }, 400);
 
   const game = {
-    id, title, description: desc, howto: how, category: cat,
+    id, title, description: desc, howto: how, category: cat, categories: cl,
     studio: studioOf(u),
     owner: u.id, path: b.path, icon: b.icon, banner: b.banner || "", thumb: b.thumb || "", logo: b.logo || "", video: b.video || "", shots: sh, device: b.device === "desktop" ? "desktop" : "all", orient: b.device === "desktop" ? "both" : ORI(b.orient), versions: [{ n: 1, path: b.path, at: Date.now() }], status: "pending", createdAt: Date.now()
   };
@@ -209,7 +213,12 @@ export async function onRequestPut({ request, env, waitUntil }) {
   }
   if (b.description !== undefined) { const d = String(b.description).trim(); if (d.length > 500 || (d !== g.description && d.length < 60)) return json({ error: "Description must be 60 to 500 characters." }, 400); g.description = d; }
   if (b.howto !== undefined) { const h = String(b.howto).replace(/[ \t]+/g, " ").trim(); if (h && (h.length < 20 || h.length > 600)) return json({ error: "How to play must be 20 to 600 characters." }, 400); g.howto = h; }
-  if (b.category !== undefined) { if (CATS.indexOf(b.category) < 0 && (await catNames(env)).indexOf(b.category) < 0) return json({ error: "Please choose a category." }, 400); g.category = b.category; }
+  if (b.categories !== undefined || b.category !== undefined) {
+    const catOk = await catNames(env), cl = [...new Set((Array.isArray(b.categories) ? b.categories : [b.category]).map(c => String(c || "").trim()).filter(Boolean))];
+    if (cl.length < 1 || cl.length > 5) return json({ error: "Please choose 1 to 5 categories." }, 400);
+    if (cl.some(c => CATS.indexOf(c) < 0 && catOk.indexOf(c) < 0)) return json({ error: "Please choose a valid category." }, 400);
+    g.category = cl[0]; g.categories = cl;
+  }
   if (b.device !== undefined) g.device = b.device === "desktop" ? "desktop" : "all";
   if (b.orient !== undefined || b.device !== undefined) g.orient = g.device === "desktop" ? "both" : ORI(b.orient !== undefined ? b.orient : g.orient);
   const ok = (p, re) => typeof p === "string" && p.startsWith(u.id + "/" + id + "-") && re.test(p);

@@ -308,3 +308,10 @@ a.dv-bk .ic{margin:0}
 header .logo.dvlogo{height:56px;width:auto;max-width:100%}
 @media(max-width:700px){header .logo.dvlogo{height:46px}}
 @media(max-width:420px){header .logo.dvlogo{height:40px}}
+
+/* choose 1 to 5 categories */
+.dv-lbl{font-weight:800;margin:14px 0 4px}.dv-lbl small{font-weight:600;opacity:.7}
+.dv-chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px}
+.dv-chip{border:2px solid #cfe6ff;background:#fff;color:#12233d;border-radius:99px;padding:7px 14px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s}
+.dv-chip:hover{border-color:#0a6cff}.dv-chip.on{background:#0a6cff;border-color:#0a6cff;color:#fff}
+.dv-catn{font-size:13px;opacity:.75;margin:0 0 4px}
