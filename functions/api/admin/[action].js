@@ -1,5 +1,6 @@
 import { notify } from "../../_mail.js";
 import { loadCats, saveCats, cleanCatName, decodeImg } from "../../_cats.js";
+import { purgeGame } from "../games.js";
 import { J, me, sign, withStudio, getLock, unlocked, unlockTok, checkCode, hashCode, rnd } from "../../_lib.js";
 const ID = /^[a-z0-9-]{8,40}$/, UID = /^[0-9a-f-]{36}$/, EM = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 export async function onRequest({ request, env, params, waitUntil }) {
@@ -101,6 +102,13 @@ export async function onRequest({ request, env, params, waitUntil }) {
     await env.GAMES.put(gk, JSON.stringify(g));
     await notify(env, waitUntil, "message", g, { text });   /* email: Message from UNTILS Team */
     return J({ ok: true });
+  }
+  if (a === "remove" && request.method === "POST") {
+    if (!lead) return J({ error: "Only the leader can do this." }, 403);
+    if (!idok) return J({ error: "Bad request." }, 400);
+    const g = await env.GAMES.get(gk, "json"); if (!g) return J({ error: "Not found." }, 404);
+    const r = await purgeGame(env, o, i);
+    return J({ ok: true, files: r.files, warn: r.warn });
   }
   if (a === "popular" && request.method === "POST") {
     if (!lead) return J({ error: "Only the leader can do this." }, 403);

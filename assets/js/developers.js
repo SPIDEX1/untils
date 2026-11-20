@@ -95,11 +95,25 @@
     var btn = $("dvGo"), label = btn.textContent;
     btn.disabled = true;
     btn.textContent = "SENDING CODE...";
-    A.sendCode(mode, em, name).then(function (r) {
-      btn.disabled = false;
-      btn.textContent = label;
-      if (!r.ok) { $("dvErr").textContent = r.message; return; }
-      showCode();
+    /* sign in: first check that a developer account exists, so no code is sent to an email without one */
+    var check = mode === "signin"
+      ? fetch("/api/dev-check", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: em }) })
+          .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+          .catch(function () { return { ok: true, d: { exists: true } }; })
+      : Promise.resolve({ ok: true, d: { exists: true } });
+    check.then(function (c) {
+      if (!c.ok) { btn.disabled = false; btn.textContent = label; $("dvErr").textContent = c.d.error || "Please try again."; return; }
+      if (c.d.exists === false) {
+        btn.disabled = false; btn.textContent = label;
+        $("dvErr").textContent = "We could not find a developer account with this email. Please create your account first.";
+        return;
+      }
+      A.sendCode(mode, em, name).then(function (r) {
+        btn.disabled = false;
+        btn.textContent = label;
+        if (!r.ok) { $("dvErr").textContent = r.message; return; }
+        showCode();
+      });
     });
   });
 
