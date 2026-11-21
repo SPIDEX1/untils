@@ -1,6 +1,7 @@
 import { notify } from "../../_mail.js";
 import { loadCats, saveCats, cleanCatName, decodeImg } from "../../_cats.js";
 import { purgeGame } from "../games.js";
+import { WDEF, cleanWinter, forgetWinter, winterActive } from "../../_winter.js";
 import { J, me, sign, withStudio, getLock, unlocked, unlockTok, checkCode, hashCode, rnd } from "../../_lib.js";
 const ID = /^[a-z0-9-]{8,40}$/, UID = /^[0-9a-f-]{36}$/, EM = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 export async function onRequest({ request, env, params, waitUntil }) {
@@ -102,6 +103,13 @@ export async function onRequest({ request, env, params, waitUntil }) {
     await env.GAMES.put(gk, JSON.stringify(g));
     await notify(env, waitUntil, "message", g, { text });   /* email: Message from UNTILS Team */
     return J({ ok: true });
+  }
+  /* ---- WINTER UPDATE: on / off and options (leader) ---- */
+  if (a === "winter") { let w = null; try { w = await env.GAMES.get("cfg:winter", "json"); } catch (e) {} const cfg = cleanWinter(w || WDEF); return J({ winter: cfg, active: winterActive(cfg) }); }
+  if (a === "winter_set" && request.method === "POST") {
+    if (!lead) return J({ error: "Only the leader can do this." }, 403);
+    const cfg = cleanWinter(b); await env.GAMES.put("cfg:winter", JSON.stringify(cfg)); forgetWinter();
+    return J({ ok: true, winter: cfg, active: winterActive(cfg) });
   }
   if (a === "remove" && request.method === "POST") {
     if (!lead) return J({ error: "Only the leader can do this." }, 403);

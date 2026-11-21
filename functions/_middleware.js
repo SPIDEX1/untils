@@ -1,4 +1,5 @@
 import { adsHead } from "./_ads.js";
+import { loadWinter, winterActive, winterHead } from "./_winter.js";
 /* 1) Developer portal lives on developer.untils.in (same Pages project). "/" -> /developers/, "/dashboard/" -> /developers/dashboard/ etc.
    2) untils.in/developers/... redirects to developer.untils.in/...
    3) Puts the AdSense code into the <head> of the public pages. Does nothing until ADSENSE_PUB is set.
@@ -11,6 +12,7 @@ const MAIN_URL = "https://untils.in";
 const DEV_ROBOTS = "User-agent: *\nAllow: /\nDisallow: /dashboard/\nDisallow: /account/\nDisallow: /inspector/\nDisallow: /play/\n\nSitemap: https://" + DEV_HOST + "/sitemap.xml\n";
 const DEV_SITEMAP = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n<url><loc>https://' + DEV_HOST + '/</loc><priority>1.0</priority></url>\n<url><loc>https://' + DEV_HOST + '/docs/</loc><priority>0.8</priority></url>\n</urlset>\n';
 const SKIP = /^\/(admin|api|live|play|sdk|assets)(\/|$)|^\/developers\/(dashboard|account|inspector)(\/|$)/;
+const WSKIP = /^\/(admin|api|play|sdk|assets|live|cdn-cgi)(\/|$)/; /* winter is never added to the admin portal or to game files */
 const strip = q => (q.replace(/^\/developers/, "") || "/");
 export async function onRequest(ctx) {
   const url = new URL(ctx.request.url), host = url.hostname, p = url.pathname;
@@ -32,9 +34,10 @@ export async function onRequest(ctx) {
   if (!res) res = await ctx.next();
   try {
     if (ctx.request.method !== "GET" || res.status !== 200) return res;
-    const tag = adsHead(ctx.env);
-    if (!tag || SKIP.test(path)) return res;
     if (!(res.headers.get("Content-Type") || "").includes("text/html")) return res;
-    return new HTMLRewriter().on("head", { element(e) { e.append(tag, { html: true }); } }).transform(res);
+    const ads = SKIP.test(path) ? "" : (adsHead(ctx.env) || "");
+    let wt = ""; if (!WSKIP.test(p)) { const w = await loadWinter(ctx.env); if (winterActive(w)) wt = winterHead(w); } /* WINTER UPDATE: added only while it is ON */
+    const add = ads + wt; if (!add) return res;
+    return new HTMLRewriter().on("head", { element(e) { e.append(add, { html: true }); } }).transform(res);
   } catch (e) { return res; }
 }

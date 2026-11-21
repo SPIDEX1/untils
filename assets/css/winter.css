@@ -1,0 +1,50 @@
+/* UNTILS WINTER UPDATE */
+/* instant cover while the opening animation is getting ready (removed by winter.js, and by a safety timer) */
+html.w-pre::before{content:"";position:fixed;inset:0;z-index:2147482000;background:radial-gradient(circle at 50% 40%,#3a96e8 0,#1556b5 60%,#0b2f6b 100%)}
+
+/* ---------- opening animation ---------- */
+#w-intro{position:fixed;inset:0;z-index:2147482000;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;
+background:radial-gradient(circle at 50% 38%,#5ec2ff 0,#2b86e8 48%,#1556b5 100%);animation:wiIn .45s ease both}
+#w-intro.out{animation:wiOut 1s ease forwards;pointer-events:none}
+@keyframes wiIn{from{opacity:0}to{opacity:1}}
+@keyframes wiOut{0%{opacity:1;transform:none;filter:none}100%{opacity:0;transform:scale(1.14);filter:blur(16px)}}
+.wi-frost{position:absolute;inset:0;pointer-events:none;animation:wiFrost 2.4s ease-out both;
+background:radial-gradient(ellipse 55% 45% at 0 0,rgba(255,255,255,.95),transparent 70%),radial-gradient(ellipse 55% 45% at 100% 0,rgba(235,248,255,.9),transparent 70%),
+radial-gradient(ellipse 55% 45% at 0 100%,rgba(235,248,255,.9),transparent 70%),radial-gradient(ellipse 55% 45% at 100% 100%,rgba(255,255,255,.95),transparent 70%)}
+@keyframes wiFrost{0%{opacity:0;transform:scale(1.6)}100%{opacity:1;transform:scale(1)}}
+.wi-box{position:relative;text-align:center;padding:30px 44px 26px;border-radius:38px;overflow:hidden;max-width:92vw;
+background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(222,243,255,.93));box-shadow:0 0 0 3px rgba(255,255,255,.8),0 0 70px rgba(170,230,255,.95),0 30px 70px rgba(0,40,110,.45);
+animation:wiBox 1.1s cubic-bezier(.2,1.3,.4,1) .25s both}
+@keyframes wiBox{0%{opacity:0;transform:translateY(-90px) scale(.7);filter:blur(10px)}100%{opacity:1;transform:none;filter:none}}
+.wi-box::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 34%,rgba(255,255,255,.95) 50%,transparent 66%);transform:translateX(-130%);animation:wiShine 1.3s ease 1.1s both}
+@keyframes wiShine{to{transform:translateX(130%)}}
+.wi-logo{display:block;margin:0 auto;width:min(400px,68vw);height:auto}
+.wi-t{margin-top:10px;font:800 clamp(26px,5.6vw,40px)/1.1 var(--fh,system-ui,sans-serif);letter-spacing:.16em;background:linear-gradient(90deg,#0a6cff,#4fc3ff,#0a6cff);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:wiT 1s ease .9s both,wiShimmer 2.4s linear 1.2s infinite}
+@keyframes wiT{0%{opacity:0;letter-spacing:.5em}100%{opacity:1;letter-spacing:.16em}}
+@keyframes wiShimmer{to{background-position:-220% 0}}
+.wi-s{margin-top:6px;font:700 15px var(--fb,system-ui,sans-serif);color:#3d5f86;animation:wiIn .8s ease 1.4s both}
+.wi-sf{position:absolute;opacity:.9;animation:wiSpin 9s linear infinite}
+.wi-sf.a{left:14px;top:12px}.wi-sf.b{right:14px;bottom:12px;animation-direction:reverse}
+@keyframes wiSpin{to{transform:rotate(360deg)}}
+.wi-skip{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);border:0;border-radius:99px;padding:9px 22px;font:800 14px var(--fh,system-ui,sans-serif);color:#0b2f6b;background:rgba(255,255,255,.85);cursor:pointer;animation:wiIn .6s ease 1s both}
+
+/* ---------- snow + click sparkles ---------- */
+#w-cv{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:2147482500}
+html.w-fs #w-cv,html.w-fs #w-frost{display:none!important}
+
+/* ---------- frozen look ---------- */
+#w-frost{position:fixed;inset:0;pointer-events:none;z-index:2147481000;
+background:radial-gradient(ellipse at 50% 50%,transparent 64%,rgba(190,232,255,.2) 84%,rgba(255,255,255,.4) 100%);box-shadow:inset 0 0 90px rgba(150,215,255,.4)}
+html[data-wf]{background:linear-gradient(180deg,#8fd6ff 0,#bfe8ff 170px,#e3f5ff 440px,#f3faff 100%) no-repeat,#eaf6ff}
+html[data-wf] header{background:rgba(255,255,255,.72);-webkit-backdrop-filter:blur(12px) saturate(1.4);backdrop-filter:blur(12px) saturate(1.4);
+box-shadow:0 8px 30px rgba(70,160,240,.32),inset 0 0 0 1.5px rgba(255,255,255,.95),inset 0 -6px 14px rgba(150,215,255,.4)}
+html[data-wf] .card{box-shadow:0 0 0 2px rgba(255,255,255,.9),0 10px 26px rgba(60,160,255,.35),inset 0 0 16px rgba(255,255,255,.3)}
+html[data-wf] .card:hover,html[data-wf] .card:active{box-shadow:0 0 0 2px #fff,0 0 24px rgba(120,210,255,.95),0 14px 30px rgba(60,160,255,.5)}
+html[data-wf] .cx,html[data-wf] .hm-text,html[data-wf] .gx-info,html[data-wf] .gx-empty,html[data-wf] .lg-btn,html[data-wf] .gx-back{border:1.5px solid rgba(255,255,255,.95);box-shadow:0 8px 24px rgba(60,160,255,.28),inset 0 0 14px rgba(190,232,255,.55)}
+html[data-wf] .cx:hover{box-shadow:0 0 20px rgba(120,210,255,.9),0 12px 26px rgba(60,160,255,.45)}
+html[data-wf] h1,html[data-wf] h2{text-shadow:0 2px 0 rgba(255,255,255,.95),0 0 18px rgba(120,205,255,.5)}
+/* icicles hanging over the footer and a snow bank at the very bottom */
+.w-icicles{position:relative;z-index:3;height:40px;margin:34px 0 -40px;pointer-events:none;
+background:conic-gradient(from 135deg at 50% 0,#f4fbff 90deg,transparent 0) 0 0/30px 100%,conic-gradient(from 140deg at 50% 0,#cfeaff 80deg,transparent 0) 12px 0/46px 70%,conic-gradient(from 138deg at 50% 0,#ffffff 84deg,transparent 0) 5px 0/22px 55%;background-repeat:repeat-x;filter:drop-shadow(0 3px 4px rgba(60,150,230,.35))}
+.w-bank{height:46px;margin-top:-2px;pointer-events:none;background:radial-gradient(ellipse 62px 26px at 50% 100%,#fff 97%,transparent 100%) 0 100%/124px 46px repeat-x,radial-gradient(ellipse 84px 20px at 50% 100%,#e4f4ff 97%,transparent 100%) 46px 100%/168px 46px repeat-x}
+@media(prefers-reduced-motion:reduce){#w-intro,.wi-box,.wi-box::after,.wi-t,.wi-frost,.wi-sf{animation:none!important}}
