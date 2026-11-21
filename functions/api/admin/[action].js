@@ -2,7 +2,7 @@ import { notify } from "../../_mail.js";
 import { loadCats, saveCats, cleanCatName, decodeImg } from "../../_cats.js";
 import { purgeGame } from "../games.js";
 import { WDEF, cleanWinter, forgetWinter, winterActive } from "../../_winter.js";
-import { J, me, sign, withStudio, getLock, unlocked, unlockTok, checkCode, hashCode, rnd } from "../../_lib.js";
+import { J, me, sign, withStudio, getLock, unlocked, unlockTok, checkCode, hashCode, rnd, SUPA } from "../../_lib.js";
 const ID = /^[a-z0-9-]{8,40}$/, UID = /^[0-9a-f-]{36}$/, EM = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 export async function onRequest({ request, env, params, waitUntil }) {
   if (!env.GAMES) return J({ error: "KV GAMES missing" }, 500);
@@ -110,6 +110,21 @@ export async function onRequest({ request, env, params, waitUntil }) {
     if (!lead) return J({ error: "Only the leader can do this." }, 403);
     const cfg = cleanWinter(b); await env.GAMES.put("cfg:winter", JSON.stringify(cfg)); forgetWinter();
     return J({ ok: true, winter: cfg, active: winterActive(cfg) });
+  }
+  /* ---- change a game's icon (leader): the new picture is shown on the home page, category pages and in previews ---- */
+  if (a === "icon_set" && request.method === "POST") {
+    if (!lead) return J({ error: "Only the leader can do this." }, 403);
+    if (!idok) return J({ error: "Bad request." }, 400);
+    if (!env.SUPABASE_SERVICE_KEY) return J({ error: "SUPABASE_SERVICE_KEY is not set." }, 500);
+    const g = await env.GAMES.get(gk, "json"); if (!g) return J({ error: "Not found." }, 404);
+    const im = decodeImg(b.img); if (!im) return J({ error: "Please choose a valid picture (PNG, JPG or WebP)." }, 400);
+    const ext = im.type === "image/png" ? "png" : im.type === "image/jpeg" ? "jpg" : "webp", path = o + "/" + i + "-i" + Date.now() + "." + ext, key = env.SUPABASE_SERVICE_KEY;
+    const up = await fetch(SUPA + "/storage/v1/object/game-icons/" + path, { method: "POST", headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": im.type }, body: im.bytes });
+    if (!up.ok) return J({ error: "Could not save the picture. Please try again." }, 502);
+    const old = g.icon; g.icon = path; g.updatedAt = Date.now();
+    await env.GAMES.put(gk, JSON.stringify(g));
+    if (old && old !== path && String(old).startsWith(o + "/") && !(g.pending && g.pending.icon === old)) { try { await fetch(SUPA + "/storage/v1/object/game-icons/" + old, { method: "DELETE", headers: { apikey: key, Authorization: "Bearer " + key } }); } catch (e) {} }
+    return J({ ok: true, icon: path });
   }
   if (a === "remove" && request.method === "POST") {
     if (!lead) return J({ error: "Only the leader can do this." }, 403);
