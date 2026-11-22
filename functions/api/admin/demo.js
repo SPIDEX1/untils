@@ -4,7 +4,7 @@
    DELETE ?kind=... */
 import { J, SUPA, me, unlocked } from "../../_lib.js";
 const MB = 1024 * 1024;
-const LIM = { icon: 2 * MB, banner: 2 * MB, thumb: 2 * MB, shots: 2 * MB, logo: 2 * MB, video: 20 * MB };
+const LIM = { pvicon: 2 * MB, icon: 2 * MB, banner: 2 * MB, thumb: 2 * MB, shots: 2 * MB, logo: 2 * MB, video: 20 * MB };
 const LIST = { shots: 5 };   /* kinds that hold several files */
 const KINDS = Object.keys(LIM);
 const BUCKET = "docs-demo", MAX_SEC = 15;
