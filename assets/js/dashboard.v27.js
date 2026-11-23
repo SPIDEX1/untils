@@ -563,6 +563,7 @@
     });
     $("eCatN").textContent = SEL.length ? SEL.length + " of 5 chosen. The first one (" + SEL[0] + ") is the main category." : "Choose at least 1 and up to 5.";
   }
+  function wc(t) { return (String(t || "").trim().match(/\S+/g) || []).length; }
   function blank() { return { id: null, title: "", description: "", howto: "", category: "", categories: [], device: "all", orient: "both", shots: [], versions: [], status: "new" }; }
   function setFe(k, m) { var n = $("fe-" + k); if (n) n.textContent = m || ""; }
   function clearErrs() { ["name", "desc", "cat", "or"].forEach(function (k) { setFe(k, ""); }); kerr = {}; vErr = ""; $("eErr").textContent = ""; }
@@ -610,9 +611,9 @@
     clearErrs();
     var bad = false, t = $("eName").value.replace(/[<>&"'`\\$]/g, "").replace(/\s+/g, " ").trim(), d = $("eDesc").value.trim();
     if (t.length < 2 || t.length > 60) { setFe("name", t ? "Name must be 2 to 60 characters." : "Please enter the game name."); bad = true; }
-    if (d.length > 500 || ((S.isNew || d !== (x.description || "")) && d.length < 60)) { setFe("desc", d ? "Description must be 60 to 500 characters." : "Please add a description (at least 60 characters)."); bad = true; }
+    if (wc(d) > 2000 || d.length > 16000 || ((S.isNew || d !== (x.description || "")) && d.length < 60)) { setFe("desc", d ? (wc(d) > 2000 ? "Description can be 2000 words at most (now " + wc(d) + ")." : "Description must be at least 60 characters.") : "Please add a description (at least 60 characters)."); bad = true; }
     var hw = $("eHow").value.trim();
-    if ((S.isNew && hw.length < 20) || (hw && hw.length < 20) || hw.length > 600) { setFe("how", hw ? "How to play must be 20 to 600 characters." : "Please explain how to play (at least 20 characters)."); bad = true; }
+    if ((S.isNew && hw.length < 20) || (hw && hw.length < 20) || wc(hw) > 500 || hw.length > 4000) { setFe("how", hw ? (wc(hw) > 500 ? "How to play can be 500 words at most (now " + wc(hw) + ")." : "How to play must be at least 20 characters.") : "Please explain how to play (at least 20 characters)."); bad = true; }
     if (SEL.length < 1) { setFe("cat", "Please choose at least 1 category."); bad = true; } else if (SEL.length > 5) { setFe("cat", "You can pick up to 5 categories."); bad = true; }
     if ($("eDev").value !== "desktop" && !$("eOrL").checked && !$("eOrP").checked) { setFe("or", "Choose at least one: Landscape or Portrait."); bad = true; }
     if ((S.isNew && !S.icon) || (S.iconRm && !S.icon)) { kerr.icon = S.isNew ? "Game icon is required. Please add your game icon." : "The icon is required. Add a new icon before saving."; bad = true; }

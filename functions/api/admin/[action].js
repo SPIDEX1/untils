@@ -1,6 +1,7 @@
 import { notify } from "../../_mail.js";
 import { loadCats, saveCats, cleanCatName, decodeImg } from "../../_cats.js";
 import { purgeGame } from "../games.js";
+import { loadAbout, cleanAbout } from "../../_about.js";
 import { WDEF, cleanWinter, forgetWinter, winterActive } from "../../_winter.js";
 import { J, me, sign, withStudio, getLock, unlocked, unlockTok, checkCode, hashCode, rnd, SUPA } from "../../_lib.js";
 const ID = /^[a-z0-9-]{8,40}$/, UID = /^[0-9a-f-]{36}$/, EM = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -166,6 +167,14 @@ export async function onRequest({ request, env, params, waitUntil }) {
     await saveCats(env, rest);
     if (/^\/cat-img\//.test(c.img || "")) { await env.GAMES.delete("catimg:" + slug); await env.GAMES.delete("catimg:" + slug + "-lg"); }
     return J({ ok: true, categories: rest });
+  }
+  /* ---- About page people (leader): name, role, email, Instagram and a long write-up ---- */
+  if (a === "about") { if (!lead) return J({ error: "Only the leader can do this." }, 403); return J({ members: await loadAbout(env) }); }
+  if (a === "about_save" && request.method === "POST") {
+    if (!lead) return J({ error: "Only the leader can do this." }, 403);
+    const r = cleanAbout(b.members); if (r.error) return J({ error: r.error }, 400);
+    await env.GAMES.put("cfg:about", JSON.stringify(r.list));
+    return J({ ok: true, members: r.list });
   }
   if (a === "staff") {
     if (!lead) return J({ error: "Only the leader can do this." }, 403);

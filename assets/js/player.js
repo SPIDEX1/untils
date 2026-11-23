@@ -18,13 +18,30 @@
       return r.text().then(function (t) { var d = {}; try { d = t ? JSON.parse(t) : {}; } catch (e) {} return { ok: r.ok, status: r.status, data: d }; });
     }, function () { return { ok: false, status: 0, data: {} }; });
   }
-  function load() { try { return JSON.parse(localStorage.getItem(SK)); } catch (e) { return null; } }
+  /* ---- one login for untils.in and developer.untils.in: the session is also kept in a cookie shared by both ---- */
+  var CK = "untils_sso", SSO_DOM = /(^|\.)untils\.in$/.test(location.hostname) ? "; Domain=.untils.in" : "";
+  function ssoGet() { try { var m = document.cookie.match(/(?:^|; )untils_sso=([^;]*)/); return m ? JSON.parse(decodeURIComponent(m[1])) : null; } catch (e) { return null; } }
+  function ssoSet(s) {
+    try { document.cookie = CK + "=" + encodeURIComponent(JSON.stringify({ r: s.refresh_token, t: s.t })) + "; Path=/; Max-Age=31536000; SameSite=Lax; Secure" + SSO_DOM; } catch (e) {}
+    var c = ssoGet(); return !!(c && c.r === s.refresh_token);
+  }
+  function ssoDel() { try { document.cookie = CK + "=; Path=/; Max-Age=0; SameSite=Lax; Secure" + SSO_DOM; } catch (e) {} }
+  /* returns the stored session, or a stub that gets refreshed when the other site logged in later */
+  function ssoMerge(l) {
+    var c = ssoGet();
+    if (c && c.r) {
+      if (!l || (c.r !== l.refresh_token && (c.t || 0) > (l.t || 0))) return { access_token: "", refresh_token: c.r, expires_at: 0, user: null, t: c.t || 0, sso: 1 };
+    } else if (l && l.sso) return null;   /* logged out on the other site */
+    return l;
+  }
+  function load() { var l = null; try { l = JSON.parse(localStorage.getItem(SK)); } catch (e) {} var m = ssoMerge(l); if (l && !m) { try { localStorage.removeItem(SK); } catch (e) {} } return m; }
   function save(d) {
-    var s = { access_token: d.access_token, refresh_token: d.refresh_token, expires_at: d.expires_at || Math.floor(Date.now() / 1000) + (d.expires_in || 3600), user: d.user || null };
+    var s = { access_token: d.access_token, refresh_token: d.refresh_token, expires_at: d.expires_at || Math.floor(Date.now() / 1000) + (d.expires_in || 3600), user: d.user || null, t: Date.now() };
+    s.sso = ssoSet(s) ? 1 : 0;
     try { localStorage.setItem(SK, JSON.stringify(s)); } catch (e) {}
     return s;
   }
-  function clear() { try { localStorage.removeItem(SK); } catch (e) {} }
+  function clear() { try { localStorage.removeItem(SK); } catch (e) {} ssoDel(); }
 
   /* ---------- session: finish Google redirect, refresh when needed ---------- */
   var session = load(), authMsg = "";
@@ -34,7 +51,7 @@
       var p = new URLSearchParams(h.replace(/^#/, ""));
       session = save({ access_token: p.get("access_token"), refresh_token: p.get("refresh_token"), expires_in: +p.get("expires_in") || 3600 });
       try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
-      call("/auth/v1/user", "GET", null, session.access_token).then(function (r) { if (r.ok && r.data && r.data.id) { session = save({ access_token: session.access_token, refresh_token: session.refresh_token, expires_at: session.expires_at, user: r.data }); paintBtn(); } });
+      call("/auth/v1/user", "GET", null, session.access_token).then(function (r) { if (r.ok && r.data && r.data.id) { session = save({ access_token: session.access_token, refresh_token: session.refresh_token, expires_at: session.expires_at, user: r.data }); paintBtn(); setTimeout(maybeAskStudio, 200); } });
       var back = ""; try { back = sessionStorage.getItem(BK) || ""; sessionStorage.removeItem(BK); } catch (e) {}
       if (back && back.charAt(0) === "/" && back !== location.pathname) location.replace(back);
     } else if (h.indexOf("error_description=") > -1) {
@@ -178,6 +195,13 @@
     if (!n && profile && profile.custom) body.name = "";
     else if (n && n !== cur) body.name = n;
     if (newAv !== undefined) body.avatar = newAv;
+    var stIn = $("#plStudioE", panel), stNew = stIn ? cleanStudio(stIn.value) : "";
+    if (stIn && stNew !== studioOf()) {
+      if (stNew.length < 2) { msg("Studio name must be at least 2 letters."); return; }
+      go.disabled = true; msg("");
+      saveStudio(stNew, function (err) { go.disabled = false; if (err) { msg(err); return; } if (Object.keys(body).length) saveProfile(); else { render("me"); place(); } });
+      return;
+    }
     if (!Object.keys(body).length) { render("me"); place(); return; }
     go.disabled = true; msg("");
     api("/api/me", "POST", body).then(function (r) {
@@ -195,9 +219,42 @@
     var f = afterCb; afterCb = null; if (f) f();
   }
   function afterLogin() {
+    if (wantStudio() && !studioOf() && curV !== "studio") { openStudio(); return; }
     loadProfile().then(function () {
       if (afterCb) { var f = afterCb; afterCb = null; close(); f(); }
       else { render("me"); place(); }
+    });
+  }
+
+  /* ---------- one account: the studio / developer name ----------
+     Everyone who signs up is asked for a studio name once. The same name is the developer account name, so the same login
+     works on the developer portal too (developer.untils.in). */
+  var AK = "untils_ask_studio";
+  function studioOf() { var m = (session && session.user && session.user.user_metadata) || {}; return String(m.studio || "").trim(); }
+  function cleanStudio(v) { return Array.from(String(v || "").replace(/[\u0000-\u001f<>&"'`\\$]/g, "").replace(/\s+/g, " ").trim()).slice(0, 25).join(""); }
+  function askFlag(on) { try { if (on) localStorage.setItem(AK, "1"); else localStorage.removeItem(AK); } catch (e) {} }
+  function wantStudio() { try { return localStorage.getItem(AK) === "1"; } catch (e) { return false; } }
+  function maybeAskStudio() {
+    if (!session || !session.refresh_token || !wantStudio()) return;
+    function decide() { if (studioOf()) { askFlag(false); return; } openStudio(); }
+    if (session.user) { decide(); return; }
+    token().then(function (t) {
+      if (!t) return;
+      call("/auth/v1/user", "GET", null, t).then(function (r) {
+        if (r.ok && r.data && r.data.id) { session = save({ access_token: session.access_token, refresh_token: session.refresh_token, expires_at: session.expires_at, user: r.data }); decide(); }
+      });
+    });
+  }
+  function saveStudio(name, done) {
+    var nm = cleanStudio(name);
+    if (nm.length < 2) { done("Please enter your studio or developer name (at least 2 letters)."); return; }
+    token().then(function (t) {
+      if (!t) { done("Please sign in again."); return; }
+      call("/auth/v1/user", "PUT", { data: { studio: nm } }, t).then(function (r) {
+        if (!r.ok) { done(r.status === 0 ? "Could not reach the server. Check your internet connection." : "Could not save. Please try again."); return; }
+        session = save({ access_token: session.access_token, refresh_token: session.refresh_token, expires_at: session.expires_at, user: r.data && r.data.id ? r.data : session.user });
+        askFlag(false); done("");
+      });
     });
   }
 
@@ -232,7 +289,8 @@
     panel.style.left = Math.max(12, Math.min(W - w - 12, Math.round(r.right - w))) + "px";
   }
   function open() { ensure(); if (session && !profile) loadProfile(); render(session ? "me" : "home"); panel.hidden = false; shade.hidden = false; place(); btn.classList.add("on-pl"); }
-  function close() { if (!panel) return; panel.hidden = true; shade.hidden = true; btn.classList.remove("on-pl"); }
+  function openStudio() { ensure(); render("studio"); panel.hidden = false; shade.hidden = false; place(); btn.classList.add("on-pl"); }
+  function close() { if (!panel) return; if (curV === "studio") askFlag(false); panel.hidden = true; shade.hidden = true; btn.classList.remove("on-pl"); }
   btn.addEventListener("click", function (e) { e.preventDefault(); ensure(); if (panel.hidden) { afterCb = null; afterWhy = ""; loginWhy = ""; open(); } else close(); });
 
   function head(title, sub, back) {
@@ -258,20 +316,30 @@
       h = head("Enter the code", "Sent to " + esc(mail), "email") +
         '<div class="pl-b"><input id="plCode" class="pl-code" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="000000" maxlength="6">' +
         '<button type="button" class="pl-go" id="plVerify">VERIFY</button><button type="button" class="pl-lk" id="plResend">Send a new code</button><p class="pl-f">Check your spam folder if you do not see the email.</p><div class="pl-msg" role="status"></div></div>';
+    } else if (view === "studio") {
+      h = head("Your studio name", "Last step. This takes 10 seconds") +
+        '<div class="pl-b"><label class="pl-lb" for="plStudio">Studio or developer name</label>' +
+        '<input id="plStudio" type="text" autocomplete="organization" maxlength="25" placeholder="For example: Pixel Panda Studio" value="' + esc(cleanStudio((session && session.user && session.user.user_metadata && (session.user.user_metadata.full_name || session.user.user_metadata.name)) || "")) + '">' +
+        '<p class="pl-hl">This is your account name. A developer account is also created automatically with the same studio name, so you can upload games later with this same login. No second signup needed.</p>' +
+        '<button type="button" class="pl-go" id="plStudioGo">CONTINUE</button><div class="pl-msg" role="status"></div></div>';
     } else if (view === "edit") {
       newAv = undefined;
       h = head("Edit profile", "", "me") +
         '<div class="pl-b"><div class="pl-ed"><button type="button" class="pl-av pl-avb" id="plAv" aria-label="Change picture">' + avHTML() + '</button>' +
         '<div class="pl-edt"><button type="button" class="pl-lk" id="plPick">Change picture</button><button type="button" class="pl-lk pl-rm" id="plRm">Use default</button></div></div>' +
         '<input id="plFile" type="file" accept="image/*" hidden>' +
+        '<label class="pl-lb" for="plStudioE">Studio / developer name</label>' +
+        '<input id="plStudioE" type="text" autocomplete="off" maxlength="25" placeholder="Your studio name" value="' + esc(studioOf()) + '">' +
+        '<p class="pl-f">Also your developer account name on UNTILS.</p>' +
         '<label class="pl-lb" for="plName">Username</label>' +
         '<input id="plName" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="25" placeholder="Your username" value="' + esc((profile && profile.name) || displayName()) + '">' +
         '<p class="pl-f">3 to 20 letters, numbers, _ or . Leave it empty to use your default name. This name and picture show on your comments.</p>' +
         '<button type="button" class="pl-go" id="plSave">SAVE</button><div class="pl-msg" role="status"></div></div>';
     } else {
       var u = (session && session.user) || {};
-      h = head("Your account", "") + '<div class="pl-b"><div class="pl-me"><span class="pl-av">' + avHTML() + '</span><div><b>' + esc(displayName()) + '</b><small>' + esc(u.email || "") + '</small></div>' +
+      h = head("Your account", "") + '<div class="pl-b"><div class="pl-me"><span class="pl-av">' + avHTML() + '</span><div><b>' + esc(displayName()) + '</b><small>' + esc(u.email || "") + '</small>' + (studioOf() ? '<small class="pl-st">Studio: ' + esc(studioOf()) + '</small>' : '') + '</div>' +
         '<button type="button" class="pl-ed2" data-go="edit">Edit</button></div>' +
+        '<a class="pl-dev" href="https://developer.untils.in/dashboard/">Developer dashboard <span aria-hidden="true">\u2192</span></a>' +
         listHTML("FAVOURITES", rd(FK), "No favourites yet. Tap the heart under any game.") +
         listHTML("RECENTLY PLAYED", rd(RK), "Games you play will show up here.") +
         '<button type="button" class="pl-go pl-out" id="plOut">LOG OUT</button></div>';
@@ -295,6 +363,11 @@
       $("#plCode", panel).onkeydown = function (e) { if (e.key === "Enter") verify(); };
       $("#plCode", panel).focus();
     }
+    if (view === "studio") {
+      var si = $("#plStudio", panel), sg = $("#plStudioGo", panel);
+      function goS() { sg.disabled = true; msg(""); saveStudio(si.value, function (err) { sg.disabled = false; if (err) { msg(err); return; } afterLogin(); }); }
+      sg.onclick = goS; si.onkeydown = function (e) { if (e.key === "Enter") goS(); }; si.focus();
+    }
     if (view === "me") {
       $("#plOut", panel).onclick = logout;
       [].forEach.call(panel.querySelectorAll("[data-open]"), function (b) { b.onclick = function () { openGameByName(b.getAttribute("data-open")); }; });
@@ -316,7 +389,7 @@
     settings().then(function (s) {
       b.disabled = false;
       if (s && s[p] === false) { msg("Google sign-in is not available yet. Please use email instead."); return; }
-      try { sessionStorage.setItem(BK, location.pathname + location.search); } catch (e) {}
+      try { sessionStorage.setItem(BK, location.pathname + location.search); } catch (e) {} askFlag(true);
       location.href = URL0 + "/auth/v1/authorize?provider=" + p + "&redirect_to=" + encodeURIComponent(location.origin + "/");
     });
   }
@@ -350,7 +423,7 @@
     function next(i, last) {
       if (i >= types.length) { go.disabled = false; msg(last && last.status === 0 ? "Could not reach the server. Check your internet connection." : "That code is not correct or has expired."); return; }
       call("/auth/v1/verify", "POST", { email: mail, token: c, type: types[i] }).then(function (r) {
-        if (r.ok && r.data.access_token) { go.disabled = false; session = save(r.data); paintBtn(); afterLogin(); return; }
+        if (r.ok && r.data.access_token) { go.disabled = false; session = save(r.data); paintBtn(); askFlag(!studioOf()); afterLogin(); return; }
         if (r.status === 0 || r.status === 429 || r.status >= 500) { go.disabled = false; msg(r.status === 429 ? "Too many tries. Please wait a minute." : "Could not reach the server. Please try again."); return; }
         next(i + 1, r);
       });
@@ -367,6 +440,7 @@
   /* open the panel again after a failed Google sign-in so the reason is visible */
   if (authMsg) setTimeout(open, 400);
   if (session) loadProfile();
+  setTimeout(maybeAskStudio, 600);
   window.UntilsPlayer = {
     open: open, close: close, getSession: function () { return session; },
     need: needProfile, api: api, userId: function () { return (session && session.user && session.user.id) || (profile && profile.id) || ""; },

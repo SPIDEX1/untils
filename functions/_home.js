@@ -16,7 +16,9 @@ export function textSection(games, cats) {
   const cs = catsOf(games, cats).map(c => ({ c, list: gamesIn(games, c) })).sort((a, b) => b.list.length - a.list.length || a.c.localeCompare(b.c));
   const top = games.slice().sort((a, b) => (b.popular ? 1 : 0) - (a.popular ? 1 : 0) || (b.launched || 0) - (a.launched || 0)).slice(0, 5);
   const fresh = games.slice().sort((a, b) => (b.launched || 0) - (a.launched || 0)).slice(0, 5);
-  const tries = cs.slice(0, 3).map(x => { const g = x.list[0]; return "<li>Like " + esc(x.c.toLowerCase()) + " games? Try " + link(g) + ". " + esc(clip(first(g.description), 130)) + "</li>"; }).join("");
+  /* each "Try" suggestion uses a different game (a game that sits in two categories is never repeated) */
+  const used = new Set();
+  const tries = cs.slice(0, 6).map(x => { const g = x.list.find(q => !used.has(q.slug)); if (!g) return ""; used.add(g.slug); return "<li>Like " + esc(x.c.toLowerCase()) + " games? Try " + link(g) + ". " + esc(clip(first(g.description), 130)) + "</li>"; }).filter(Boolean).slice(0, 3).join("");
   const desktopOnly = games.some(g => g.device === "desktop");
   const faq = (q, a) => "<h4>" + q + "</h4><p>" + a + "</p>";
   return '<section class="hm-wrap"><div class="hm-text tx"><h2>Free online games on UNTILS</h2>' +

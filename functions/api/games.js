@@ -8,6 +8,7 @@ const KEY = "sb_publishable_HUSSW4Xiau3suUYMfcTjtQ_h083WJbS";
 const CATS = ["Action", "Adventure", "Arcade", "Board", "Card", "Casual", "Educational", "Endless Runner", "Fighting", "Horror", "Idle", "Kids", "Multiplayer", "Music", "Platformer", "Puzzle", "Racing", "Role Playing", "Sandbox", "Shooter", "Runner", "Shooting", "Stickman", "Simulation", "Space", "Sports", "Strategy", "Survival", "Tower Defense", "Trivia", "Word", "Other"];
 const MAX_GAMES = 20;
 /* studio name exactly as the developer typed it (numbers and symbols too) */
+const WC = t => (String(t || "").trim().match(/\S+/g) || []).length; /* word count */
 const studioOf = u => { const v = u && u.user_metadata ? u.user_metadata.studio : ""; return v == null ? "" : Array.from(String(v).replace(/[\u0000-\u001f]/g, "").trim()).slice(0, 25).join(""); };
 const cleanTitle = t => String(t || "").replace(/[<>&"'`\\$]/g, "").replace(/\s+/g, " ").trim();
 const slugOf = t => String(t).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
@@ -127,8 +128,8 @@ export async function onRequestPost({ request, env, waitUntil }) {
   }
   if (title.length < 2 || title.length > 60) return json({ error: "Title must be 2 to 60 characters." }, 400);
   if (await titleTaken(env, title, null)) return json({ error: "Another game already uses this name. Please choose a different name." }, 400);
-  if (desc.length < 60 || desc.length > 500) return json({ error: "Description must be 60 to 500 characters." }, 400);
-  if (how.length < 20 || how.length > 600) return json({ error: "How to play must be 20 to 600 characters." }, 400);
+  if (desc.length < 60 || WC(desc) > 2000 || desc.length > 16000) return json({ error: "Description must be at least 60 characters and at most 2000 words." }, 400);
+  if (how.length < 20 || WC(how) > 500 || how.length > 4000) return json({ error: "How to play must be at least 20 characters and at most 500 words." }, 400);
   /* 1 to 5 categories; the first one is the main category */
   const catOk = await catNames(env), cl = [...new Set(catIn.map(c => String(c || "").trim()).filter(Boolean))];
   if (cl.length < 1 || cl.length > 5) return json({ error: "Please choose 1 to 5 categories." }, 400);
@@ -211,8 +212,8 @@ export async function onRequestPut({ request, env, waitUntil }) {
       g.title = t;
     }
   }
-  if (b.description !== undefined) { const d = String(b.description).trim(); if (d.length > 500 || (d !== g.description && d.length < 60)) return json({ error: "Description must be 60 to 500 characters." }, 400); g.description = d; }
-  if (b.howto !== undefined) { const h = String(b.howto).replace(/[ \t]+/g, " ").trim(); if (h && (h.length < 20 || h.length > 600)) return json({ error: "How to play must be 20 to 600 characters." }, 400); g.howto = h; }
+  if (b.description !== undefined) { const d = String(b.description).trim(); if (WC(d) > 2000 || d.length > 16000 || (d !== g.description && d.length < 60)) return json({ error: "Description must be at least 60 characters and at most 2000 words." }, 400); g.description = d; }
+  if (b.howto !== undefined) { const h = String(b.howto).replace(/[ \t]+/g, " ").trim(); if (h && (h.length < 20 || WC(h) > 500 || h.length > 4000)) return json({ error: "How to play must be at least 20 characters and at most 500 words." }, 400); g.howto = h; }
   if (b.categories !== undefined || b.category !== undefined) {
     const catOk = await catNames(env), cl = [...new Set((Array.isArray(b.categories) ? b.categories : [b.category]).map(c => String(c || "").trim()).filter(Boolean))];
     if (cl.length < 1 || cl.length > 5) return json({ error: "Please choose 1 to 5 categories." }, 400);

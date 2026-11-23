@@ -17,7 +17,7 @@ function urlFor(v){
  if(v=="game")return"/games/"+slug(cur)+"/";
  return"/"}
 function pageMeta(v){
- if(v=="game"){const n=cur,i=info[n];return[n+" - Play Free Online | UNTILS",i?i[0]:"Play "+n+" free on UNTILS."]}
+ if(v=="game"){const n=cur,i=info[n];return[n+" - Play Free Online | UNTILS",i?i[0].replace(/<br>/g," ").slice(0,300):"Play "+n+" free on UNTILS."]}
  if(v=="home"&&/^\/games\/?$/.test(location.pathname))return["All Games – Play Free Web Games Online | UNTILS","Browse all free web games on UNTILS. IO, arcade, puzzle and action games that run instantly in your browser on mobile and PC."];
  return({
   home:["UNTILS – Free Web Games | Play UNTILS Games Online","UNTILS is a free web games website. Play UNTILS web games online instantly in your browser on mobile and PC. No download, no sign-up needed."],
@@ -144,7 +144,7 @@ function loadPv(){const t=new URLSearchParams(location.search).get("pv");if(!t)r
  if(L[n]){if(L[n].key===x.key)L[n].pv=t;return}/* live game: preview plays the previewed version on the same game page */
  L[n]={key:x.key,cats:(x.categories&&x.categories.length?x.categories:[x.category]),device:x.device,orient:x.orient||"both",popular:false,pv:t,banner:"",icon:x.pvicon||(x.icon?SU+x.icon:""),shots:(x.shots||[]).map(p=>SU+p)};
  games.push([n,x.category,x.device=="desktop"?"PC":"Mobile + PC",0,x.pvicon?`<img class="gi" src="${x.pvicon}" alt="">`:x.icon?`<img class="gi" src="${SU+x.icon}" alt="">`:"\ud83c\udfae","#1aa7ff,#7a3ffc"]);
- info[n]=[esc(x.description),sname(x.studio),0,0,esc(x.howto||"").replace(/\n/g,"<br>")]}).catch(()=>{})}
+ info[n]=[esc(x.description).replace(/\n/g,"<br>"),sname(x.studio),0,0,esc(x.howto||"").replace(/\n/g,"<br>")]}).catch(()=>{})}
 function killFrame(){const f=$("gf");if(f)f.remove()}
 $("play").onclick=()=>{const g=L[cur];if(!g)return;const p=$("start").querySelector("p");
  if(g.device=="desktop"&&MOBDEV){p.textContent="\ud83d\udeab This game is not for mobile. Please play it on a desktop (PC).";p.style.color="#ff8a8a";return}
@@ -332,5 +332,5 @@ let failLive=0;fetch("/api/live").then(r=>{if(!r.ok)throw 0;return r.json()}).th
  const n=String(x.title||"").replace(/[<>&"'`\\$]/g,"").trim();if(!n||L[n])return;
  L[n]={key:x.key,cats:(x.categories&&x.categories.length?x.categories:[x.category]),device:x.device,orient:x.orient||"both",popular:!!x.popular,banner:x.banner?SU+x.banner:"",icon:x.icon?SU+x.icon:"",shots:(x.shots||[]).map(p=>SU+p)};
  games.push([n,x.category,x.device=="desktop"?"PC":"Mobile + PC",x.popular?5:0,x.icon?`<img class="gi" src="${SU+x.icon}" alt="">`:"\ud83c\udfae","#1aa7ff,#7a3ffc"]);
- info[n]=[esc(x.description),sname(x.studio),+x.launched||0,+x.updated||0,esc(x.howto||"").replace(/\n/g,"<br>")]})}).catch(()=>{failLive=1}).then(loadPv).then(startApp).then(()=>{if(failLive&&$("grid")&&window.UL){const bx=document.createElement("div");bx.style.gridColumn="1/-1";$("grid").appendChild(bx);UL.fail(bx,()=>fetch("/api/live").then(r=>{if(!r.ok)throw 0;location.reload()}))}});
+ info[n]=[esc(x.description).replace(/\n/g,"<br>"),sname(x.studio),+x.launched||0,+x.updated||0,esc(x.howto||"").replace(/\n/g,"<br>")]})}).catch(()=>{failLive=1}).then(loadPv).then(startApp).then(()=>{if(failLive&&$("grid")&&window.UL){const bx=document.createElement("div");bx.style.gridColumn="1/-1";$("grid").appendChild(bx);UL.fail(bx,()=>fetch("/api/live").then(r=>{if(!r.ok)throw 0;location.reload()}))}});
 

@@ -9,16 +9,13 @@ export async function hasDeveloper(env, email) {
   const key = env.SUPABASE_SERVICE_KEY; if (!key) return null;
   const h = { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" };
   try {
-    /* 1) fast: optional SQL function developer_exists(p_email) (see the setup notes) */
-    const r = await fetch(SUPA + "/rest/v1/rpc/developer_exists", { method: "POST", headers: h, body: JSON.stringify({ p_email: email }) });
-    if (r.ok) { const v = await r.json(); if (v === true || v === false) return v; }
     /* 2) otherwise look through the user list (fine for a few thousand users) */
     for (let page = 1; page <= 10; page++) {
       const u = await fetch(SUPA + "/auth/v1/admin/users?page=" + page + "&per_page=1000", { headers: h });
       if (!u.ok) return null;
       const list = (await u.json()).users || [];
       const m = list.find(x => String(x.email || "").toLowerCase() === email);
-      if (m) return !!String((m.user_metadata || {}).studio || "").trim();
+      if (m) return true;   /* one account for everything: a player account also works as a developer account (the studio name is added at sign-in) */
       if (list.length < 1000) return false;
     }
   } catch (e) {}

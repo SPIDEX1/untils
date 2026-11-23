@@ -50,16 +50,36 @@
   }
 
   /* ---- session storage ---- */
+  /* ---- one login for untils.in and developer.untils.in: the session is also kept in a cookie shared by both ---- */
+  var CK = "untils_sso", SSO_DOM = /(^|\.)untils\.in$/.test(location.hostname) ? "; Domain=.untils.in" : "";
+  function ssoGet() { try { var m = document.cookie.match(/(?:^|; )untils_sso=([^;]*)/); return m ? JSON.parse(decodeURIComponent(m[1])) : null; } catch (e) { return null; } }
+  function ssoSet(s) {
+    try { document.cookie = CK + "=" + encodeURIComponent(JSON.stringify({ r: s.refresh_token, t: s.t })) + "; Path=/; Max-Age=31536000; SameSite=Lax; Secure" + SSO_DOM; } catch (e) {}
+    var c = ssoGet(); return !!(c && c.r === s.refresh_token);
+  }
+  function ssoDel() { try { document.cookie = CK + "=; Path=/; Max-Age=0; SameSite=Lax; Secure" + SSO_DOM; } catch (e) {} }
+  /* returns the stored session, or a stub that gets refreshed when the other site logged in later */
+  function ssoMerge(l) {
+    var c = ssoGet();
+    if (c && c.r) {
+      if (!l || (c.r !== l.refresh_token && (c.t || 0) > (l.t || 0))) return { access_token: "", refresh_token: c.r, expires_at: 0, user: null, t: c.t || 0, sso: 1 };
+    } else if (l && l.sso) return null;   /* logged out on the other site */
+    return l;
+  }
   function load() {
-    try { return JSON.parse(localStorage.getItem(SK)); } catch (e) { return null; }
+    var l = null; try { l = JSON.parse(localStorage.getItem(SK)); } catch (e) {}
+    var m = ssoMerge(l);
+    if (l && !m) { try { localStorage.removeItem(SK); } catch (e) {} }
+    return m;
   }
   function save(d) {
     var exp = d.expires_at || Math.floor(Date.now() / 1000) + (d.expires_in || 3600);
-    var s = { access_token: d.access_token, refresh_token: d.refresh_token, expires_at: exp, user: d.user };
+    var s = { access_token: d.access_token, refresh_token: d.refresh_token, expires_at: exp, user: d.user, t: Date.now() };
+    s.sso = ssoSet(s) ? 1 : 0;
     try { localStorage.setItem(SK, JSON.stringify(s)); } catch (e) {}
     return s;
   }
-  function clear() { try { localStorage.removeItem(SK); } catch (e) {} }
+  function clear() { try { localStorage.removeItem(SK); } catch (e) {} ssoDel(); }
   function hasSession() { var s = load(); return !!(s && s.refresh_token); }
 
   /* ---- public api ---- */
