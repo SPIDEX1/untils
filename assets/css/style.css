@@ -515,15 +515,25 @@ nav a{white-space:nowrap}
 .sf-soc a{display:flex;align-items:center;gap:10px}
 .sf-soc svg{width:18px;height:18px;flex:none}
 
-/* v75: legal pages - contents box */
-.lg-toc{margin:22px 0 4px;padding:16px 18px;border-radius:16px;background:#eef6ff;border:1px solid #cfe3ff}
-.lg-toc b{display:block;margin-bottom:8px;font-size:13px;letter-spacing:.08em;color:#0a6cff}
-.lg-toc ol{margin:0;padding-left:22px;columns:2;column-gap:28px}
-.lg-toc li{break-inside:avoid;margin:3px 0;line-height:1.5}
-.legal h2[id]{scroll-margin-top:84px}
+/* v76: legal pages - contents grid */
+.lg-toc{margin:24px 0 8px;padding:18px;border-radius:24px;background:linear-gradient(135deg,#eaf4ff,#f4eeff);border:2px solid #d4e6ff;box-shadow:0 10px 28px rgba(10,80,180,.10)}
+.lg-th{display:flex;align-items:center;gap:12px;margin:0 2px 14px}
+.lg-ti{flex:none;width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#2fa8ff,#0a6cff);color:#fff;display:grid;place-items:center;box-shadow:0 6px 14px rgba(10,108,255,.35)}
+.lg-th b{display:block;font:800 18px/1.2 var(--fh);color:#12233d;letter-spacing:0}
+.lg-th small{display:block;margin-top:2px;font-size:13px;font-weight:700;color:#5d7390}
+.lg-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.lg-grid li{margin:0;min-width:0}
+.lg-grid a{display:flex;align-items:center;gap:12px;min-height:50px;padding:8px 12px;border-radius:16px;background:#fff;color:#12233d!important;text-decoration:none;font-weight:800;font-size:14.5px;line-height:1.3;box-shadow:0 3px 10px rgba(20,90,170,.10);border:2px solid transparent;transition:transform .2s,border-color .2s,box-shadow .2s}
+.lg-grid a:hover,.lg-grid a:focus-visible{transform:translateY(-2px);border-color:#0a6cff;box-shadow:0 8px 18px rgba(10,108,255,.22);outline:none}
+.lg-grid i{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:800 13px var(--fh);font-style:normal;color:#fff;background:linear-gradient(135deg,#2fa8ff,#0a6cff)}
+.lg-grid li:nth-child(4n+2) i{background:linear-gradient(135deg,#ff9a1a,#ff5c7a)}
+.lg-grid li:nth-child(4n+3) i{background:linear-gradient(135deg,#2fbf5a,#79d46a)}
+.lg-grid li:nth-child(4n) i{background:linear-gradient(135deg,#8e5bff,#c05bff)}
+.lg-grid span{flex:1;min-width:0;overflow-wrap:anywhere}
+.lg-grid em{flex:none;font-style:normal;font-size:22px;color:#0a6cff;line-height:1}
+.legal h2[id]{scroll-margin-top:92px}
 .legal{overflow-wrap:anywhere}
-@media(max-width:600px){.lg-toc ol{columns:1}}
-
+@media(max-width:600px){.lg-toc{padding:14px;border-radius:20px}.lg-grid{grid-template-columns:1fr}.lg-grid a{min-height:48px}}
 /* v75: contact page */
 .ct-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:22px 0 6px}
 .ct-card{display:block;padding:16px 18px;border-radius:18px;background:#fff;box-shadow:0 6px 18px rgba(20,90,170,.14);text-decoration:none;color:#12233d!important;border:2px solid transparent;transition:transform .25s,border-color .25s}
@@ -551,3 +561,16 @@ nav a{white-space:nowrap}
 .ct-q[open] summary::after{content:"\2212"}
 .ct-q p{margin:0;padding:0 16px 16px}
 @media(max-width:520px){.ct-cards{grid-template-columns:1fr}.ct-form{padding:16px;border-radius:18px}.ct-act .btn{flex-basis:100%}}
+
+/* v76: 404 surprise button */
+.nf-act{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;margin-top:20px}
+.nf-sp{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#ff9a1a,#ff4d6d 55%,#7a3ffc);color:#fff;border:0;cursor:pointer;box-shadow:0 10px 24px rgba(255,77,109,.38);min-height:48px}
+.nf-sp svg{flex:none;animation:nfd 2.6s ease-in-out infinite}
+.nf-sp:hover{transform:translateY(-3px) scale(1.03)}
+.nf-sp:disabled{opacity:.85;cursor:progress}
+.nf-sp.rolling svg{animation:nfr .5s linear infinite}
+.nf-msg{margin:16px 0 0;min-height:22px;font-weight:800;color:#0a6cff;text-align:center;overflow-wrap:anywhere}
+@keyframes nfd{0%,100%{transform:rotate(0)}50%{transform:rotate(-16deg) scale(1.12)}}
+@keyframes nfr{to{transform:rotate(360deg)}}
+@media(max-width:520px){.nf-act{flex-direction:column;align-items:stretch;padding:0 16px}.nf-act .btn{width:100%;box-sizing:border-box;text-align:center}}
+@media(prefers-reduced-motion:reduce){.nf-sp svg,.nf-sp.rolling svg{animation:none}}

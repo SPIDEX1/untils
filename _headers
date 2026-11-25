@@ -3,7 +3,13 @@
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: SAMEORIGIN
 
-/assets/*
+/assets/js/*
+  Cache-Control: public, no-cache
+
+/assets/css/*
+  Cache-Control: public, no-cache
+
+/assets/img/*
   Cache-Control: public, max-age=86400
 
 /admin/*
