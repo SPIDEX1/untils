@@ -85,8 +85,9 @@ html.fsmode,html.fsmode body{overflow:hidden!important;overscroll-behavior:none;
 .sh-dn:hover{animation-play-state:paused}
 @media(prefers-reduced-motion:reduce){.sh-dn{animation:none}}
 @media(min-width:801px){
- .gw>.panel{align-self:start;position:sticky;top:96px}
- #more{max-height:calc(100vh - 190px);min-height:220px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:8px 8px 56px;margin:-8px -8px 0}
+ .gw>.panel{align-self:stretch;display:flex;flex-direction:column;min-width:0}
+ .gw>.panel>.sh-wrap{flex:1 1 auto;min-height:440px;position:relative}
+ .gw>.panel #more{position:absolute;inset:0;align-content:start;grid-auto-rows:max-content;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:8px 8px 58px;margin:0}
 }
 
 .dvb{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;background:none;border:0;padding:0;margin:0;font:inherit;letter-spacing:inherit;color:inherit;text-align:left;cursor:pointer}

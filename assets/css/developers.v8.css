@@ -140,15 +140,15 @@ a.dv-sbtn,a.dv-sbtn:hover{color:#fff}
 
 /* v9: more developer page sections */
 .dv-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.dv-panel{background:#fff;border-radius:24px;padding:24px 22px;box-shadow:var(--sh);min-width:0}
-.dv-panel h3{margin:0 0 12px;font-size:20px;letter-spacing:0;text-transform:none;color:var(--navy)}
-.dv-panel p{margin:0;color:var(--mut);font-size:15px;line-height:1.65;font-weight:700}
-.dv-panel a,.dv-note a,.dv-faq a,.dv-sub a{color:var(--ac)}
+.dx-card{background:#fff;border-radius:24px;padding:24px 22px;box-shadow:var(--sh);min-width:0}
+.dx-card h3{margin:0 0 12px;font-size:20px;letter-spacing:0;text-transform:none;color:var(--navy)}
+.dx-card p{margin:0;color:var(--mut);font-size:15px;line-height:1.65;font-weight:700}
+.dx-card a:not(.btn),.dx-note a:not(.btn),.dv-faq a:not(.btn),.dv-sub a:not(.btn){color:var(--ac)}
 .dv-list{list-style:none;margin:0;padding:0;display:grid;gap:11px}
 .dv-list li{position:relative;padding-left:30px;color:var(--mut);font-size:15px;line-height:1.55;font-weight:700;overflow-wrap:anywhere}
 .dv-list li::before{content:"";position:absolute;left:0;top:2px;width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#2fbf5a,#7ad36b) no-repeat center/12px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E")}
 .dv-list b{color:var(--navy)}
-.dv-note{max-width:640px;margin:22px auto 0;text-align:center;color:var(--mut);font-size:15px;line-height:1.6;font-weight:700}
+.dx-note{max-width:640px;margin:22px auto 0;text-align:center;color:var(--mut);font-size:15px;line-height:1.6;font-weight:700}
 .dv-faq{max-width:780px;margin:0 auto;display:grid;gap:10px}
 .dv-faq details{background:#fff;border-radius:18px;box-shadow:var(--sh);padding:0;overflow:hidden}
 .dv-faq summary{cursor:pointer;list-style:none;padding:16px 50px 16px 18px;font-weight:800;font-size:16px;color:var(--navy);position:relative;line-height:1.4;min-height:24px}
@@ -156,4 +156,7 @@ a.dv-sbtn,a.dv-sbtn:hover{color:#fff}
 .dv-faq summary::after{content:"+";position:absolute;right:16px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:#eaf3ff;color:#0a6cff;display:grid;place-items:center;font-size:20px;font-weight:800}
 .dv-faq details[open] summary::after{content:"\2212"}
 .dv-faq details p{margin:0;padding:0 18px 18px;color:var(--mut);font-size:15px;line-height:1.65;font-weight:700}
-@media(max-width:760px){.dv-two{grid-template-columns:1fr}.dv-panel{padding:20px 18px;border-radius:20px}}
+@media(max-width:760px){.dv-two{grid-template-columns:1fr}.dx-card{padding:20px 18px;border-radius:20px}}
+
+/* v10: developer buttons always keep white text */
+a.dv-sbtn,a.dv-cta,a.dv-signin,button.dv-sbtn,button.dv-cta,button.dv-signin{color:#fff!important}

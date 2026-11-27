@@ -3,6 +3,7 @@
    (bio, email and Instagram buttons). Tap again, or tap another card, to close / switch. If the list cannot be loaded the page keeps its built-in team. */
 (function () {
   "use strict";
+  var ln = document.getElementById("abLangN"); function lc() { if (ln && window.UntilsLangCount) ln.textContent = window.UntilsLangCount; } lc(); window.addEventListener("load", lc);
   var h2 = [].filter.call(document.querySelectorAll(".ab-sec h2"), function (x) { return /^\s*THE (TEAM|ORIGINS)\s*$/i.test(x.textContent); })[0];
   if (!h2) return;
   var sec = h2.closest(".ab-sec"), vg = sec && sec.querySelector(".vg");
