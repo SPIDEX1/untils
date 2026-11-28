@@ -18,8 +18,8 @@
 <meta property="og:url" content="https://developer.untils.in/docs/">
 <meta property="og:image" content="https://untils.in/assets/img/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="/assets/css/style.css?v=77"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap"><link rel="stylesheet" href="/assets/css/theme.v8.css">
-<link rel="stylesheet" href="/assets/css/developers.v8.css?v=10">
+<link rel="stylesheet" href="/assets/css/style.css?v=78"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap"><link rel="stylesheet" href="/assets/css/theme.v8.css">
+<link rel="stylesheet" href="/assets/css/developers.v8.css?v=11">
 <link rel="stylesheet" href="/assets/css/dev-ui.css?v=20">
 <link rel="stylesheet" href="/assets/css/loader.css?v=1"></head>
 <body class="dvp"><style>
@@ -89,7 +89,7 @@ main.doc{overflow-x:clip!important;overflow-y:visible!important}.doc .grp{scroll
 <tr><td>Format</td><td>One <code>.zip</code> file. <code>index.html</code> at the top (not inside a sub-folder).</td></tr>
 <tr><td>Max size</td><td>50 MB. We recommend under 20 MB so the game loads fast on mobile data.</td></tr>
 <tr><td>File paths</td><td>Use <b>relative</b> paths: <code>game.js</code>, <code>img/hero.png</code>. Do not start paths with <code>/</code>, because your game runs inside <code>/live/...</code>.</td></tr>
-<tr><td>Technology</td><td>HTML5, JavaScript, Canvas, WebGL, WebAssembly. Web exports from Unity, Cocos and Godot work as long as the export has an <code>index.html</code>. Unity, Cocos and Godot each have their own SDK.</td></tr>
+<tr><td>Technology</td><td>HTML5, JavaScript, Canvas, WebGL, WebAssembly. Web exports from Unity, Cocos, Godot, Construct and GDevelop work as long as the export has an <code>index.html</code>. Unity, Cocos, Godot, Construct and GDevelop each have their own SDK.</td></tr>
 <tr><td>Starts by itself</td><td>No login, no installs, no pop-ups. The game must start from the Play screen.</td></tr>
 </table>
 <div class="tip"><b>Good to know:</b> your game runs in a protected sandbox. It cannot read UNTILS accounts or cookies. Browser <code>localStorage</code> is saved for you automatically, and the SDK gives you a cleaner way to save (see below).</div>
@@ -109,7 +109,7 @@ main.doc{overflow-x:clip!important;overflow-y:visible!important}.doc .grp{scroll
 &lt;style&gt;html,body{margin:0;height:100%;overflow:hidden;touch-action:manipulation}&lt;/style&gt;</code></pre>
 </section>
 <section class="sec" id="engines" data-l="Engines">
-<h2>Unity, Cocos, Godot and other engines</h2>
+<h2>Unity, Cocos, Godot, Construct, GDevelop and other engines</h2>
 <p>Web (HTML5) exports from game engines work if the zip follows the same rules as above: <code>index.html</code> at the top, relative paths, under 50 MB.</p>
 <h3>Unity (WebGL)</h3>
 <ol>
@@ -127,6 +127,18 @@ main.doc{overflow-x:clip!important;overflow-y:visible!important}.doc .grp{scroll
 <div class="tip"><b>Using Cocos Creator?</b> Use the <a href="#cocos">Cocos SDK</a>. It adds <code>UntilsPrefs</code> so progress is saved, and sends loading and pause events for you.</div>
 <h3>Godot</h3>
 <div class="tip"><b>Using Godot?</b> Use the <a href="#godot">Godot SDK</a>. It is a plugin that adds saves, loading and pause events for you. Export for Web (Godot 3: HTML5), turn Thread Support off, and zip the export as above.</div>
+<h3>Construct 3 (HTML5)</h3>
+<ol>
+<li>Menu &rarr; Project &rarr; Export &rarr; <b>Web</b> &rarr; <b>HTML5 website</b>, and download the zip.</li>
+<li>Check that <code>index.html</code> is at the top of the zip. If everything is inside a folder, zip the <b>contents</b> of that folder.</li>
+</ol>
+<div class="tip"><b>Using Construct 3?</b> Use the <a href="#construct">Construct SDK</a>. It is a plugin with ready-made actions, conditions and expressions for saves, gameplay events and pause handling.</div>
+<h3>GDevelop (HTML5)</h3>
+<ol>
+<li>Export your game as a <b>Web</b> (HTML5) game and download the zip.</li>
+<li>Check that <code>index.html</code> is at the top of the zip. If everything is inside a folder, zip the <b>contents</b> of that folder.</li>
+</ol>
+<div class="tip"><b>Using GDevelop?</b> Use the <a href="#gdevelop">GDevelop SDK</a>. It is an extension with ready-made actions, conditions and expressions for saves, gameplay events and pause handling.</div>
 </section>
 <div class="gnx"><a href="#g-kit">Digital Kit &rarr;</a></div>
 </div>
@@ -601,6 +613,127 @@ func on_reward_button():
 <li><b>Large exports:</b> keep the zip under 50 MB. Compress textures and audio, and remove unused export templates.</li>
 </ul>
 <p>This SDK is in <b>beta</b>. If you find a problem, please tell us through the <a href="/contact/">contact page</a> and include your Godot version.</p>
+</section>
+<section class="sec" id="construct" data-l="Construct SDK">
+<h2>Construct SDK <small style="font-size:14px;color:#6b7c93">(beta, Construct 3, HTML5)</small></h2>
+<p>This is a Construct 3 <b>plugin</b>. It gives you ready-made <b>conditions, actions and expressions</b> for saves, gameplay events and pause handling, so you can use them in your event sheets without any code. The web SDK is already inside it, so there is nothing else to copy.</p>
+<table class="dl-t">
+<tr><th>Your engine</th><th>SDK version</th><th>Download</th></tr>
+<tr><td><b>Construct 3</b><br><small>HTML5 website export</small></td><td>Construct SDK 1.0.0</td><td><div class="btns"><a href="/sdk/construct/UntilsSDK-Construct3.c3addon" download aria-label="Download for Construct 3" title="Download for Construct 3"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 20h14"/></svg><span class="tx">Download for Construct 3</span><span class="sh">Construct 3</span></a></div></td></tr>
+</table>
+<h3>Install and export</h3>
+<ol>
+<li><b>Install the plugin.</b> Drag the file <code>UntilsSDK-Construct3.c3addon</code> onto the Construct 3 editor window, or open the Addon Manager (in the main menu) and choose <b>Install new addon</b>. Restart Construct when it asks you to. Third-party plugins need a Construct 3 edition that allows addons (see Construct's own price page).</li>
+<li>In your project, <b>Insert new object</b> and add <b>UNTILS SDK</b> (it is in the <b>Platform specific</b> group). It is a single object for the whole project, you add it once.</li>
+<li>Open <b>Project Properties &rarr; Advanced</b> and check that <b>Use worker</b> is set to <b>No</b>. The plugin needs the main thread to talk to UNTILS. (The plugin asks Construct for this itself.)</li>
+<li>Add the events from the example below. Replace browser storage such as the <b>Local storage</b> object with the <b>Save</b> actions of this plugin, because browser storage is blocked in the UNTILS sandbox.</li>
+<li><b>Menu &rarr; Project &rarr; Export</b>, choose <b>Web</b> and the <b>HTML5 website</b> type, then download the zip. Open it and check that <code>index.html</code> is at the top of the zip (if everything is inside a folder, zip the <b>contents</b> of that folder). Upload it in your dashboard. UNTILS then opens the <a href="#inspector">Inspector view</a> to check your SDK.</li>
+</ol>
+<h3>Events example</h3>
+<pre><code>Event sheet 1
+
+System: On start of layout
+    UNTILS SDK: Start UNTILS SDK
+
+UNTILS SDK: On UNTILS SDK ready
+    System: Set Level to UNTILS SDK.LoadNumber("level", 1)
+    UNTILS SDK: Loading finished
+
+Start button: On clicked
+    UNTILS SDK: Gameplay starts
+
+System: On Game over
+    UNTILS SDK: Gameplay stops
+    UNTILS SDK: Save number "level" = Level
+
+UNTILS SDK: On paused by UNTILS
+    Audio: Set silent
+    System: Set time scale to 0
+
+UNTILS SDK: On resumed by UNTILS
+    Audio: Set silent off
+    System: Set time scale to 1</code></pre>
+<p>Use <b>Start UNTILS SDK</b> once, at the start of your first layout. Everything else works after <b>On UNTILS SDK ready</b>. Saved values are read from memory, so <code>LoadNumber</code> and <code>LoadText</code> answer at once.</p>
+<h3>Commands</h3>
+<table>
+<tr><th>Command</th><th>What it does</th><th>Status</th></tr>
+<tr><td>Action <b>Start UNTILS SDK</b></td><td>Starts the SDK and loads the saved data. Run it first, once. Turn <b>debug log</b> On to see what the SDK does in the browser console.</td><td>Live</td></tr>
+<tr><td>Condition <b>On UNTILS SDK ready</b> / <b>UNTILS SDK is ready</b></td><td>The SDK has started and the saved data is loaded.</td><td>Live</td></tr>
+<tr><td>Actions <b>Save number</b> / <b>Save text</b> / <b>Delete saved value</b> / <b>Delete all saved data</b></td><td>Saves progress for the player on UNTILS (about 900 KB per game). When you test on your own computer, it is saved in your browser.</td><td>Live</td></tr>
+<tr><td>Expressions <code>LoadNumber(key, default)</code> / <code>LoadText(key, default)</code>, condition <b>A value is saved</b></td><td>Read saved values. You get the default when nothing is saved yet.</td><td>Live</td></tr>
+<tr><td>Actions <b>Gameplay starts</b> / <b>Gameplay stops</b></td><td>Real play starts or stops (death, menu, pause). Repeated calls are ignored.</td><td>Live</td></tr>
+<tr><td>Actions <b>Loading starts</b> / <b>Loading finished</b></td><td>Optional. Say when your game is loading more content and when the menu is ready.</td><td>Live</td></tr>
+<tr><td>Conditions <b>On paused by UNTILS</b> / <b>On resumed by UNTILS</b> / <b>Paused by UNTILS</b></td><td>Run when the tab is hidden or the player comes back. Mute the sound and stop your game here, and undo it when the player returns.</td><td>Live</td></tr>
+<tr><td>Expressions <code>PlayerName</code>, <code>Language</code>, <code>UrlParam(name)</code>, <code>Environment</code>, <code>SdkVersion</code>; conditions <b>Game is running on UNTILS</b>, <b>Player is on a phone or tablet</b></td><td>Handy values. <code>Environment</code> is <code>untils</code> on the site and <code>offline</code> when you test on your own computer. Everyone is "Guest" for now.</td><td>Basic</td></tr>
+<tr><td>Actions <b>Ask for fullscreen</b> / <b>Leave fullscreen</b></td><td>Ask UNTILS to enter or leave fullscreen. Call from a button click or touch.</td><td>Live</td></tr>
+<tr><td>Action <b>Send event</b></td><td>Send your own event, for example <code>level_complete</code>. Name up to 40 characters. Stats come later.</td><td>Reserved</td></tr>
+<tr><td>Action <b>Show ad between levels</b></td><td>Ads are not live yet. The game simply continues, and it will work when ads go live.</td><td>Reserved</td></tr>
+</table>
+<h3>If you cannot use plugins</h3>
+<p>Without the plugin you can still use the <a href="#sdk">web SDK</a>: export your game, copy <code>untils.js</code> next to <code>index.html</code>, add <code>&lt;script src="untils.js"&gt;&lt;/script&gt;</code> before the other scripts in <code>index.html</code>, and call the commands with the <b>Browser &rarr; Execute JavaScript</b> action, for example <code>Untils.save("level", 5)</code>.</p>
+<h3>If something goes wrong</h3>
+<ul>
+<li><b>The "Use the action Start UNTILS SDK" warning</b> in the browser console: a save or event action ran before <b>Start UNTILS SDK</b> finished. Put those actions after <b>On UNTILS SDK ready</b>.</li>
+<li><b>"needs the main thread" error:</b> set <b>Project Properties &rarr; Advanced &rarr; Use worker</b> to <b>No</b> and export again.</li>
+<li><b>Progress is not saved:</b> you used the <b>Local storage</b> object or browser storage. It is blocked in the UNTILS sandbox. Use the <b>Save</b> actions of this plugin.</li>
+<li><b>Sound does not start:</b> browsers only allow sound after the first tap or click. Start your music from a button press.</li>
+<li><b>Large exports:</b> keep the zip under 50 MB. Compress images and audio.</li>
+</ul>
+<p>This SDK is in <b>beta</b>. If you find a problem, please tell us through the <a href="/contact/">contact page</a> and include your Construct 3 version (for example r400) and the message in the browser console.</p>
+</section>
+<section class="sec" id="gdevelop" data-l="GDevelop SDK">
+<h2>GDevelop SDK <small style="font-size:14px;color:#6b7c93">(beta, GDevelop 5, HTML5)</small></h2>
+<p>This is a GDevelop <b>extension</b>. It adds ready-made <b>actions, conditions and expressions</b> for saves, gameplay events and pause handling to your event sheets, so you do not need to write code. The web SDK is already inside it, so there is nothing else to copy.</p>
+<table class="dl-t">
+<tr><th>Your engine</th><th>SDK version</th><th>Download</th></tr>
+<tr><td><b>GDevelop 5</b><br><small>HTML5 (Web) export</small></td><td>GDevelop SDK 1.0.0</td><td><div class="btns"><a href="/sdk/gdevelop/UntilsSDK-GDevelop.json" download aria-label="Download for GDevelop" title="Download for GDevelop"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 20h14"/></svg><span class="tx">Download for GDevelop</span><span class="sh">GDevelop</span></a></div></td></tr>
+</table>
+<h3>Install and export</h3>
+<ol>
+<li><b>Import the extension.</b> Open your project, then in the <b>Project manager</b> open <b>Extensions</b> and choose <b>Add or search for extensions</b>. At the bottom, press <b>Import extension</b> and pick the file <code>UntilsSDK-GDevelop.json</code>. You then see <b>UNTILS SDK</b> in the list of your extensions.</li>
+<li>In your <b>first scene</b>, add the action <b>Start UNTILS SDK</b> at the start of the scene. Use the events from the example below.</li>
+<li>Replace GDevelop's <b>Storage</b> actions (browser storage) with the <b>Save</b> actions of this extension, because browser storage is blocked in the UNTILS sandbox.</li>
+<li>Export your game as a <b>Web</b> (HTML5) game and download the <b>zip</b>. Do not use a "publish online" link. Open the zip and check that <code>index.html</code> is at the top (if everything is inside a folder, zip the <b>contents</b> of that folder). Upload it in your dashboard. UNTILS then opens the <a href="#inspector">Inspector view</a> to check your SDK.</li>
+</ol>
+<h3>Events example</h3>
+<pre><code>At the beginning of the scene
+    UNTILS SDK: Start UNTILS SDK (pause the game and sound when the tab is hidden: yes)
+
+UNTILS SDK is ready      [Trigger once while true]
+    Set scene variable Level to UntilsSDK::LoadNumber("level", 1)
+    UNTILS SDK: Loading finished
+
+Start button is clicked
+    UNTILS SDK: Gameplay starts
+
+Game over
+    UNTILS SDK: Gameplay stops
+    UNTILS SDK: Save number Level as "level"</code></pre>
+<p>Use <b>Start UNTILS SDK</b> once, in the first scene. Everything else works when <b>UNTILS SDK is ready</b>. Saved values are read from memory, so <code>UntilsSDK::LoadNumber</code> and <code>UntilsSDK::LoadText</code> answer at once. By default the extension also pauses the game and mutes the sound when the tab is hidden, and brings them back when the player returns. Switch this off in the <b>Start UNTILS SDK</b> action if you want to do it yourself, and then use the condition <b>Paused by UNTILS</b>.</p>
+<h3>Commands</h3>
+<table>
+<tr><th>Command</th><th>What it does</th><th>Status</th></tr>
+<tr><td>Action <b>Start UNTILS SDK</b></td><td>Starts the SDK and loads the saved data. Run it first, once.</td><td>Live</td></tr>
+<tr><td>Condition <b>UNTILS SDK is ready</b></td><td>The SDK has started and the saved data is loaded.</td><td>Live</td></tr>
+<tr><td>Actions <b>Save a number</b> / <b>Save a text</b> / <b>Delete a saved value</b> / <b>Delete all saved data</b></td><td>Saves progress for the player on UNTILS (about 900 KB per game). When you test on your own computer, it is saved in your browser.</td><td>Live</td></tr>
+<tr><td>Expressions <code>UntilsSDK::LoadNumber(key, default)</code> / <code>UntilsSDK::LoadText(key, default)</code>, condition <b>A value is saved</b></td><td>Read saved values. You get the default when nothing is saved yet.</td><td>Live</td></tr>
+<tr><td>Actions <b>Gameplay starts</b> / <b>Gameplay stops</b></td><td>Real play starts or stops (death, menu, pause). Repeated calls are ignored.</td><td>Live</td></tr>
+<tr><td>Actions <b>Loading starts</b> / <b>Loading finished</b></td><td>Optional. Say when your game is loading more content and when the menu is ready.</td><td>Live</td></tr>
+<tr><td>Condition <b>Paused by UNTILS</b></td><td>True while the tab is hidden or the app is switched away.</td><td>Live</td></tr>
+<tr><td>Expressions <code>UntilsSDK::PlayerName()</code>, <code>Language()</code>, <code>UrlParameter(name)</code>, <code>SDKVersion()</code>; conditions <b>Game is running on UNTILS</b>, <b>Player is on a phone or tablet</b></td><td>Handy values. Everyone is "Guest" for now. "Game is running on UNTILS" is false when you test on your own computer.</td><td>Basic</td></tr>
+<tr><td>Actions <b>Ask for fullscreen</b> / <b>Leave fullscreen</b></td><td>Ask UNTILS to enter or leave fullscreen. Call from a button click or touch.</td><td>Live</td></tr>
+<tr><td>Action <b>Send an event</b></td><td>Send your own event, for example <code>level_complete</code>. Name up to 40 characters. Stats come later.</td><td>Reserved</td></tr>
+<tr><td>Action <b>Show an ad between levels</b></td><td>Ads are not live yet. The game simply continues, and it will work when ads go live.</td><td>Reserved</td></tr>
+</table>
+<h3>If something goes wrong</h3>
+<ul>
+<li><b>The "Start UNTILS SDK first" warning</b> in the browser console: a save or event action ran before the SDK was ready. Put those actions under the condition <b>UNTILS SDK is ready</b>.</li>
+<li><b>Progress is not saved:</b> you used GDevelop's <b>Storage</b> actions. Browser storage is blocked in the UNTILS sandbox. Use the <b>Save</b> actions of this extension.</li>
+<li><b>Values are always the default:</b> you read them before the SDK was ready. Read them after <b>UNTILS SDK is ready</b>.</li>
+<li><b>Sound does not start:</b> browsers only allow sound after the first tap or click. Start your music from a button press.</li>
+<li><b>Large exports:</b> keep the zip under 50 MB. Compress images and audio.</li>
+</ul>
+<p>This SDK is in <b>beta</b>. If you find a problem, please tell us through the <a href="/contact/">contact page</a> and include your GDevelop version and the message in the browser console.</p>
 </section>
 <div class="gnx"><a class="g" href="#g-art">&larr; Game Art</a><a href="#g-test">Test and publish &rarr;</a></div>
 </div>

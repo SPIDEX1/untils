@@ -160,3 +160,9 @@ a.dv-sbtn,a.dv-sbtn:hover{color:#fff}
 
 /* v10: developer buttons always keep white text */
 a.dv-sbtn,a.dv-cta,a.dv-signin,button.dv-sbtn,button.dv-cta,button.dv-signin{color:#fff!important}
+
+/* v11: the sign-up button in the big banner is white, so its text is dark; log out is red */
+.dv-final .dv-cta,.dv-final button.dv-cta{color:var(--navy)!important}
+#dvOut{background:linear-gradient(135deg,#ff6b6b,#e5173f)!important;color:#fff!important;box-shadow:0 6px 14px rgba(229,23,63,.35)!important}
+#dvOut:hover{background:linear-gradient(135deg,#ff5252,#c9102f)!important;box-shadow:0 10px 22px rgba(229,23,63,.45)!important}
+#dvOut svg{color:#fff}

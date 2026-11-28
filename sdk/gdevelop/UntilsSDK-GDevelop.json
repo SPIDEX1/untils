@@ -1,0 +1,669 @@
+{
+  "author": "UNTILS",
+  "category": "Advanced",
+  "extensionNamespace": "",
+  "fullName": "UNTILS SDK",
+  "helpPath": "https://developer.untils.in/docs/",
+  "iconUrl": "",
+  "name": "UntilsSDK",
+  "previewIconUrl": "",
+  "shortDescription": "Save progress, gameplay events, pause handling and share links for games published on UNTILS.",
+  "version": "1.0.0",
+  "description": "The UNTILS SDK for GDevelop. Add it to your project, run the action \"Start UNTILS SDK\" in your first scene, and your game can save progress for players and talk to UNTILS. The UNTILS HTML SDK is included, there is nothing else to download. Works in the HTML5 export. Docs: https://developer.untils.in/docs/",
+  "tags": [
+    "untils",
+    "save",
+    "storage",
+    "web",
+    "html5",
+    "sdk"
+  ],
+  "authorIds": [],
+  "dependencies": [],
+  "eventsFunctions": [
+    {
+      "description": "Starts the UNTILS SDK and loads the saved data. Run it once, in the first scene, at the start. Then wait for the condition \"UNTILS SDK is ready\".",
+      "fullName": "Start UNTILS SDK",
+      "functionType": "Action",
+      "name": "Start",
+      "private": false,
+      "sentence": "Start UNTILS SDK (pause the game and sound when the tab is hidden: _PARAM1_)",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD = window.UntilsGD || { ready: false, started: false, cache: {}, paused: false, autoPause: true, vol: 1, player: { guest: true, name: \"Guest\" } };\nif (!gd.started) {\n  gd.started = true;\n  gd.autoPause = eventsFunctionContext.getArgument(\"AutoPause\") !== false;\n  /* the UNTILS HTML SDK (untils.js 1.2.0), built into this extension */\nif (!window.Untils) {\n/*! HTML SDK (untils.js) v1.2.0 | Docs: /developers/docs/ */\n(function (w) {\n  \"use strict\";\n  var NAME = \"HTML SDK\", VERSION = \"1.2.0\", TIMEOUT = 3000, OFF = \"untils_sdk_offline\", MAXSAVE = 900000;\n  var env = \"none\", ready = false, data = {}, player = { guest: true, name: \"Guest\" }, debug = false, ctx = { url: \"\", params: \"\" };\n  var mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && Math.min(screen.width, screen.height) < 820);\n  var pend = {}, seq = 0, pauseCb = [], resumeCb = [], paused = false, saveT = 0, loading = false, playing = false;\n\n  function log() { if (debug) { try { console.log.apply(console, [\"[Untils]\"].concat([].slice.call(arguments))); } catch (e) {} } }\n  function warn(m) { try { console.warn(\"[Untils] \" + m); } catch (e) {} }\n  function noop() {}\n  function inFrame() { try { return w.parent && w.parent !== w; } catch (e) { return false; } }\n  function send(type, extra, ms) {\n    return new Promise(function (res, rej) {\n      var id = ++seq, m = { untils: 1, id: id, type: type }, k;\n      for (k in extra) m[k] = extra[k];\n      var t = setTimeout(function () { delete pend[id]; rej(new Error(\"timeout\")); }, ms || TIMEOUT);\n      pend[id] = function (r) { clearTimeout(t); res(r); };\n      try { w.parent.postMessage(m, \"*\"); } catch (e) { clearTimeout(t); delete pend[id]; rej(e); }\n    });\n  }\n  function fire(list) { list.forEach(function (f) { try { f(); } catch (e) { console.error(e); } }); }\n  function evt(type, extra) { log(type, extra || \"\"); if (ready && env === \"untils\") send(type, extra || {}).catch(noop); }\n  function flush() {\n    clearTimeout(saveT);\n    if (env === \"untils\") send(\"save\", { data: data }).catch(noop);\n    else { try { w.localStorage.setItem(OFF, JSON.stringify(data)); } catch (e) {} }\n  }\n  function persist() { clearTimeout(saveT); saveT = setTimeout(flush, 150); }\n  function info() { return { name: NAME, version: VERSION, env: env, isMobile: mobile, player: player, language: lang() }; }\n  function lang() { return String((navigator.language || \"en\")).slice(0, 2).toLowerCase(); }\n  function need(n) { if (!ready) { warn(\"Call Untils.init() first, before Untils.\" + n + \"().\"); return false; } return true; }\n  function doPause() {\n    if (paused) return;\n    paused = true;\n    if (playing) { playing = false; evt(\"gameplay\", { state: \"stop\", auto: true }); }\n    fire(pauseCb);\n  }\n  function doResume() { if (paused) { paused = false; fire(resumeCb); } }\n  function params() { try { return new URLSearchParams(env === \"untils\" ? ctx.params : w.location.search); } catch (e) { return new URLSearchParams(\"\"); } }\n\n  w.addEventListener(\"message\", function (e) {\n    var m = e.data;\n    if (!m || m.untils !== 1 || e.source !== w.parent) return;\n    if (m.ev === \"pause\") { doPause(); return; }\n    if (m.ev === \"resume\") { doResume(); return; }\n    if (m.id && pend[m.id]) { var f = pend[m.id]; delete pend[m.id]; f(m); }\n  });\n  document.addEventListener(\"visibilitychange\", function () { if (document.hidden) doPause(); else doResume(); });\n  w.addEventListener(\"pagehide\", function () { if (ready) flush(); });\n  var errN = 0;\n  w.addEventListener(\"error\", function (e) {\n    if (ready && env === \"untils\" && errN++ < 20) evt(\"error\", { message: String((e && e.message) || \"error\").slice(0, 200), source: String((e && e.filename) || \"\").slice(-80), line: (e && e.lineno) || 0 });\n  });\n  w.addEventListener(\"unhandledrejection\", function (e) {\n    var r = e && e.reason;\n    if (ready && env === \"untils\" && errN++ < 20) evt(\"error\", { message: (\"Unhandled promise: \" + String((r && r.message) || r)).slice(0, 200) });\n  });\n\n  w.Untils = {\n    sdkName: NAME,\n    version: VERSION,\n    adsAvailable: false,\n    get env() { return env; },\n    get isMobile() { return mobile; },\n    get isReady() { return ready; },\n\n    /* Start: always call first. Resolves with { name, version, env, isMobile, player, language }. Never rejects. */\n    init: function (opts) {\n      if (opts && opts.debug) debug = true;\n      if (ready) return Promise.resolve(info());\n      var p = inFrame() ? send(\"init\", { sdk: NAME, sdkVersion: VERSION, via: (opts && opts.via) || \"\" }).then(function (r) {\n        if (!r || !r.ok || !r.data) throw new Error(\"bad reply\");\n        env = \"untils\"; data = r.data.data || {}; player = r.data.player || player;\n        ctx = { url: r.data.url || \"\", params: r.data.params || \"\" };\n        if (r.data.mobile != null) mobile = !!r.data.mobile;\n      }) : Promise.reject(new Error(\"standalone\"));\n      return p.catch(function () {\n        env = \"offline\";\n        try { data = JSON.parse(w.localStorage.getItem(OFF) || \"{}\") || {}; } catch (e) { data = {}; }\n      }).then(function () { ready = true; log(\"ready\", info()); return info(); });\n    },\n    setDebug: function (on) { debug = !!on; },\n\n    /* Used by engine plugins (for example Untils SDK Unity) to tell UNTILS which plugin is running. */\n    announce: function (name, version) { if (ready && env === \"untils\") send(\"announce\", { name: String(name), version: String(version) }).catch(noop); },\n\n    /* Loading and gameplay state */\n    loadingStart: function () { if (!need(\"loadingStart\") || loading) return; loading = true; evt(\"loading\", { state: \"start\" }); },\n    loadingFinished: function () { if (!need(\"loadingFinished\") || !loading) return; loading = false; evt(\"loading\", { state: \"finished\" }); },\n    gameplayStart: function () { if (!need(\"gameplayStart\") || playing) return; playing = true; evt(\"gameplay\", { state: \"start\" }); },\n    gameplayStop: function () { if (!need(\"gameplayStop\") || !playing) return; playing = false; evt(\"gameplay\", { state: \"stop\" }); },\n\n    /* Save data: any JSON value. About 900 KB total per game. */\n    save: function (key, value) {\n      if (!need(\"save\")) return Promise.resolve(false);\n      if (typeof key !== \"string\" || !key) { warn(\"save(key, value): key must be a non-empty string.\"); return Promise.resolve(false); }\n      var had = Object.prototype.hasOwnProperty.call(data, key), prev = data[key];\n      try { data[key] = JSON.parse(JSON.stringify(value === undefined ? null : value)); } catch (e) { warn(\"save(): value must be JSON-safe.\"); return Promise.resolve(false); }\n      if (JSON.stringify(data).length > MAXSAVE) {\n        if (had) data[key] = prev; else delete data[key];\n        warn(\"save(): too much data (limit about 900 KB per game). Nothing was saved for \\\"\" + key + \"\\\".\");\n        return Promise.resolve(false);\n      }\n      persist(); return Promise.resolve(true);\n    },\n    load: function (key, fallback) {\n      if (!need(\"load\")) return Promise.resolve(fallback);\n      return Promise.resolve(Object.prototype.hasOwnProperty.call(data, key) ? data[key] : fallback);\n    },\n    remove: function (key) { if (!need(\"remove\")) return Promise.resolve(false); delete data[key]; persist(); return Promise.resolve(true); },\n    clearSave: function () { if (!need(\"clearSave\")) return Promise.resolve(false); data = {}; persist(); return Promise.resolve(true); },\n    keys: function () { return need(\"keys\") ? Object.keys(data) : []; },\n\n    /* Pause / resume (tab hidden, app switched). gameplayStop is sent for you when the tab is hidden. */\n    onPause: function (fn) { if (typeof fn === \"function\") pauseCb.push(fn); },\n    onResume: function (fn) { if (typeof fn === \"function\") resumeCb.push(fn); },\n\n    /* Player and device */\n    getPlayer: function () { return Promise.resolve({ guest: player.guest !== false, name: player.name || \"Guest\" }); },\n    getLanguage: function () { return lang(); },\n\n    /* Share links: shareableURL({level: 5}) gives a link; the game reads it with getURLParam(\"level\") */\n    shareableURL: function (obj) {\n      var base = (env === \"untils\" && ctx.url) || (w.location.origin + w.location.pathname), q = [], k;\n      for (k in (obj || {})) if (Object.prototype.hasOwnProperty.call(obj, k)) q.push(\"u_\" + encodeURIComponent(k) + \"=\" + encodeURIComponent(String(obj[k])));\n      return base + (q.length ? \"?\" + q.join(\"&\") : \"\");\n    },\n    getURLParam: function (name) { var v = params().get(\"u_\" + name); return v === null ? undefined : v; },\n\n    /* Screen */\n    requestFullscreen: function () { if (need(\"requestFullscreen\")) evt(\"fullscreen\", { state: true }); },\n    exitFullscreen: function () { if (need(\"exitFullscreen\")) evt(\"fullscreen\", { state: false }); },\n\n    /* Your own events for stats: track(\"level_complete\", { level: 3 }). Collected by UNTILS later. */\n    track: function (name, extra) {\n      if (!need(\"track\")) return;\n      if (typeof name !== \"string\" || !name || name.length > 40) { warn(\"track(name, data): name must be a string up to 40 characters.\"); return; }\n      evt(\"track\", { name: name, data: extra === undefined ? null : extra });\n    },\n\n    /* Ads: not live yet. Interstitial resolves true (continue), rewarded resolves false (no reward). */\n    showAd: function (type) {\n      if (type !== \"interstitial\" && type !== \"rewarded\") { warn('showAd(\"interstitial\" | \"rewarded\")'); return Promise.resolve(false); }\n      var free = type === \"interstitial\";\n      if (!ready || env !== \"untils\") return Promise.resolve(free);\n      return send(\"ad\", { kind: type }, 60000).then(function (r) {\n        var d = (r && r.data) || {};\n        return type === \"rewarded\" ? d.rewarded === true : true;\n      }).catch(function () { return free; });\n    },\n    commercialBreak: function () { return this.showAd(\"interstitial\"); },\n    rewardedBreak: function () { return this.showAd(\"rewarded\"); },\n\n    /* Leaderboards: coming with player login. Safe to call now. */\n    submitScore: function (board, score) {\n      if (!ready || env !== \"untils\") return Promise.resolve(false);\n      return send(\"score\", { board: String(board), score: Number(score) }).then(function (r) { return !!(r && r.data && r.data.saved); }).catch(function () { return false; });\n    }\n  };\n})(window);\n\n}\n\n  const U = window.Untils;\n  const game = runtimeScene.getGame();\n  U.onPause(function () {\n    gd.paused = true;\n    if (gd.autoPause) {\n      try { const sm = game.getSoundManager(); gd.vol = sm.getGlobalVolume(); sm.setGlobalVolume(0); } catch (e) {}\n      try { if (typeof game.pause === \"function\") game.pause(true); } catch (e) {}\n    }\n  });\n  U.onResume(function () {\n    gd.paused = false;\n    if (gd.autoPause) {\n      try { game.getSoundManager().setGlobalVolume(gd.vol); } catch (e) {}\n      try { if (typeof game.pause === \"function\") game.pause(false); } catch (e) {}\n    }\n  });\n  U.init().then(function () {\n    return U.getPlayer().then(function (p) { gd.player = p; });\n  }).then(function () {\n    return Promise.all(U.keys().map(function (k) { return U.load(k).then(function (v) { gd.cache[k] = v; }); }));\n  }).then(function () {\n    gd.ready = true;\n    try { U.announce(\"GDevelop SDK\", \"1.0.0\"); } catch (e) {}\n  });\n}\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Pause the game and mute the sound when the tab is hidden",
+          "name": "AutoPause",
+          "type": "yesorno",
+          "longDescription": "",
+          "optional": false,
+          "supplementaryInformation": "",
+          "defaultValue": "yes"
+        }
+      ],
+      "objectGroups": [],
+      "group": "Start"
+    },
+    {
+      "description": "True when the SDK has started and the saved data is loaded.",
+      "fullName": "UNTILS SDK is ready",
+      "functionType": "Condition",
+      "name": "IsReady",
+      "private": false,
+      "sentence": "UNTILS SDK is ready",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\neventsFunctionContext.returnValue = !!(gd && gd.ready);\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": [],
+      "group": "Start"
+    },
+    {
+      "description": "True when the game runs on untils.in. False when you test it on your own computer (saves then go to your browser).",
+      "fullName": "Game is running on UNTILS",
+      "functionType": "Condition",
+      "name": "IsOnUntils",
+      "private": false,
+      "sentence": "The game is running on UNTILS",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\neventsFunctionContext.returnValue = !!(gd && gd.ready && U.env === \"untils\");\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": [],
+      "group": "Start"
+    },
+    {
+      "description": "Tell UNTILS that the game starts loading more content (optional).",
+      "fullName": "Loading starts",
+      "functionType": "Action",
+      "name": "LoadingStart",
+      "private": false,
+      "sentence": "Loading starts",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\nif (gd && U && gd.ready) {\nU.loadingStart();\n} else { console.warn('[Untils] Use the action \"Start UNTILS SDK\" first and wait until \"UNTILS SDK is ready\".'); }\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": [],
+      "group": "Game state"
+    },
+    {
+      "description": "Tell UNTILS that loading is finished and the menu is ready. Do it when your first menu is shown.",
+      "fullName": "Loading finished",
+      "functionType": "Action",
+      "name": "LoadingFinished",
+      "private": false,
+      "sentence": "Loading finished",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\nif (gd && U && gd.ready) {\nU.loadingFinished();\n} else { console.warn('[Untils] Use the action \"Start UNTILS SDK\" first and wait until \"UNTILS SDK is ready\".'); }\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": [],
+      "group": "Game state"
+    },
+    {
+      "description": "The player starts really playing. Call it when a level or round begins.",
+      "fullName": "Gameplay starts",
+      "functionType": "Action",
+      "name": "GameplayStart",
+      "private": false,
+      "sentence": "Gameplay starts",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\nif (gd && U && gd.ready) {\nU.gameplayStart();\n} else { console.warn('[Untils] Use the action \"Start UNTILS SDK\" first and wait until \"UNTILS SDK is ready\".'); }\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": [],
+      "group": "Game state"
+    },
+    {
+      "description": "The player stops playing: game over, menu or pause. Repeated calls are ignored.",
+      "fullName": "Gameplay stops",
+      "functionType": "Action",
+      "name": "GameplayStop",
+      "private": false,
+      "sentence": "Gameplay stops",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\nif (gd && U && gd.ready) {\nU.gameplayStop();\n} else { console.warn('[Untils] Use the action \"Start UNTILS SDK\" first and wait until \"UNTILS SDK is ready\".'); }\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": [],
+      "group": "Game state"
+    },
+    {
+      "description": "True while the tab is hidden or the app is switched away.",
+      "fullName": "Paused by UNTILS",
+      "functionType": "Condition",
+      "name": "IsPaused",
+      "private": false,
+      "sentence": "The game is paused by UNTILS (tab hidden)",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\neventsFunctionContext.returnValue = !!(gd && gd.paused);\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": [],
+      "group": "Game state"
+    },
+    {
+      "description": "Saves a number under a name. It is stored for the player on UNTILS (about 900 KB per game).",
+      "fullName": "Save a number",
+      "functionType": "Action",
+      "name": "SaveNumber",
+      "private": false,
+      "sentence": "Save number _PARAM2_ as _PARAM1_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\nif (gd && U && gd.ready) {\nconst k = String(eventsFunctionContext.getArgument(\"Key\"));\nconst v = Number(eventsFunctionContext.getArgument(\"Value\"));\ngd.cache[k] = v;\nU.save(k, v);\n} else { console.warn('[Untils] Use the action \"Start UNTILS SDK\" first and wait until \"UNTILS SDK is ready\".'); }\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name (for example level)",
+          "name": "Key",
+          "type": "string",
+          "longDescription": "",
+          "optional": false,
+          "supplementaryInformation": ""
+        },
+        {
+          "description": "Number",
+          "name": "Value",
+          "type": "expression",
+          "longDescription": "",
+          "optional": false,
+          "supplementaryInformation": ""
+        }
+      ],
+      "objectGroups": [],
+      "group": "Save and load"
+    },
+    {
+      "description": "Saves a text under a name. It is stored for the player on UNTILS (about 900 KB per game).",
+      "fullName": "Save a text",
+      "functionType": "Action",
+      "name": "SaveText",
+      "private": false,
+      "sentence": "Save text _PARAM2_ as _PARAM1_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\nif (gd && U && gd.ready) {\nconst k = String(eventsFunctionContext.getArgument(\"Key\"));\nconst v = String(eventsFunctionContext.getArgument(\"Text\"));\ngd.cache[k] = v;\nU.save(k, v);\n} else { console.warn('[Untils] Use the action \"Start UNTILS SDK\" first and wait until \"UNTILS SDK is ready\".'); }\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name (for example playerName)",
+          "name": "Key",
+          "type": "string",
+          "longDescription": "",
+          "optional": false,
+          "supplementaryInformation": ""
+        },
+        {
+          "description": "Text",
+          "name": "Text",
+          "type": "string",
+          "longDescription": "",
+          "optional": false,
+          "supplementaryInformation": ""
+        }
+      ],
+      "objectGroups": [],
+      "group": "Save and load"
+    },
+    {
+      "description": "Deletes one saved value.",
+      "fullName": "Delete a saved value",
+      "functionType": "Action",
+      "name": "DeleteKey",
+      "private": false,
+      "sentence": "Delete the saved value _PARAM1_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\nif (gd && U && gd.ready) {\nconst k = String(eventsFunctionContext.getArgument(\"Key\"));\ndelete gd.cache[k];\nU.remove(k);\n} else { console.warn('[Untils] Use the action \"Start UNTILS SDK\" first and wait until \"UNTILS SDK is ready\".'); }\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name",
+          "name": "Key",
+          "type": "string",
+          "longDescription": "",
+          "optional": false,
+          "supplementaryInformation": ""
+        }
+      ],
+      "objectGroups": [],
+      "group": "Save and load"
+    },
+    {
+      "description": "Deletes everything saved for this game.",
+      "fullName": "Delete all saved data",
+      "functionType": "Action",
+      "name": "DeleteAll",
+      "private": false,
+      "sentence": "Delete all saved data",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\nif (gd && U && gd.ready) {\ngd.cache = {};\nU.clearSave();\n} else { console.warn('[Untils] Use the action \"Start UNTILS SDK\" first and wait until \"UNTILS SDK is ready\".'); }\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": [],
+      "group": "Save and load"
+    },
+    {
+      "description": "True when something is saved under this name.",
+      "fullName": "A value is saved",
+      "functionType": "Condition",
+      "name": "HasKey",
+      "private": false,
+      "sentence": "A value is saved as _PARAM1_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\nconst k = String(eventsFunctionContext.getArgument(\"Key\"));\neventsFunctionContext.returnValue = !!(gd && gd.ready && Object.prototype.hasOwnProperty.call(gd.cache, k));\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name",
+          "name": "Key",
+          "type": "string",
+          "longDescription": "",
+          "optional": false,
+          "supplementaryInformation": ""
+        }
+      ],
+      "objectGroups": [],
+      "group": "Save and load"
+    },
+    {
+      "description": "Gives the saved number, or the default when nothing is saved yet.",
+      "fullName": "Saved number",
+      "functionType": "Expression",
+      "name": "LoadNumber",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\nconst k = String(eventsFunctionContext.getArgument(\"Key\"));\nlet r = Number(eventsFunctionContext.getArgument(\"Default\")) || 0;\nif (gd && gd.ready && Object.prototype.hasOwnProperty.call(gd.cache, k)) { const n = Number(gd.cache[k]); if (!isNaN(n)) r = n; }\neventsFunctionContext.returnValue = r;\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name",
+          "name": "Key",
+          "type": "string",
+          "longDescription": "",
+          "optional": false,
+          "supplementaryInformation": ""
+        },
+        {
+          "description": "Number to use when nothing is saved",
+          "name": "Default",
+          "type": "expression",
+          "longDescription": "",
+          "optional": false,
+          "supplementaryInformation": ""
+        }
+      ],
+      "objectGroups": [],
+      "group": "Save and load"
+    },
+    {
+      "description": "Gives the saved text, or the default when nothing is saved yet.",
+      "fullName": "Saved text",
+      "functionType": "StringExpression",
+      "name": "LoadText",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\nconst k = String(eventsFunctionContext.getArgument(\"Key\"));\nlet r = String(eventsFunctionContext.getArgument(\"Default\"));\nif (gd && gd.ready && Object.prototype.hasOwnProperty.call(gd.cache, k) && gd.cache[k] !== null) { r = String(gd.cache[k]); }\neventsFunctionContext.returnValue = r;\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Name",
+          "name": "Key",
+          "type": "string",
+          "longDescription": "",
+          "optional": false,
+          "supplementaryInformation": ""
+        },
+        {
+          "description": "Text to use when nothing is saved",
+          "name": "Default",
+          "type": "string",
+          "longDescription": "",
+          "optional": false,
+          "supplementaryInformation": ""
+        }
+      ],
+      "objectGroups": [],
+      "group": "Save and load"
+    },
+    {
+      "description": "Asks UNTILS to enter fullscreen. Use it from a button press.",
+      "fullName": "Ask for fullscreen",
+      "functionType": "Action",
+      "name": "RequestFullscreen",
+      "private": false,
+      "sentence": "Ask UNTILS for fullscreen",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\nif (gd && U && gd.ready) {\nU.requestFullscreen();\n} else { console.warn('[Untils] Use the action \"Start UNTILS SDK\" first and wait until \"UNTILS SDK is ready\".'); }\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": [],
+      "group": "Screen"
+    },
+    {
+      "description": "Asks UNTILS to leave fullscreen.",
+      "fullName": "Leave fullscreen",
+      "functionType": "Action",
+      "name": "ExitFullscreen",
+      "private": false,
+      "sentence": "Ask UNTILS to leave fullscreen",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\nif (gd && U && gd.ready) {\nU.exitFullscreen();\n} else { console.warn('[Untils] Use the action \"Start UNTILS SDK\" first and wait until \"UNTILS SDK is ready\".'); }\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": [],
+      "group": "Screen"
+    },
+    {
+      "description": "True when the player uses a phone or a tablet.",
+      "fullName": "Player is on a phone or tablet",
+      "functionType": "Condition",
+      "name": "IsMobile",
+      "private": false,
+      "sentence": "The player is on a phone or tablet",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\neventsFunctionContext.returnValue = !!(gd && gd.ready && U.isMobile);\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": [],
+      "group": "Player and device"
+    },
+    {
+      "description": "The player's name. Everyone is Guest for now.",
+      "fullName": "Player name",
+      "functionType": "StringExpression",
+      "name": "PlayerName",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\neventsFunctionContext.returnValue = (gd && gd.player && gd.player.name) ? String(gd.player.name) : \"Guest\";\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": [],
+      "group": "Player and device"
+    },
+    {
+      "description": "The language code of the player, for example en or hi.",
+      "fullName": "Player language",
+      "functionType": "StringExpression",
+      "name": "Language",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\neventsFunctionContext.returnValue = (gd && gd.ready) ? String(U.getLanguage()) : \"en\";\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": [],
+      "group": "Player and device"
+    },
+    {
+      "description": "Reads a value from a share link that was made with the SDK (empty when it is not there).",
+      "fullName": "Share link value",
+      "functionType": "StringExpression",
+      "name": "UrlParameter",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\nlet r = \"\";\nif (gd && gd.ready) { const v = U.getURLParam(String(eventsFunctionContext.getArgument(\"Name\"))); if (v !== undefined) r = String(v); }\neventsFunctionContext.returnValue = r;\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Value name",
+          "name": "Name",
+          "type": "string",
+          "longDescription": "",
+          "optional": false,
+          "supplementaryInformation": ""
+        }
+      ],
+      "objectGroups": [],
+      "group": "Player and device"
+    },
+    {
+      "description": "Sends your own event, for example level_complete. Name up to 40 characters. Stats come later.",
+      "fullName": "Send an event",
+      "functionType": "Action",
+      "name": "Track",
+      "private": false,
+      "sentence": "Send event _PARAM1_",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\nif (gd && U && gd.ready) {\nU.track(String(eventsFunctionContext.getArgument(\"Name\")));\n} else { console.warn('[Untils] Use the action \"Start UNTILS SDK\" first and wait until \"UNTILS SDK is ready\".'); }\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [
+        {
+          "description": "Event name",
+          "name": "Name",
+          "type": "string",
+          "longDescription": "",
+          "optional": false,
+          "supplementaryInformation": ""
+        }
+      ],
+      "objectGroups": [],
+      "group": "Events and ads"
+    },
+    {
+      "description": "Ads are not live yet, so the game simply continues. When ads go live, your game already works.",
+      "fullName": "Show an ad between levels",
+      "functionType": "Action",
+      "name": "ShowInterstitialAd",
+      "private": false,
+      "sentence": "Show an ad between levels",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\nif (gd && U && gd.ready) {\nU.showAd(\"interstitial\");\n} else { console.warn('[Untils] Use the action \"Start UNTILS SDK\" first and wait until \"UNTILS SDK is ready\".'); }\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": [],
+      "group": "Events and ads"
+    },
+    {
+      "description": "The version of the UNTILS HTML SDK inside this extension.",
+      "fullName": "SDK version",
+      "functionType": "StringExpression",
+      "name": "SDKVersion",
+      "private": false,
+      "sentence": "",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "const gd = window.UntilsGD;\nconst U = window.Untils;\neventsFunctionContext.returnValue = (window.Untils && window.Untils.version) ? String(window.Untils.version) : \"\";\n",
+          "parameterObjects": "",
+          "useStrict": true,
+          "eventsSheetExpanded": true
+        }
+      ],
+      "parameters": [],
+      "objectGroups": [],
+      "group": "Start"
+    }
+  ],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": []
+}
